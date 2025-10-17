@@ -1,6 +1,4 @@
 import { Platform } from 'react-native';
-import * as FileSystem from 'expo-file-system';
-import * as Sharing from 'expo-sharing';
 import { T2125Data, formatCurrency, formatPercent } from './mapper';
 
 export function generateT2125HTML(data: T2125Data): string {
@@ -446,6 +444,10 @@ export async function downloadHTML(htmlContent: string, filename: string = 't212
     link.click();
     document.body.removeChild(link);
   } else {
+    // Dynamic imports for native modules
+    const FileSystem = await import('expo-file-system');
+    const Sharing = await import('expo-sharing');
+
     const fileUri = FileSystem.documentDirectory + filename;
     await FileSystem.writeAsStringAsync(fileUri, htmlContent, {
       encoding: FileSystem.EncodingType.UTF8,
