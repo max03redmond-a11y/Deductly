@@ -1,4 +1,3 @@
-import { Platform } from 'react-native';
 import { T2125Data, formatCurrency, formatPercent } from './mapper';
 
 export interface T2125CSVRow {
@@ -399,30 +398,15 @@ export function generateT2125CSV(data: T2125Data): string {
 }
 
 export async function downloadCSV(csvContent: string, filename: string = 't2125_export.csv') {
-  if (Platform.OS === 'web') {
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
 
-    link.setAttribute('href', url);
-    link.setAttribute('download', filename);
-    link.style.visibility = 'hidden';
+  link.setAttribute('href', url);
+  link.setAttribute('download', filename);
+  link.style.visibility = 'hidden';
 
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  } else {
-    // Dynamic imports for native modules
-    const FileSystem = await import('expo-file-system');
-    const Sharing = await import('expo-sharing');
-
-    const fileUri = FileSystem.documentDirectory + filename;
-    await FileSystem.writeAsStringAsync(fileUri, csvContent, {
-      encoding: FileSystem.EncodingType.UTF8,
-    });
-
-    if (await Sharing.isAvailableAsync()) {
-      await Sharing.shareAsync(fileUri);
-    }
-  }
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
