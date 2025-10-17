@@ -420,11 +420,7 @@ export async function downloadCSV(csvContent: string, filename: string = 't2125_
     });
 
     if (await Sharing.isAvailableAsync()) {
-      await Sharing.shareAsync(fileUri, {
-        mimeType: 'text/csv',
-        dialogTitle: 'Export T2125 Data',
-        UTI: 'public.comma-separated-values-text',
-      });
+      await Sharing.shareAsync(fileUri);
     }
   }
 }

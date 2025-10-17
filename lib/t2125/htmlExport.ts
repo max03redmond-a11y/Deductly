@@ -452,11 +452,7 @@ export async function downloadHTML(htmlContent: string, filename: string = 't212
     });
 
     if (await Sharing.isAvailableAsync()) {
-      await Sharing.shareAsync(fileUri, {
-        mimeType: 'text/html',
-        dialogTitle: 'Export T2125 Report',
-        UTI: 'public.html',
-      });
+      await Sharing.shareAsync(fileUri);
     }
   }
 }
