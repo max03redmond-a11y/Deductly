@@ -1,3 +1,6 @@
+import { Platform } from 'react-native';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 import { T2125Data, formatCurrency, formatPercent } from './mapper';
 
 export function generateT2125HTML(data: T2125Data): string {
@@ -430,15 +433,30 @@ export function generateT2125HTML(data: T2125Data): string {
 }
 
 export async function downloadHTML(htmlContent: string, filename: string = 't2125_report.html') {
-  const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8;' });
-  const link = document.createElement('a');
-  const url = URL.createObjectURL(blob);
+  if (Platform.OS === 'web') {
+    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
 
-  link.setAttribute('href', url);
-  link.setAttribute('download', filename);
-  link.style.visibility = 'hidden';
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
 
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } else {
+    const fileUri = FileSystem.documentDirectory + filename;
+    await FileSystem.writeAsStringAsync(fileUri, htmlContent, {
+      encoding: FileSystem.EncodingType.UTF8,
+    });
+
+    if (await Sharing.isAvailableAsync()) {
+      await Sharing.shareAsync(fileUri, {
+        mimeType: 'text/html',
+        dialogTitle: 'Export T2125 Report',
+        UTI: 'public.html',
+      });
+    }
+  }
 }
