@@ -27,7 +27,7 @@ const SAMPLE_PARTNERS: ReferralPartner[] = [
     description: 'Start investing with automated portfolios',
     logo_url: null,
     offer_text: 'Open a TFSA or RRSP and get $25 bonus when you invest $100+',
-    referral_url: 'https://example.com/wealthsimple',
+    referral_url: 'https://www.wealthsimple.com/invite/9WT8PA',
     commission_amount: 10,
     is_active: true,
     sort_order: 2,

@@ -61,7 +61,7 @@ INSERT INTO referrals (title, description, reward_text, logo_url, link_url, disp
     'Invest in stocks, ETFs, and crypto. Build wealth for your future with low fees and smart portfolios.',
     'Get $25 when you sign up and fund your account',
     'https://cdn.wealthsimple.com/assets/logo.svg',
-    'https://www.wealthsimple.com/en-ca',
+    'https://www.wealthsimple.com/invite/9WT8PA',
     1
   ),
   (
