@@ -50,11 +50,14 @@ export interface T2125Data {
     line9060_salariesWages: number;
     line9180_propertyTaxes: number;
     line9200_travelExpenses: number;
+    line9225_telephone: number;
     line9220_utilities: number;
     line9224_fuelCosts: number;
+    line9270_other: number;
     line9275_deliveryFreight: number;
     line9281_motorVehicleExpenses: number;
     line9936_cca: number;
+    line9945_homeOffice: number;
     line9368_totalExpenses: number;
   };
   expenseDetails: ExpenseDetail[];
@@ -78,25 +81,49 @@ export interface T2125Data {
 
 export function mapExpenseToT2125Line(categoryCode: string): keyof T2125Data['expenses'] | null {
   const mapping: Record<string, keyof T2125Data['expenses']> = {
+    'ADVERTISING_PROMOS': 'line8521_advertising',
     '8521': 'line8521_advertising',
+    'MEALS_CLIENT': 'line8523_mealsEntertainment',
     '8523': 'line8523_mealsEntertainment',
     '8590': 'line8590_badDebts',
     '8690': 'line8690_insurance',
+    'BANK_FEES_INTEREST': 'line8710_interestBankCharges',
+    'LOAN_INTEREST': 'line8710_interestBankCharges',
     '8710': 'line8710_interestBankCharges',
+    'LIC_REG': 'line8760_businessTaxesLicences',
     '8760': 'line8760_businessTaxesLicences',
     '8810': 'line8810_officeExpenses',
+    'SUPPLIES': 'line8811_officeStationery',
+    'CLEANING_SUPPLIES': 'line8811_officeStationery',
     '8811': 'line8811_officeStationery',
+    'ACCOUNTING_SOFTWARE': 'line8860_professionalFees',
     '8860': 'line8860_professionalFees',
+    'UBER_FEES': 'line8871_managementFees',
     '8871': 'line8871_managementFees',
     '8910': 'line8910_rent',
     '8960': 'line8960_repairsMaintenance',
     '9060': 'line9060_salariesWages',
     '9180': 'line9180_propertyTaxes',
     '9200': 'line9200_travelExpenses',
+    'PHONE_PLAN_DATA': 'line9225_telephone',
+    'INTERNET_BUSINESS': 'line9225_telephone',
+    '9225': 'line9225_telephone',
     '9220': 'line9220_utilities',
     '9224': 'line9224_fuelCosts',
+    'TRAINING_EDU': 'line9270_other',
+    '9270': 'line9270_other',
     '9275': 'line9275_deliveryFreight',
+    'GAS_FUEL': 'line9281_motorVehicleExpenses',
+    'REPAIRS_MAINT': 'line9281_motorVehicleExpenses',
+    'INSURANCE_AUTO': 'line9281_motorVehicleExpenses',
+    'CAR_WASH': 'line9281_motorVehicleExpenses',
+    'PARKING_TOLLS': 'line9281_motorVehicleExpenses',
+    'LEASE_PAYMENTS': 'line9281_motorVehicleExpenses',
     '9281': 'line9281_motorVehicleExpenses',
+    'VEHICLE_DEPRECIATION_CCA': 'line9936_cca',
+    '9936': 'line9936_cca',
+    'HOME_OFFICE': 'line9945_homeOffice',
+    '9945': 'line9945_homeOffice',
   };
 
   return mapping[categoryCode] || null;
@@ -118,8 +145,9 @@ export function generateT2125Data(
 
   expenses.forEach((expense) => {
     const lineKey = mapExpenseToT2125Line(expense.category_code || expense.category);
-    if (lineKey) {
-      expensesByLine[lineKey] = (expensesByLine[lineKey] || 0) + (expense.deductible_amount || 0);
+    if (lineKey && lineKey !== 'line9936_cca') {
+      const deductible = expense.deductible_amount || (expense.amount * (expense.business_percentage / 100));
+      expensesByLine[lineKey] = (expensesByLine[lineKey] || 0) + deductible;
     }
   });
 
@@ -131,26 +159,31 @@ export function generateT2125Data(
     ? (mileageTotals.business / mileageTotals.total) * 100
     : 0;
 
-  const vehicleExpenses = expenses.filter((e) =>
-    ['9210', '9220', '9275'].includes(e.category_code || e.category)
-  );
-
   const vehicleFuel = expenses
-    .filter((e) => e.category_code === '9210')
-    .reduce((sum, e) => sum + (e.deductible_amount || 0), 0);
+    .filter((e) => e.category_code === 'GAS_FUEL')
+    .reduce((sum, e) => sum + (e.deductible_amount || (e.amount * (e.business_percentage / 100))), 0);
 
   const vehicleInsurance = expenses
-    .filter((e) => e.category_code === '9220')
-    .reduce((sum, e) => sum + (e.deductible_amount || 0), 0);
+    .filter((e) => e.category_code === 'INSURANCE_AUTO')
+    .reduce((sum, e) => sum + (e.deductible_amount || (e.amount * (e.business_percentage / 100))), 0);
 
   const vehicleMaintenance = expenses
-    .filter((e) => e.category_code === '9275')
-    .reduce((sum, e) => sum + (e.deductible_amount || 0), 0);
+    .filter((e) => ['REPAIRS_MAINT', 'CAR_WASH'].includes(e.category_code || ''))
+    .reduce((sum, e) => sum + (e.deductible_amount || (e.amount * (e.business_percentage / 100))), 0);
 
-  const totalVehicleExpenses = vehicleFuel + vehicleInsurance + vehicleMaintenance;
-  const businessVehicleExpenses = totalVehicleExpenses * (businessUsePercent / 100);
+  const vehicleLicence = expenses
+    .filter((e) => e.category_code === 'LIC_REG')
+    .reduce((sum, e) => sum + (e.deductible_amount || (e.amount * (e.business_percentage / 100))), 0);
 
-  expensesByLine.line9281_motorVehicleExpenses = businessVehicleExpenses;
+  const vehicleParking = expenses
+    .filter((e) => e.category_code === 'PARKING_TOLLS')
+    .reduce((sum, e) => sum + (e.deductible_amount || (e.amount * (e.business_percentage / 100))), 0);
+
+  const vehicleLease = expenses
+    .filter((e) => e.category_code === 'LEASE_PAYMENTS')
+    .reduce((sum, e) => sum + (e.deductible_amount || (e.amount * (e.business_percentage / 100))), 0);
+
+  const totalVehicleExpenses = vehicleFuel + vehicleInsurance + vehicleMaintenance + vehicleLicence + vehicleParking + vehicleLease;
 
   const ccaDeduction = calculateCCADeduction(assets, filter);
   expensesByLine.line9936_cca = ccaDeduction;
@@ -160,10 +193,14 @@ export function generateT2125Data(
   const netIncomeBeforeAdjustments = totalIncome - totalExpenses;
 
   const expenseDetails: ExpenseDetail[] = expenses
+    .filter((e) => e.category_code !== 'VEHICLE_DEPRECIATION_CCA')
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     .map((expense) => {
       const categoryCode = expense.category_code || expense.category;
-      const lineNumber = categoryCode || 'N/A';
+      const lineKey = mapExpenseToT2125Line(categoryCode);
+      const lineNumber = expense.category_code?.match(/^\d{4}$/)
+        ? expense.category_code
+        : lineKey?.replace('line', '').replace(/_.*/, '') || 'N/A';
 
       return {
         id: expense.id,
@@ -179,20 +216,37 @@ export function generateT2125Data(
       };
     });
 
+  const businessTypes: Record<string, string> = {
+    rideshare: 'Rideshare Driver (Uber/Lyft)',
+    delivery: 'Delivery Driver (DoorDash/Skip)',
+    courier: 'Courier Service',
+    freelance: 'Freelance/Contractor',
+    other: 'Self-Employed',
+  };
+
+  const mainService = businessTypes[profile?.business_type || ''] || 'Rideshare Driver';
+
+  const formatAddress = () => {
+    if (!profile?.mailing_address_line1) return '—';
+    const parts = [profile.mailing_address_line1];
+    if (profile.mailing_address_line2) parts.push(profile.mailing_address_line2);
+    return parts.join(', ');
+  };
+
   return {
     identification: {
-      yourName: profile?.full_name || '',
-      sin: profile?.sin || '',
-      businessName: profile?.business_name || '',
-      businessNumber: profile?.business_number || '',
-      businessAddress: profile?.business_address || '',
-      city: profile?.city || '',
+      yourName: profile?.legal_name || profile?.full_name || '—',
+      sin: '—',
+      businessName: profile?.business_name || '—',
+      businessNumber: profile?.business_number || '—',
+      businessAddress: formatAddress(),
+      city: profile?.mailing_city || '—',
       province: profile?.province || 'ON',
-      postalCode: profile?.postal_code || '',
-      fiscalPeriodStart: `${currentYear}0101`,
-      fiscalPeriodEnd: `${currentYear}1231`,
-      mainProductService: profile?.main_business_activity || 'Rideshare Driver',
-      industryCode: profile?.industry_code || '',
+      postalCode: profile?.mailing_postal_code || '—',
+      fiscalPeriodStart: profile?.fiscal_year_start || `${currentYear}-01-01`,
+      fiscalPeriodEnd: profile?.fiscal_year_end_date || `${currentYear}-12-31`,
+      mainProductService: mainService,
+      industryCode: profile?.naics_code || '485310',
     },
     income: {
       line8000_grossIncome: totalIncome,
@@ -214,11 +268,14 @@ export function generateT2125Data(
       line9060_salariesWages: expensesByLine.line9060_salariesWages || 0,
       line9180_propertyTaxes: expensesByLine.line9180_propertyTaxes || 0,
       line9200_travelExpenses: expensesByLine.line9200_travelExpenses || 0,
+      line9225_telephone: expensesByLine.line9225_telephone || 0,
       line9220_utilities: expensesByLine.line9220_utilities || 0,
       line9224_fuelCosts: expensesByLine.line9224_fuelCosts || 0,
+      line9270_other: expensesByLine.line9270_other || 0,
       line9275_deliveryFreight: expensesByLine.line9275_deliveryFreight || 0,
       line9281_motorVehicleExpenses: expensesByLine.line9281_motorVehicleExpenses || 0,
       line9936_cca: expensesByLine.line9936_cca || 0,
+      line9945_homeOffice: expensesByLine.line9945_homeOffice || 0,
       line9368_totalExpenses: totalExpenses,
     },
     expenseDetails,
@@ -228,11 +285,11 @@ export function generateT2125Data(
       businessUsePercent: businessUsePercent,
       fuelOil: vehicleFuel,
       insurance: vehicleInsurance,
-      licence: 0,
+      licence: vehicleLicence,
       maintenance: vehicleMaintenance,
       electricity: 0,
       totalExpenses: totalVehicleExpenses,
-      businessPortion: businessVehicleExpenses,
+      businessPortion: totalVehicleExpenses,
     },
     netIncome: {
       line9369_netIncomeBeforeAdjustments: netIncomeBeforeAdjustments,
