@@ -79,13 +79,28 @@ export default function ExportModal({ visible, onClose }: ExportModalProps) {
       const income = (incomeRes.data || []) as IncomeRecord[];
       const mileage = (mileageRes.data || []) as MileageLog[];
 
+      console.log('Export data counts:', {
+        expenses: expenses.length,
+        income: income.length,
+        mileage: mileage.length,
+        assets: assets.length,
+      });
+
       const t2125Data = generateT2125Data(profile, expenses, income, mileage, assets);
+
+      console.log('T2125 generated:', {
+        name: t2125Data.identification.yourName,
+        totalIncome: t2125Data.income.line8299_grossBusinessIncome,
+        totalExpenses: t2125Data.expenses.line9368_totalExpenses,
+      });
 
       const filename = `T2125_${currentYear}_${lastName}`;
 
       switch (selectedFormat) {
         case 'pdf': {
           const pdfHTML = generateT2125PDF(t2125Data);
+          console.log('HTML generated, length:', pdfHTML.length);
+          console.log('HTML starts with:', pdfHTML.substring(0, 200));
           await exportT2125AsPDF(pdfHTML, `${filename}.pdf`);
           showToast('PDF export started! Check your downloads or print dialog.', 'success');
           break;

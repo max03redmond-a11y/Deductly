@@ -655,14 +655,23 @@ export function generateT2125PDF(data: T2125Data): string {
 
 export async function exportT2125AsPDF(htmlContent: string, filename: string = 't2125_report.pdf') {
   if (Platform.OS === 'web') {
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      printWindow.document.write(htmlContent);
-      printWindow.document.close();
-      printWindow.onload = () => {
-        printWindow.print();
-      };
-    }
+    // Download as HTML file - user can then print or view in browser
+    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename.replace('.pdf', '.html'));
+    link.style.visibility = 'hidden';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Clean up the URL object
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+    }, 100);
   } else {
     const fileUri = FileSystem.documentDirectory + filename.replace('.pdf', '.html');
     await FileSystem.writeAsStringAsync(fileUri, htmlContent, {
