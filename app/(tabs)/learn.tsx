@@ -147,74 +147,80 @@ export default function LearnScreen() {
         return (
           <View style={styles.content}>
             <Text style={styles.emoji}>🧾</Text>
-            <Text style={styles.contentTitle}>Proper Expense & Mileage Tracking</Text>
+            <Text style={styles.contentTitle}>Tracking Expenses & Mileage</Text>
 
             <Text style={styles.paragraph}>
-              To claim deductions, the CRA requires proof that your expenses are business-related. Proper tracking ensures you can back up every claim if asked.
+              In Deductly Beta, everything needs to be logged manually — but doing it right now saves you hours later at tax time. The CRA requires you to keep detailed records for all your self-employment expenses and mileage.
             </Text>
 
-            <Text style={styles.subheading}>What to Track:</Text>
+            <Text style={styles.sectionHeader}>🧾 1. Logging Expenses</Text>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                <Text style={styles.bold}>Fuel & Oil:</Text> Every gas purchase related to rides or deliveries.
+                Each time you pay for something work-related (gas, oil changes, repairs, insurance, phone bill, parking, etc.), add a new expense entry in the app.
               </Text>
             </View>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                <Text style={styles.bold}>Maintenance & Repairs:</Text> Oil changes, tires, brake work, cleaning, detailing.
+                Record the date, amount, and a short description like "Gas – Shell Station."
               </Text>
             </View>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                <Text style={styles.bold}>Insurance & Licensing:</Text> Vehicle insurance, Uber or commercial licenses.
+                Select the correct category so it exports properly to your CRA T2125 later.
+              </Text>
+            </View>
+
+            <View style={styles.infoBox}>
+              <Text style={styles.infoBoxTitle}>💡 Keep every receipt.</Text>
+              <Text style={styles.infoBoxText}>
+                The CRA can request proof for up to 6 years. Snap photos of all paper receipts or upload screenshots for digital ones. Deductly stores them securely so you never lose evidence of your claims.
+              </Text>
+            </View>
+
+            <Text style={styles.sectionHeader}>🚗 2. Tracking Mileage</Text>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                Log each trip's start and end odometer readings in the Mileage tab.
               </Text>
             </View>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                <Text style={styles.bold}>Phone & Data:</Text> The portion used for your rideshare or delivery work.
+                Include a brief note for each trip (e.g., "Airport rides – 4 trips").
               </Text>
             </View>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                <Text style={styles.bold}>Car Washes & Parking:</Text> Small costs that add up over the year.
-              </Text>
-            </View>
-
-            <Text style={styles.subheading}>Mileage Tracking:</Text>
-
-            <View style={styles.bulletPoint}>
-              <Text style={styles.bullet}>•</Text>
-              <Text style={styles.bulletText}>
-                Log your start and end odometer readings at the beginning and end of each trip or day.
+                At year-end, Deductly calculates your business-use percentage, which determines how much of your car expenses are deductible.
               </Text>
             </View>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                Deductly will calculate your business-use % (e.g., 70% business, 30% personal).
+                Try to record your mileage daily or weekly for accuracy — it's much easier than catching up months later.
               </Text>
             </View>
 
-            <View style={styles.bulletPoint}>
-              <Text style={styles.bullet}>•</Text>
-              <Text style={styles.bulletText}>
-                This % is applied across all vehicle-related expenses to calculate your CRA-eligible deductions.
-              </Text>
-            </View>
+            <Text style={styles.sectionHeader}>🧮 3. Why Accurate Tracking Matters</Text>
+
+            <Text style={styles.paragraph}>
+              The more precise your records, the larger your legal deductions and the smaller your audit risk. Every kilometer and every receipt adds up to real tax savings.
+            </Text>
 
             <Text style={[styles.paragraph, styles.highlight]}>
-              The more accurately you track, the more you save — and the easier your tax season becomes.
+              Deductly helps you stay organized — all your income, expenses, and mileage are stored together so your export to the T2125 is accurate and CRA-ready.
             </Text>
           </View>
         );
