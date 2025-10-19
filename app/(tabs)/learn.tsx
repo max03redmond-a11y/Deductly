@@ -406,74 +406,153 @@ export default function LearnScreen() {
         return (
           <View style={styles.content}>
             <Text style={styles.emoji}>💰</Text>
-            <Text style={styles.contentTitle}>Tips to Maximize Deductions</Text>
+            <Text style={styles.contentTitle}>Maximize Your Deductions</Text>
 
             <Text style={styles.paragraph}>
-              Smart recordkeeping means bigger refunds and fewer headaches. Here's how to maximize your deductions:
+              Every dollar you track matters. As a self-employed driver, your taxes are based on profit (income minus expenses) — so the more expenses you claim, the less tax you pay.
             </Text>
 
-            <View style={styles.tipCard}>
-              <Text style={styles.checkmark}>✅</Text>
-              <View style={styles.tipContent}>
-                <Text style={styles.tipTitle}>Track Every Trip</Text>
-                <Text style={styles.tipText}>
-                  Use Deductly's mileage tracker for every business drive. Even short trips matter.
-                </Text>
-              </View>
+            <Text style={styles.paragraph}>
+              Deductly helps you stay organized so you can legally reduce your tax bill and keep more of what you earn.
+            </Text>
+
+            <Text style={styles.sectionHeader}>🧾 1. Track Everything, Big or Small</Text>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                Every tank of gas, parking fee, car wash, and oil change counts.
+              </Text>
             </View>
 
-            <View style={styles.tipCard}>
-              <Text style={styles.checkmark}>✅</Text>
-              <View style={styles.tipContent}>
-                <Text style={styles.tipTitle}>Snap Every Receipt</Text>
-                <Text style={styles.tipText}>
-                  Gas, maintenance, parking, and even car washes are deductible. Upload a quick photo — no more lost papers.
-                </Text>
-              </View>
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                Even small daily expenses can add up to hundreds in savings.
+              </Text>
             </View>
 
-            <View style={styles.tipCard}>
-              <Text style={styles.checkmark}>✅</Text>
-              <View style={styles.tipContent}>
-                <Text style={styles.tipTitle}>Separate Business & Personal Spending</Text>
-                <Text style={styles.tipText}>
-                  Use a different card or account for your rideshare work to make recordkeeping cleaner.
-                </Text>
-              </View>
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                Use Deductly to log each expense right when it happens — it's easier than catching up later.
+              </Text>
             </View>
 
-            <View style={styles.tipCard}>
-              <Text style={styles.checkmark}>✅</Text>
-              <View style={styles.tipContent}>
-                <Text style={styles.tipTitle}>Claim Phone & Internet</Text>
-                <Text style={styles.tipText}>
-                  Estimate how much of your phone and data plan you use for work (usually 50–70%) and record it in Deductly.
-                </Text>
-              </View>
+            <View style={styles.infoBox}>
+              <Text style={styles.infoBoxTitle}>💡 Tip: Keep your receipts organized</Text>
+              <Text style={styles.infoBoxText}>
+                Upload photos in Deductly. The CRA can ask for proof for up to 6 years.
+              </Text>
             </View>
 
-            <View style={styles.tipCard}>
-              <Text style={styles.checkmark}>✅</Text>
-              <View style={styles.tipContent}>
-                <Text style={styles.tipTitle}>Don't Miss Home Office Deductions</Text>
-                <Text style={styles.tipText}>
-                  If you manage bookings or accounting from home, you may be able to claim a portion of your rent, utilities, and internet.
-                </Text>
-              </View>
+            <Text style={styles.sectionHeader}>🚗 2. Maximize Your Mileage</Text>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                Record your start and end odometer readings every day or each trip.
+              </Text>
             </View>
 
-            <View style={styles.tipCard}>
-              <Text style={styles.checkmark}>✅</Text>
-              <View style={styles.tipContent}>
-                <Text style={styles.tipTitle}>Check Your Summary Often</Text>
-                <Text style={styles.tipText}>
-                  Deductly's dashboard shows your estimated deductions and potential tax savings in real time.
-                </Text>
-              </View>
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                The higher your business-use percentage, the more of your car expenses you can deduct.
+              </Text>
             </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                <Text style={styles.bold}>Example:</Text> If 80% of your driving is for Uber, 80% of your fuel, insurance, and maintenance costs are deductible.
+              </Text>
+            </View>
+
+            <View style={styles.infoBox}>
+              <Text style={styles.infoBoxTitle}>💡 Tip: Make a habit</Text>
+              <Text style={styles.infoBoxText}>
+                Log mileage whenever you refuel or start your day.
+              </Text>
+            </View>
+
+            <Text style={styles.sectionHeader}>📱 3. Claim Phone and Data</Text>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                The CRA allows you to deduct part of your cell phone bill used for rideshare work.
+              </Text>
+            </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                Estimate the business-use percentage (usually 50–70%) and apply it to your monthly bill.
+              </Text>
+            </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                Include any extra data costs or navigation subscriptions.
+              </Text>
+            </View>
+
+            <Text style={styles.sectionHeader}>🏠 4. Don't Miss Home Office Deductions</Text>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                If you manage your rides, bookings, or accounting from home, you may claim part of your rent, utilities, or internet.
+              </Text>
+            </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                Calculate your workspace percentage (e.g., 10% of your home) and apply that to those bills.
+              </Text>
+            </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                Keep a simple note in Deductly to remember which expenses you claimed.
+              </Text>
+            </View>
+
+            <Text style={styles.sectionHeader}>📊 5. Review Your Totals Regularly</Text>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                Open your Reports page often to see your estimated deductions and business-use percentage.
+              </Text>
+            </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                Check for missing expenses or trips to make sure nothing is left out.
+              </Text>
+            </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                The more complete your records, the smoother your tax filing — and the bigger your legal deductions.
+              </Text>
+            </View>
+
+            <Text style={styles.subheading}>✅ Remember:</Text>
+
+            <Text style={styles.paragraph}>
+              Deductly doesn't just record your data — it turns your effort into savings.
+            </Text>
 
             <Text style={[styles.paragraph, styles.highlight]}>
-              More tracking = more deductions = less tax.
+              By keeping detailed logs, receipts, and mileage, you can confidently export your T2125 knowing you've claimed every deduction you're entitled to.
             </Text>
           </View>
         );
