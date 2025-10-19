@@ -23,6 +23,7 @@ export default function TabLayout() {
           fontWeight: theme.typography.fontWeight.medium,
           marginBottom: 4,
         },
+        swipeEnabled: false,
       }}
     >
       <Tabs.Screen

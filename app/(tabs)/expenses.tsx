@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, Platform } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Plus, Receipt, Trash2, Car } from 'lucide-react-native';
 import { Expense, EXPENSE_CATEGORIES, MileageLog } from '@/types/database';
@@ -8,9 +9,8 @@ import { EnhancedExpenseModal } from '@/components/EnhancedExpenseModal';
 import { PageHeader } from '@/components/PageHeader';
 import { EmptyState } from '@/components/EmptyState';
 
-const DEFAULT_USER_ID = '63dca12f-937b-4760-8f7d-c50dafcaaef3';
-
 export default function ExpensesScreen() {
+  const { profile } = useAuth();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -18,24 +18,26 @@ export default function ExpensesScreen() {
   const [businessUsePercent, setBusinessUsePercent] = useState(0);
 
   const loadExpenses = useCallback(async () => {
+    if (!profile) return;
+
     const currentYear = new Date().getFullYear();
 
     const [expensesRes, mileageRes, mileageSettingsRes] = await Promise.all([
       supabase
         .from('expenses')
         .select('*')
-        .eq('user_id', DEFAULT_USER_ID)
+        .eq('user_id', profile.id)
         .order('date', { ascending: false }),
       supabase
         .from('mileage_logs')
         .select('*')
-        .eq('user_id', DEFAULT_USER_ID)
+        .eq('user_id', profile.id)
         .gte('date', `${currentYear}-01-01`)
         .lte('date', `${currentYear}-12-31`),
       supabase
         .from('mileage_settings')
         .select('jan1_odometer_km, current_odometer_km')
-        .eq('user_id', DEFAULT_USER_ID)
+        .eq('user_id', profile.id)
         .eq('year', currentYear)
         .maybeSingle(),
     ]);
@@ -63,7 +65,7 @@ export default function ExpensesScreen() {
     }
 
     setLoading(false);
-  }, []);
+  }, [profile]);
 
   useEffect(() => {
     loadExpenses();

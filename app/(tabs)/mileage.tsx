@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput, Switch, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Car, Plus, Calendar } from 'lucide-react-native';
 import { showToast } from '@/lib/toast';
@@ -19,9 +20,8 @@ interface MileageLog {
   updated_at: string;
 }
 
-const DEFAULT_USER_ID = '63dca12f-937b-4760-8f7d-c50dafcaaef3';
-
 export default function MileageScreen() {
+  const { profile } = useAuth();
   const currentYear = new Date().getFullYear();
 
   const [logs, setLogs] = useState<MileageLog[]>([]);
@@ -40,18 +40,20 @@ export default function MileageScreen() {
   const [useOdometer, setUseOdometer] = useState(false);
 
   const loadData = useCallback(async () => {
+    if (!profile) return;
+
     const [logsRes, settingsRes] = await Promise.all([
       supabase
         .from('mileage_logs')
         .select('*')
-        .eq('user_id', DEFAULT_USER_ID)
+        .eq('user_id', profile.id)
         .gte('date', `${currentYear}-01-01`)
         .lte('date', `${currentYear}-12-31`)
         .order('date', { ascending: false }),
       supabase
         .from('mileage_settings')
         .select('*')
-        .eq('user_id', DEFAULT_USER_ID)
+        .eq('user_id', profile.id)
         .eq('year', currentYear)
         .maybeSingle(),
     ]);
@@ -69,7 +71,7 @@ export default function MileageScreen() {
     }
 
     setLoading(false);
-  }, [currentYear]);
+  }, [profile, currentYear]);
 
   useEffect(() => {
     loadData();
@@ -94,11 +96,13 @@ export default function MileageScreen() {
     : 0;
 
   const saveYearOdometer = async (startKm: string, endKm: string) => {
+    if (!profile) return;
+
     const startNum = parseFloat(startKm) || 0;
     const endNum = parseFloat(endKm) || 0;
 
     const dataToSave = {
-      user_id: DEFAULT_USER_ID,
+      user_id: profile.id,
       year: currentYear,
       jan1_odometer_km: startNum,
       current_odometer_km: endNum,
@@ -125,6 +129,7 @@ export default function MileageScreen() {
   };
 
   const handleAddTrip = async () => {
+    if (!profile) return;
 
     let distanceNum: number;
     let startOdoNum = 0;
@@ -162,7 +167,7 @@ export default function MileageScreen() {
     const { error } = await supabase
       .from('mileage_logs')
       .insert([{
-        user_id: DEFAULT_USER_ID,
+        user_id: profile.id,
         date: tripDate,
         start_odometer: startOdoNum,
         end_odometer: endOdoNum,

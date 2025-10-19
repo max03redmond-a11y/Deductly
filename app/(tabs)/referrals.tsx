@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Share, Image } from 'react-native';
+import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Gift, Users, ExternalLink, Copy, TrendingUp, Shield, Building2 } from 'lucide-react-native';
 import { ReferralPartner, UserReferral, REFERRAL_CATEGORIES } from '@/types/database';
@@ -63,9 +64,8 @@ const SAMPLE_PARTNERS: ReferralPartner[] = [
   },
 ];
 
-const DEFAULT_USER_ID = '63dca12f-937b-4760-8f7d-c50dafcaaef3';
-
 export default function ReferralsScreen() {
+  const { profile } = useAuth();
   const [partners, setPartners] = useState<ReferralPartner[]>(SAMPLE_PARTNERS);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [userReferralCode, setUserReferralCode] = useState<string>('');
@@ -76,10 +76,12 @@ export default function ReferralsScreen() {
   }, []);
 
   const loadUserReferrals = async () => {
+    if (!profile) return;
+
     const { data, error } = await supabase
       .from('user_referrals')
       .select('*')
-      .eq('user_id', DEFAULT_USER_ID)
+      .eq('user_id', profile.id)
       .eq('referral_type', 'user_to_user')
       .maybeSingle();
 
@@ -92,12 +94,13 @@ export default function ReferralsScreen() {
   };
 
   const generateReferralCode = async () => {
+    if (!profile) return '';
 
     const { data, error } = await supabase.rpc('generate_referral_code');
 
     if (data) {
       await supabase.from('user_referrals').insert({
-        user_id: DEFAULT_USER_ID,
+        user_id: profile.id,
         referral_code: data,
         referral_type: 'user_to_user',
         status: 'pending',

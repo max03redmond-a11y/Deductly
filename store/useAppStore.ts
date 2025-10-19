@@ -7,21 +7,55 @@ import { generateDemoData, clearDemoData } from '@/lib/demoData';
 import { AppStore } from '@/types/store';
 import { Expense } from '@/types/database';
 
-const DEFAULT_USER_ID = '63dca12f-937b-4760-8f7d-c50dafcaaef3';
-
 export const useAppStore = create<AppStore>((set, get) => ({
-  // Auth State (deprecated but kept for compatibility)
+  // Auth State
   user: null,
   profile: null,
-  isLoggedIn: true,
-  loading: false,
+  isLoggedIn: false,
+  loading: true,
 
-  setUser: (user) => set({ user, isLoggedIn: true }),
+  setUser: (user) => set({ user, isLoggedIn: !!user }),
   setProfile: (profile) => set({ profile }),
   setLoading: (loading) => set({ loading }),
 
   logout: async (clearData = false) => {
-    console.log('Logout not available without authentication');
+    try {
+      set({ loading: true });
+
+      if (clearData) {
+        const userId = get().user?.id;
+        if (userId) {
+          // Clear all user data from Supabase
+          await Promise.all([
+            supabase.from('expenses').delete().eq('user_id', userId),
+            supabase.from('income_records').delete().eq('user_id', userId),
+            supabase.from('mileage_logs').delete().eq('user_id', userId),
+          ]);
+
+          // Clear local storage
+          await storage.remove(STORAGE_KEYS.EXPENSES_BACKUP);
+          await storage.remove(STORAGE_KEYS.DEMO_MODE);
+        }
+      }
+
+      await supabase.auth.signOut();
+
+      set({
+        user: null,
+        profile: null,
+        isLoggedIn: false,
+        items: [],
+        demoModeEnabled: false,
+        loading: false,
+      });
+
+      router.replace('/auth/sign-in');
+      showToast('Logged out successfully', 'success');
+    } catch (error: any) {
+      console.error('Logout error:', error);
+      showToast('Failed to logout: ' + error.message, 'error');
+      set({ loading: false });
+    }
   },
 
   // Expenses State
@@ -36,7 +70,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   },
 
   removeExpense: async (id: string) => {
-    const { items } = get();
+    const { items, user } = get();
     const expenseToDelete = items.find((e) => e.id === id);
 
     if (!expenseToDelete) {
@@ -53,7 +87,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
         .from('expenses')
         .delete()
         .eq('id', id)
-        .eq('user_id', DEFAULT_USER_ID);
+        .eq('user_id', user?.id);
 
       if (error) throw error;
 
@@ -69,8 +103,11 @@ export const useAppStore = create<AppStore>((set, get) => ({
   },
 
   clearExpenses: async () => {
+    const userId = get().user?.id;
+    if (!userId) return;
+
     try {
-      await supabase.from('expenses').delete().eq('user_id', DEFAULT_USER_ID);
+      await supabase.from('expenses').delete().eq('user_id', userId);
       set({ items: [] });
       showToast('All expenses cleared', 'success');
     } catch (error: any) {
@@ -80,11 +117,17 @@ export const useAppStore = create<AppStore>((set, get) => ({
   },
 
   seedDemoData: async () => {
+    const userId = get().user?.id;
+    if (!userId) {
+      showToast('Must be logged in to seed demo data', 'error');
+      return;
+    }
+
     try {
       set({ loading: true });
 
       // Generate and insert demo data
-      const result = await generateDemoData(DEFAULT_USER_ID);
+      const result = await generateDemoData(userId);
 
       // Reload expenses
       await get().loadExpenses();
@@ -102,11 +145,17 @@ export const useAppStore = create<AppStore>((set, get) => ({
   },
 
   loadExpenses: async () => {
+    const userId = get().user?.id;
+    if (!userId) {
+      set({ items: [] });
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from('expenses')
         .select('*')
-        .eq('user_id', DEFAULT_USER_ID)
+        .eq('user_id', userId)
         .order('date', { ascending: false });
 
       if (error) throw error;
@@ -122,7 +171,12 @@ export const useAppStore = create<AppStore>((set, get) => ({
   demoModeEnabled: false,
 
   setDemoMode: async (enabled: boolean) => {
-    const { demoModeEnabled, items } = get();
+    const { demoModeEnabled, user, items } = get();
+
+    if (!user?.id) {
+      showToast('Must be logged in to toggle demo mode', 'error');
+      return;
+    }
 
     try {
       set({ loading: true });
@@ -138,7 +192,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
           }
 
           // Clear existing demo data
-          await clearDemoData(DEFAULT_USER_ID);
+          await clearDemoData(user.id);
         } else {
           // Backup current real data (non-demo expenses)
           const realExpenses = items.filter((e) => e.imported_from !== 'demo');
@@ -152,7 +206,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
       } else {
         // Disabling demo mode
-        await clearDemoData(DEFAULT_USER_ID);
+        await clearDemoData(user.id);
 
         // Restore backed up data
         const backup = await storage.getJSON<Expense[]>(STORAGE_KEYS.EXPENSES_BACKUP);
