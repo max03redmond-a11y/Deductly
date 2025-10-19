@@ -90,8 +90,8 @@ export default function ExportModal({ visible, onClose }: ExportModalProps) {
 
       console.log('T2125 generated:', {
         name: t2125Data.identification.yourName,
-        totalIncome: t2125Data.income.line8299_grossBusinessIncome,
-        totalExpenses: t2125Data.expenses.line9368_totalExpenses,
+        totalIncome: t2125Data.part3c_income.line8299_grossBusinessIncome,
+        totalExpenses: t2125Data.part4_expenses.line9368_totalExpenses,
       });
 
       const filename = `T2125_${currentYear}_${lastName}`;

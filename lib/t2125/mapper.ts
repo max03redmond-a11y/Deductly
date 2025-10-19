@@ -71,6 +71,7 @@ export interface T2125Data {
     line9200_travelExpenses: number;
     line9220_utilities: number;
     line9224_fuelCosts: number;
+    line9225_telephone: number;
     line9275_deliveryFreight: number;
     line9281_motorVehicleExpenses: number;
     line9936_cca: number;
@@ -352,6 +353,7 @@ export function generateT2125Data(
       line9200_travelExpenses: expensesByLine.line9200_travelExpenses || 0,
       line9220_utilities: expensesByLine.line9220_utilities || 0,
       line9224_fuelCosts: expensesByLine.line9224_fuelCosts || 0,
+      line9225_telephone: expensesByLine.line9225_telephone || 0,
       line9275_deliveryFreight: expensesByLine.line9275_deliveryFreight || 0,
       line9281_motorVehicleExpenses: chartA_line16,
       line9936_cca: expensesByLine.line9936_cca || 0,

@@ -281,6 +281,13 @@ export function generateT2125HTML(data: T2125Data): string {
       <div class="amount">$${formatCurrency(data.part4_expenses.line9220_utilities)}</div>
     </div>` : ''}
 
+    ${data.part4_expenses.line9225_telephone > 0 ? `
+    <div class="row">
+      <div class="line-number">9225</div>
+      <div class="description">Telephone and utilities</div>
+      <div class="amount">$${formatCurrency(data.part4_expenses.line9225_telephone)}</div>
+    </div>` : ''}
+
     ${data.part4_expenses.line9224_fuelCosts > 0 ? `
     <div class="row">
       <div class="line-number">9224</div>
