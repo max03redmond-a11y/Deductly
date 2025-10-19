@@ -32,28 +32,24 @@ export default function ExportModal({ visible, onClose }: ExportModalProps) {
   const [selectedFormat, setSelectedFormat] = useState<ExportFormat>('pdf');
 
   const profile = useAppStore((state) => state.profile);
-  const user = useAppStore((state) => state.user);
 
+  const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000001';
   const currentYear = new Date().getFullYear();
   const lastName = profile?.full_name?.split(' ').pop()?.toLowerCase() || 'export';
 
   const handleExport = async () => {
     if (exporting) return;
 
-    if (!user?.id || !profile) {
-      showToast('Please log in to export data', 'error');
-      return;
-    }
-
     setExporting(true);
 
     try {
       // Fetch all data from Supabase
-      const [expensesRes, incomeRes, mileageRes, assetsRes] = await Promise.all([
-        supabase.from('expenses').select('*').eq('user_id', user.id),
-        supabase.from('income_records').select('*').eq('user_id', user.id),
-        supabase.from('mileage_logs').select('*').eq('user_id', user.id),
-        supabase.from('assets').select('*').eq('user_id', user.id),
+      const [expensesRes, incomeRes, mileageRes, assetsRes, profileRes] = await Promise.all([
+        supabase.from('expenses').select('*').eq('user_id', DEFAULT_USER_ID),
+        supabase.from('income_records').select('*').eq('user_id', DEFAULT_USER_ID),
+        supabase.from('mileage_logs').select('*').eq('user_id', DEFAULT_USER_ID),
+        supabase.from('assets').select('*').eq('user_id', DEFAULT_USER_ID),
+        supabase.from('profiles').select('*').eq('id', DEFAULT_USER_ID).maybeSingle(),
       ]);
 
       if (expensesRes.error) {
@@ -78,6 +74,7 @@ export default function ExportModal({ visible, onClose }: ExportModalProps) {
       const expenses = (expensesRes.data || []) as Expense[];
       const income = (incomeRes.data || []) as IncomeRecord[];
       const mileage = (mileageRes.data || []) as MileageLog[];
+      const userProfile = profileRes.data || profile;
 
       console.log('Export data counts:', {
         expenses: expenses.length,
@@ -86,7 +83,7 @@ export default function ExportModal({ visible, onClose }: ExportModalProps) {
         assets: assets.length,
       });
 
-      const t2125Data = generateT2125Data(profile, expenses, income, mileage, assets);
+      const t2125Data = generateT2125Data(userProfile, expenses, income, mileage, assets);
 
       console.log('T2125 generated:', {
         name: t2125Data.identification.yourName,
