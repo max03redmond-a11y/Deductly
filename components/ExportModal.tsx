@@ -16,7 +16,9 @@ import { generateT2125PDF, exportT2125AsPDF } from '@/lib/t2125/pdfExport';
 import { generateT2125CSV, downloadCSV } from '@/lib/t2125/csvExport';
 import { downloadHTML } from '@/lib/t2125/htmlExport';
 import { useAppStore } from '@/store/useAppStore';
+import { supabase } from '@/lib/supabase';
 import { showToast } from '@/lib/toast';
+import { Expense, IncomeRecord, MileageLog, Asset } from '@/types/database';
 
 interface ExportModalProps {
   visible: boolean;
@@ -30,10 +32,7 @@ export default function ExportModal({ visible, onClose }: ExportModalProps) {
   const [selectedFormat, setSelectedFormat] = useState<ExportFormat>('pdf');
 
   const profile = useAppStore((state) => state.profile);
-  const expenses = useAppStore((state) => state.expenses);
-  const income = useAppStore((state) => state.income);
-  const mileage = useAppStore((state) => state.mileage);
-  const assets = useAppStore((state) => state.assets);
+  const user = useAppStore((state) => state.user);
 
   const currentYear = new Date().getFullYear();
   const lastName = profile?.full_name?.split(' ').pop()?.toLowerCase() || 'export';
@@ -41,10 +40,46 @@ export default function ExportModal({ visible, onClose }: ExportModalProps) {
   const handleExport = async () => {
     if (exporting) return;
 
+    if (!user?.id || !profile) {
+      showToast('Please log in to export data', 'error');
+      return;
+    }
+
     setExporting(true);
 
     try {
-      const t2125Data = generateT2125Data(profile, expenses, income, mileage, assets || []);
+      // Fetch all data from Supabase
+      const [expensesRes, incomeRes, mileageRes, assetsRes] = await Promise.all([
+        supabase.from('expenses').select('*').eq('user_id', user.id),
+        supabase.from('income_records').select('*').eq('user_id', user.id),
+        supabase.from('mileage_logs').select('*').eq('user_id', user.id),
+        supabase.from('assets').select('*').eq('user_id', user.id),
+      ]);
+
+      if (expensesRes.error) {
+        console.error('Expenses fetch error:', expensesRes.error);
+        throw new Error(`Failed to fetch expenses: ${expensesRes.error.message}`);
+      }
+      if (incomeRes.error) {
+        console.error('Income fetch error:', incomeRes.error);
+        throw new Error(`Failed to fetch income: ${incomeRes.error.message}`);
+      }
+      if (mileageRes.error) {
+        console.error('Mileage fetch error:', mileageRes.error);
+        throw new Error(`Failed to fetch mileage: ${mileageRes.error.message}`);
+      }
+
+      // Assets table might not exist yet, so we'll handle it gracefully
+      const assets = assetsRes.error ? [] : ((assetsRes.data || []) as Asset[]);
+      if (assetsRes.error) {
+        console.warn('Assets fetch error (continuing without assets):', assetsRes.error);
+      }
+
+      const expenses = (expensesRes.data || []) as Expense[];
+      const income = (incomeRes.data || []) as IncomeRecord[];
+      const mileage = (mileageRes.data || []) as MileageLog[];
+
+      const t2125Data = generateT2125Data(profile, expenses, income, mileage, assets);
 
       const filename = `T2125_${currentYear}_${lastName}`;
 
@@ -72,9 +107,10 @@ export default function ExportModal({ visible, onClose }: ExportModalProps) {
       setTimeout(() => {
         onClose();
       }, 1500);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Export error:', error);
-      showToast('Export failed. Please try again.', 'error');
+      const errorMessage = error?.message || 'Unknown error occurred';
+      showToast(`Export failed: ${errorMessage}`, 'error');
     } finally {
       setExporting(false);
     }
