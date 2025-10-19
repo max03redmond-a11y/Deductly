@@ -10,6 +10,7 @@ import { generateT2125Data } from '@/lib/t2125/mapper';
 import { generateT2125CSV, downloadCSV } from '@/lib/t2125/csvExport';
 import { generateT2125HTML, downloadHTML } from '@/lib/t2125/htmlExport';
 import { showToast } from '@/lib/toast';
+import ExportModal from '@/components/ExportModal';
 
 export default function DashboardScreen() {
   const { profile } = useAuth();
@@ -19,6 +20,7 @@ export default function DashboardScreen() {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddIncomeModal, setShowAddIncomeModal] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
 
   const loadData = useCallback(async () => {
     if (!profile) return;
@@ -213,22 +215,13 @@ export default function DashboardScreen() {
             <Text style={styles.exportDescription}>
               Export your business data to CRA T2125 format with all income, expenses, and deductions pre-calculated
             </Text>
-            <View style={styles.exportButtons}>
-              <TouchableOpacity
-                style={styles.exportButton}
-                onPress={handleExportT2125HTML}
-              >
-                <FileText size={18} color="#FFFFFF" />
-                <Text style={styles.exportButtonText}>Export Report (HTML)</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.exportButton, styles.exportButtonSecondary]}
-                onPress={handleExportT2125CSV}
-              >
-                <FileSpreadsheet size={18} color="#3B82F6" />
-                <Text style={styles.exportButtonTextSecondary}>Export Data (CSV)</Text>
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity
+              style={styles.exportButtonMain}
+              onPress={() => setShowExportModal(true)}
+            >
+              <Download size={20} color="#FFFFFF" />
+              <Text style={styles.exportButtonMainText}>Export T2125</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -370,6 +363,11 @@ export default function DashboardScreen() {
           setShowAddIncomeModal(false);
           loadData();
         }}
+      />
+
+      <ExportModal
+        visible={showExportModal}
+        onClose={() => setShowExportModal(false)}
       />
     </View>
   );
@@ -1005,6 +1003,26 @@ const styles = StyleSheet.create({
   exportButtonTextSecondary: {
     color: '#3B82F6',
     fontSize: 15,
+    fontFamily: 'Montserrat-SemiBold',
+  },
+  exportButtonMain: {
+    backgroundColor: '#000000',
+    borderRadius: 16,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    marginTop: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  exportButtonMainText: {
+    color: '#FFFFFF',
+    fontSize: 16,
     fontFamily: 'Montserrat-SemiBold',
   },
 });

@@ -232,6 +232,13 @@ export function generateT2125CSV(data: T2125Data): string {
 
   rows.push({
     section: 'Part 4',
+    lineNumber: '9225',
+    description: 'Telephone and utilities',
+    amount: formatCurrency(data.expenses.line9225_telephone),
+  });
+
+  rows.push({
+    section: 'Part 4',
     lineNumber: '9220',
     description: 'Utilities',
     amount: formatCurrency(data.expenses.line9220_utilities),
@@ -242,6 +249,13 @@ export function generateT2125CSV(data: T2125Data): string {
     lineNumber: '9224',
     description: 'Fuel costs (except for motor vehicles)',
     amount: formatCurrency(data.expenses.line9224_fuelCosts),
+  });
+
+  rows.push({
+    section: 'Part 4',
+    lineNumber: '9270',
+    description: 'Other expenses',
+    amount: formatCurrency(data.expenses.line9270_other),
   });
 
   rows.push({
@@ -263,6 +277,13 @@ export function generateT2125CSV(data: T2125Data): string {
     lineNumber: '9936',
     description: 'Capital cost allowance (CCA)',
     amount: formatCurrency(data.expenses.line9936_cca),
+  });
+
+  rows.push({
+    section: 'Part 4',
+    lineNumber: '9945',
+    description: 'Business-use-of-home expenses',
+    amount: formatCurrency(data.expenses.line9945_homeOffice),
   });
 
   rows.push({
@@ -319,6 +340,13 @@ export function generateT2125CSV(data: T2125Data): string {
     lineNumber: '5',
     description: 'Insurance',
     amount: formatCurrency(data.motorVehicle.insurance),
+  });
+
+  rows.push({
+    section: 'Chart A',
+    lineNumber: '6',
+    description: 'Licence and registration',
+    amount: formatCurrency(data.motorVehicle.licence),
   });
 
   rows.push({
