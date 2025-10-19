@@ -189,8 +189,8 @@ export function generateT2125Data(
 
   // Calculate income totals
   const totalIncome = income.reduce((sum, i) => sum + i.amount, 0);
-  const gstHstCollected = income.reduce((sum, i) => sum + (i.gst_hst_collected || 0), 0);
-  const tipsAndBonuses = income.reduce((sum, i) => sum + (i.tips || 0) + (i.bonuses || 0) + (i.incentives || 0), 0);
+  const gstHstCollected = 0; // GST/HST not tracked in current income_records schema
+  const tipsAndBonuses = 0; // Tips/bonuses not tracked in current income_records schema
 
   const expensesByLine: Partial<Record<keyof T2125Data['part4_expenses'], number>> = {};
 
@@ -295,7 +295,9 @@ export function generateT2125Data(
   const chartA_line16 = chartA_line13 + vehicleParking;
 
   // Part 7 - Home Office (if applicable)
-  const homeOfficeExpenses = expensesByLine.line9945_homeOffice || 0;
+  // Home office expenses should be calculated separately
+  // For now, we set it to 0 as it's not tracked in the current schema
+  const homeOfficeExpenses = 0;
 
   return {
     identification: {

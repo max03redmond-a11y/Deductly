@@ -143,7 +143,7 @@ export default function ExportModal({ visible, onClose }: ExportModalProps) {
           <View style={styles.header}>
             <Text style={styles.title}>Export T2125 Report</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <X size={24} color={theme.colors.text.secondary} />
+              <X size={24} color={theme.colors.textSecondary} />
             </TouchableOpacity>
           </View>
 
@@ -169,7 +169,7 @@ export default function ExportModal({ visible, onClose }: ExportModalProps) {
               onPress={() => setSelectedFormat('pdf')}
             >
               <View style={styles.formatIcon}>
-                <FileDown size={24} color={selectedFormat === 'pdf' ? theme.colors.primary : theme.colors.text.secondary} />
+                <FileDown size={24} color={selectedFormat === 'pdf' ? theme.colors.primary : theme.colors.textSecondary} />
               </View>
               <View style={styles.formatDetails}>
                 <Text style={[
@@ -192,7 +192,7 @@ export default function ExportModal({ visible, onClose }: ExportModalProps) {
               onPress={() => setSelectedFormat('csv')}
             >
               <View style={styles.formatIcon}>
-                <FileSpreadsheet size={24} color={selectedFormat === 'csv' ? theme.colors.primary : theme.colors.text.secondary} />
+                <FileSpreadsheet size={24} color={selectedFormat === 'csv' ? theme.colors.primary : theme.colors.textSecondary} />
               </View>
               <View style={styles.formatDetails}>
                 <Text style={[
@@ -215,7 +215,7 @@ export default function ExportModal({ visible, onClose }: ExportModalProps) {
               onPress={() => setSelectedFormat('html')}
             >
               <View style={styles.formatIcon}>
-                <FileDown size={24} color={selectedFormat === 'html' ? theme.colors.primary : theme.colors.text.secondary} />
+                <FileDown size={24} color={selectedFormat === 'html' ? theme.colors.primary : theme.colors.textSecondary} />
               </View>
               <View style={styles.formatDetails}>
                 <Text style={[
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '600',
-    color: theme.colors.text.primary,
+    color: theme.colors.text,
   },
   closeButton: {
     padding: 4,
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 14,
-    color: theme.colors.text.secondary,
+    color: theme.colors.textSecondary,
     lineHeight: 20,
     marginBottom: 16,
   },
@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: theme.colors.text.primary,
+    color: theme.colors.text,
     marginBottom: 12,
   },
   formatOption: {
@@ -380,7 +380,7 @@ const styles = StyleSheet.create({
   formatTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: theme.colors.text.primary,
+    color: theme.colors.text,
     marginBottom: 4,
   },
   formatTitleSelected: {
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
   },
   formatDescription: {
     fontSize: 13,
-    color: theme.colors.text.secondary,
+    color: theme.colors.textSecondary,
     lineHeight: 18,
   },
   summaryBox: {
@@ -401,12 +401,12 @@ const styles = StyleSheet.create({
   summaryTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: theme.colors.text.primary,
+    color: theme.colors.text,
     marginBottom: 12,
   },
   summaryItem: {
     fontSize: 13,
-    color: theme.colors.text.secondary,
+    color: theme.colors.textSecondary,
     lineHeight: 22,
   },
   warningBox: {
@@ -445,7 +445,7 @@ const styles = StyleSheet.create({
   cancelButtonText: {
     fontSize: 15,
     fontWeight: '600',
-    color: theme.colors.text.secondary,
+    color: theme.colors.textSecondary,
   },
   exportButton: {
     flex: 1,

@@ -129,10 +129,10 @@ export function convertToT2125PDFData(data: T2125Data): T2125PDFData {
       income_from_web_percent: 100,
     },
     part3_income: {
-      line3A_gross_sales_incl_gst: data.part3c_income.line8000_grossIncome,
+      line3A_gross_sales_incl_gst: data.part3c_income.line8000_adjustedGrossSales,
       line3B_gst_collected: 0,
-      line3C_subtotal: data.part3c_income.line8000_grossIncome,
-      line8000_adjusted_gross_sales: data.part3c_income.line8000_grossIncome,
+      line3C_subtotal: data.part3c_income.line8000_adjustedGrossSales,
+      line8000_adjusted_gross_sales: data.part3c_income.line8000_adjustedGrossSales,
       line8230_other_income: 0,
       line8299_total_gross_income: data.part3c_income.line8299_grossBusinessIncome,
     },

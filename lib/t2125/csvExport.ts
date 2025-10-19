@@ -255,7 +255,7 @@ export function generateT2125CSV(data: T2125Data): string {
     section: 'Part 4',
     lineNumber: '9270',
     description: 'Other expenses',
-    amount: formatCurrency(data.part4_expenses.line9270_other),
+    amount: formatCurrency(data.part4_expenses.line9270_otherExpenses),
   });
 
   rows.push({
