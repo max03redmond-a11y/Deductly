@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Share, Image } from 'react-native';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/contexts/OfflineContext';
 import { Gift, Users, ExternalLink, Copy, TrendingUp, Shield, Building2 } from 'lucide-react-native';
 import { ReferralPartner, UserReferral, REFERRAL_CATEGORIES } from '@/types/database';
 

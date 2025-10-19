@@ -18,68 +18,43 @@ export default function ExpensesScreen() {
   const [businessUsePercent, setBusinessUsePercent] = useState(0);
 
   const loadExpenses = useCallback(async () => {
-    if (!profile) return;
-
     const currentYear = new Date().getFullYear();
 
-    const [expensesRes, mileageRes, mileageSettingsRes] = await Promise.all([
-      supabase
-        .from('expenses')
-        .select('*')
-        .eq('user_id', profile.id)
-        .order('date', { ascending: false }),
-      supabase
-        .from('mileage_logs')
-        .select('*')
-        .eq('user_id', profile.id)
-        .gte('date', `${currentYear}-01-01`)
-        .lte('date', `${currentYear}-12-31`),
-      supabase
-        .from('mileage_settings')
-        .select('jan1_odometer_km, current_odometer_km')
-        .eq('user_id', profile.id)
-        .eq('year', currentYear)
-        .maybeSingle(),
+    const [expensesData, allMileageLogs, mileageSettings] = await Promise.all([
+      localDB.getExpenses(),
+      localDB.getMileage(),
+      localDB.getMileageSettings(currentYear),
     ]);
 
-    if (expensesRes.error) {
-      console.error('Error loading expenses:', expensesRes.error);
-    } else {
-      setExpenses(expensesRes.data || []);
+    const sortedExpenses = expensesData.sort((a, b) =>
+      new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+    setExpenses(sortedExpenses);
+
+    const mileageLogsThisYear = allMileageLogs.filter(log => {
+      const logDate = new Date(log.date);
+      return logDate.getFullYear() === currentYear;
+    });
+
+    setMileageLogs(mileageLogsThisYear);
+
+    const businessKm = mileageLogsThisYear
+      .filter((log) => log.is_business)
+      .reduce((sum, log) => sum + log.distance_km, 0);
+
+    let totalKm = 0;
+    if (mileageSettings) {
+      totalKm = mileageSettings.current_odometer_km - mileageSettings.jan1_odometer_km;
     }
 
-    if (mileageRes.data) {
-      setMileageLogs(mileageRes.data);
-
-      const businessKm = mileageRes.data
-        .filter((log) => log.is_business)
-        .reduce((sum, log) => sum + log.distance_km, 0);
-
-      let totalKm = 0;
-      if (mileageSettingsRes.data) {
-        totalKm = mileageSettingsRes.data.current_odometer_km - mileageSettingsRes.data.jan1_odometer_km;
-      }
-
-      const percent = totalKm > 0 ? Math.min(100, Math.max(0, (businessKm / totalKm) * 100)) : 0;
-      setBusinessUsePercent(percent);
-    }
+    const percent = totalKm > 0 ? Math.min(100, Math.max(0, (businessKm / totalKm) * 100)) : 0;
+    setBusinessUsePercent(percent);
 
     setLoading(false);
-  }, [profile]);
+  }, []);
 
   useEffect(() => {
     loadExpenses();
-
-    const channel = supabase
-      .channel('expenses-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'expenses' }, () => {
-        loadExpenses();
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
   }, [loadExpenses]);
 
   useFocusEffect(
@@ -225,21 +200,8 @@ function ExpenseItem({ expense, onDelete }: { expense: Expense; onDelete: () => 
   const performDelete = async () => {
     setDeleting(true);
     try {
-      const { error } = await supabase
-        .from('expenses')
-        .delete()
-        .eq('id', expense.id);
-
-      if (error) {
-        console.error('Delete error:', error);
-        if (Platform.OS === 'web') {
-          alert('Failed to delete expense');
-        } else {
-          Alert.alert('Error', 'Failed to delete expense');
-        }
-      } else {
-        onDelete();
-      }
+      await localDB.deleteExpense(expense.id);
+      onDelete();
     } catch (err) {
       console.error('Delete exception:', err);
     } finally {
