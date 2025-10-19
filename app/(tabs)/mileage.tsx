@@ -270,35 +270,35 @@ export default function MileageScreen() {
               </View>
             )}
 
-            <View style={styles.row}>
-              <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
-                <Text style={styles.inputLabel}>Start (Jan 1)</Text>
-                <TextInput
-                  style={styles.input}
-                  value={yearStartOdo}
-                  onChangeText={(text) => {
-                    setYearStartOdo(text);
-                    saveYearOdometer(text, yearEndOdo);
-                  }}
-                  keyboardType="decimal-pad"
-                  placeholder="0"
-                  placeholderTextColor="#9CA3AF"
-                />
-              </View>
-              <View style={[styles.inputGroup, { flex: 1, marginLeft: 8 }]}>
-                <Text style={styles.inputLabel}>Current</Text>
-                <TextInput
-                  style={styles.input}
-                  value={yearEndOdo}
-                  onChangeText={(text) => {
-                    setYearEndOdo(text);
-                    saveYearOdometer(yearStartOdo, text);
-                  }}
-                  keyboardType="decimal-pad"
-                  placeholder="0"
-                  placeholderTextColor="#9CA3AF"
-                />
-              </View>
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Start (Jan 1)</Text>
+              <TextInput
+                style={styles.input}
+                value={yearStartOdo}
+                onChangeText={(text) => {
+                  setYearStartOdo(text);
+                  saveYearOdometer(text, yearEndOdo);
+                }}
+                keyboardType="decimal-pad"
+                placeholder="0"
+                placeholderTextColor="#9CA3AF"
+                editable={true}
+              />
+            </View>
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Current KM</Text>
+              <TextInput
+                style={styles.input}
+                value={yearEndOdo}
+                onChangeText={(text) => {
+                  setYearEndOdo(text);
+                  saveYearOdometer(yearStartOdo, text);
+                }}
+                keyboardType="decimal-pad"
+                placeholder="0"
+                placeholderTextColor="#9CA3AF"
+                editable={true}
+              />
             </View>
 
             <View style={styles.yearCalcCard}>
