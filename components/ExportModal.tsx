@@ -16,7 +16,7 @@ import { generateT2125PDF, exportT2125AsPDF } from '@/lib/t2125/pdfExport';
 import { generateT2125CSV, downloadCSV } from '@/lib/t2125/csvExport';
 import { downloadHTML } from '@/lib/t2125/htmlExport';
 import { useAppStore } from '@/store/useAppStore';
-import { localDB } from '@/lib/localDatabase';
+import { supabase } from '@/lib/supabase';
 import { showToast } from '@/lib/toast';
 import { Expense, IncomeRecord, MileageLog, Asset } from '@/types/database';
 
@@ -40,21 +40,44 @@ export default function ExportModal({ visible, onClose }: ExportModalProps) {
   const handleExport = async () => {
     if (exporting) return;
 
-    if (!profile) {
-      showToast('Profile not found', 'error');
+    if (!user?.id || !profile) {
+      showToast('Please log in to export data', 'error');
       return;
     }
 
     setExporting(true);
 
     try {
-      // Fetch all data from local database
-      const [expenses, income, mileage, assets] = await Promise.all([
-        localDB.getExpenses(),
-        localDB.getIncome(),
-        localDB.getMileage(),
-        localDB.getAssets(),
+      // Fetch all data from Supabase
+      const [expensesRes, incomeRes, mileageRes, assetsRes] = await Promise.all([
+        supabase.from('expenses').select('*').eq('user_id', user.id),
+        supabase.from('income_records').select('*').eq('user_id', user.id),
+        supabase.from('mileage_logs').select('*').eq('user_id', user.id),
+        supabase.from('assets').select('*').eq('user_id', user.id),
       ]);
+
+      if (expensesRes.error) {
+        console.error('Expenses fetch error:', expensesRes.error);
+        throw new Error(`Failed to fetch expenses: ${expensesRes.error.message}`);
+      }
+      if (incomeRes.error) {
+        console.error('Income fetch error:', incomeRes.error);
+        throw new Error(`Failed to fetch income: ${incomeRes.error.message}`);
+      }
+      if (mileageRes.error) {
+        console.error('Mileage fetch error:', mileageRes.error);
+        throw new Error(`Failed to fetch mileage: ${mileageRes.error.message}`);
+      }
+
+      // Assets table might not exist yet, so we'll handle it gracefully
+      const assets = assetsRes.error ? [] : ((assetsRes.data || []) as Asset[]);
+      if (assetsRes.error) {
+        console.warn('Assets fetch error (continuing without assets):', assetsRes.error);
+      }
+
+      const expenses = (expensesRes.data || []) as Expense[];
+      const income = (incomeRes.data || []) as IncomeRecord[];
+      const mileage = (mileageRes.data || []) as MileageLog[];
 
       console.log('Export data counts:', {
         expenses: expenses.length,

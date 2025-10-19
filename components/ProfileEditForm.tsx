@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { Eye, EyeOff, Check, AlertCircle, Info } from 'lucide-react-native';
 import { Profile, CANADIAN_PROVINCES } from '@/types/database';
-import { localDB } from '@/lib/localDatabase';
+import { supabase } from '@/lib/supabase';
 import { theme } from '@/constants/theme';
 
 interface ProfileEditFormProps {
@@ -128,16 +128,17 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
       updated_at: new Date().toISOString(),
     };
 
-    try {
-      await localDB.saveProfile(updates);
-      setLoading(false);
+    const { error } = await supabase.from('profiles').update(updates).eq('id', profile.id);
+
+    setLoading(false);
+
+    if (error) {
+      const msg = error.message;
+      Platform.OS === 'web' ? alert(msg) : Alert.alert('Error', msg);
+    } else {
       const msg = 'Profile updated successfully';
       Platform.OS === 'web' ? alert(msg) : Alert.alert('Success', msg);
       onSuccess();
-    } catch (error) {
-      setLoading(false);
-      const msg = 'Failed to update profile';
-      Platform.OS === 'web' ? alert(msg) : Alert.alert('Error', msg);
     }
   };
 

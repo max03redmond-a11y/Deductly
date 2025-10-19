@@ -1,45 +1,60 @@
 import { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { useAuth } from '@/contexts/OfflineContext';
-import { User, Edit3, FileText, ChevronRight, Trash2 } from 'lucide-react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Switch, ActivityIndicator } from 'react-native';
+import { useAuth } from '@/contexts/AuthContext';
+import { User, Shield, Building2, Sparkles, LogOut, ChevronRight, Edit3, FileText } from 'lucide-react-native';
+import { CANADIAN_PROVINCES, BUSINESS_TYPES } from '@/types/database';
+import { generateDemoData, clearDemoData } from '@/lib/demoData';
 import { theme } from '@/constants/theme';
 import { Card } from '@/components/Card';
+import { Button } from '@/components/Button';
 import { ProfileEditForm } from '@/components/ProfileEditForm';
-import { localDB } from '@/lib/localDatabase';
-import { useAppState } from '@/lib/state/appStore';
 
-export default function SettingsScreen() {
-  const { profile } = useAuth();
+export default function ProfileScreen() {
+  const { user, profile, signOut, refreshProfile } = useAuth();
+  const [demoMode, setDemoMode] = useState(false);
+  const [demoLoading, setDemoLoading] = useState(false);
   const [editMode, setEditMode] = useState(false);
-  const clearAllData = useAppState((state) => state.clearAllData);
-  const loadAllData = useAppState((state) => state.loadAllData);
 
-  const handleEditSuccess = async () => {
-    setEditMode(false);
+  const provinceName = CANADIAN_PROVINCES.find(p => p.value === profile?.province)?.label;
+  const businessTypeName = BUSINESS_TYPES.find(b => b.value === profile?.business_type)?.label;
+
+  const handleSignOut = async () => {
+    const confirmed = confirm('Are you sure you want to sign out?');
+    if (confirmed) {
+      await signOut();
+    }
   };
 
-  const handleClearData = () => {
-    Alert.alert(
-      'Clear All Data',
-      'This will permanently delete all your expenses, income, mileage logs, and settings. This action cannot be undone. Are you sure?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Clear All Data',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await clearAllData();
-              Alert.alert('Success', 'All data has been cleared');
-              await loadAllData();
-            } catch (error) {
-              Alert.alert('Error', 'Failed to clear data');
-              console.error(error);
-            }
-          },
-        },
-      ]
-    );
+  const handleDemoModeToggle = async (value: boolean) => {
+    if (!profile) return;
+
+    if (value) {
+      setDemoLoading(true);
+      try {
+        await generateDemoData(profile.id);
+        setDemoMode(true);
+      } catch (error: any) {
+        console.error('Demo data generation error:', error);
+        setDemoMode(false);
+      } finally {
+        setDemoLoading(false);
+      }
+    } else {
+      setDemoLoading(true);
+      try {
+        await clearDemoData(profile.id);
+        setDemoMode(false);
+      } catch (error: any) {
+        console.error('Demo data clear error:', error);
+      } finally {
+        setDemoLoading(false);
+      }
+    }
+  };
+
+  const handleEditSuccess = async () => {
+    await refreshProfile();
+    setEditMode(false);
   };
 
   if (editMode && profile) {
@@ -60,23 +75,39 @@ export default function SettingsScreen() {
   return (
     <View style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        {/* Profile Header */}
         <View style={styles.profileHeader}>
           <View style={styles.avatarContainer}>
             <User size={48} color={theme.colors.primary} />
           </View>
-          <Text style={styles.userName}>{profile?.full_name || 'Local User'}</Text>
-          <Text style={styles.offlineText}>Offline Mode</Text>
+          <Text style={styles.userName}>{profile?.full_name || 'Driver'}</Text>
+          <Text style={styles.userEmail}>{user?.email}</Text>
         </View>
 
-        <View style={styles.infoCard}>
-          <FileText size={20} color="#3B82F6" />
-          <Text style={styles.infoText}>
-            Deductly Beta runs fully offline — your data stays on your device and never leaves it.
-          </Text>
-        </View>
+        {/* Profile Completeness Banner */}
+        {profile && !profile.profile_completed && (
+          <View style={styles.section}>
+            <Card style={styles.completenessCard}>
+              <FileText size={24} color="#EF4444" />
+              <View style={styles.completenessContent}>
+                <Text style={styles.completenessTitle}>Complete Your Tax Profile</Text>
+                <Text style={styles.completenessText}>
+                  Add your CRA information to enable T2125 exports
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={styles.completeButton}
+                onPress={() => setEditMode(true)}
+              >
+                <Text style={styles.completeButtonText}>Complete</Text>
+              </TouchableOpacity>
+            </Card>
+          </View>
+        )}
 
+        {/* Account Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Profile</Text>
+          <Text style={styles.sectionTitle}>Account</Text>
 
           <Card style={styles.menuCard}>
             <TouchableOpacity style={styles.menuItem} onPress={() => setEditMode(true)}>
@@ -86,26 +117,105 @@ export default function SettingsScreen() {
               <Text style={styles.menuLabel}>Edit Tax Profile</Text>
               <ChevronRight size={20} color={theme.colors.iconInactive} />
             </TouchableOpacity>
-          </Card>
-        </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Data Management</Text>
+            <View style={styles.menuDivider} />
 
-          <Card style={styles.menuCard}>
-            <TouchableOpacity style={styles.menuItem} onPress={handleClearData}>
-              <View style={[styles.menuIconContainer, styles.deleteIconContainer]}>
-                <Trash2 size={20} color="#EF4444" />
+            <TouchableOpacity style={styles.menuItem}>
+              <View style={styles.menuIconContainer}>
+                <Shield size={20} color={theme.colors.icon} />
               </View>
-              <Text style={[styles.menuLabel, styles.deleteLabel]}>Clear Local Data</Text>
+              <Text style={styles.menuLabel}>Account Security</Text>
+              <ChevronRight size={20} color={theme.colors.iconInactive} />
+            </TouchableOpacity>
+
+            <View style={styles.menuDivider} />
+
+            <TouchableOpacity style={styles.menuItem}>
+              <View style={styles.menuIconContainer}>
+                <Building2 size={20} color={theme.colors.icon} />
+              </View>
+              <View style={styles.menuContent}>
+                <Text style={styles.menuLabel}>Business Information</Text>
+                <Text style={styles.menuValue}>{businessTypeName}</Text>
+              </View>
               <ChevronRight size={20} color={theme.colors.iconInactive} />
             </TouchableOpacity>
           </Card>
         </View>
 
+        {/* Business Details */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Business Details</Text>
+
+          <Card>
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Province</Text>
+              <Text style={styles.detailValue}>{provinceName}</Text>
+            </View>
+
+            <View style={styles.detailDivider} />
+
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Business Type</Text>
+              <Text style={styles.detailValue}>{businessTypeName}</Text>
+            </View>
+
+            <View style={styles.detailDivider} />
+
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>GST/HST Registered</Text>
+              <Text style={styles.detailValue}>
+                {profile?.gst_hst_registered ? 'Yes' : 'No'}
+              </Text>
+            </View>
+          </Card>
+        </View>
+
+        {/* Demo Mode */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Developer</Text>
+
+          <Card>
+            <View style={styles.demoModeContainer}>
+              <View style={styles.demoModeIconContainer}>
+                <Sparkles size={20} color={theme.colors.primary} />
+              </View>
+              <View style={styles.demoModeContent}>
+                <Text style={styles.demoModeTitle}>Demo Mode</Text>
+                <Text style={styles.demoModeSubtitle}>
+                  {demoMode ? 'Sample data active' : 'Add sample data for testing'}
+                </Text>
+              </View>
+              {demoLoading ? (
+                <ActivityIndicator size="small" color={theme.colors.primary} />
+              ) : (
+                <Switch
+                  value={demoMode}
+                  onValueChange={handleDemoModeToggle}
+                  trackColor={{
+                    false: theme.colors.border,
+                    true: theme.colors.primary,
+                  }}
+                  thumbColor={theme.colors.surface}
+                  testID="toggle-demo"
+                />
+              )}
+            </View>
+          </Card>
+        </View>
+
+        {/* Sign Out */}
+        <View style={styles.section}>
+          <Button
+            title="Sign Out"
+            onPress={handleSignOut}
+            variant="secondary"
+            testID="btn-logout"
+          />
+        </View>
+
         <View style={styles.footer}>
-          <Text style={styles.footerText}>Deductly • Version 1.0.0 Beta</Text>
-          <Text style={styles.footerSubtext}>100% Offline</Text>
+          <Text style={styles.footerText}>Deductly • Version 1.0.0</Text>
         </View>
       </ScrollView>
     </View>
@@ -141,31 +251,9 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
     marginBottom: theme.spacing.xs,
   },
-  offlineText: {
+  userEmail: {
     fontSize: theme.typography.fontSize.sm,
     color: theme.colors.textSecondary,
-    backgroundColor: '#DBEAFE',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-  infoCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    margin: theme.spacing.base,
-    padding: theme.spacing.base,
-    backgroundColor: '#EFF6FF',
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#DBEAFE',
-  },
-  infoText: {
-    flex: 1,
-    fontSize: theme.typography.fontSize.sm,
-    color: '#1E40AF',
-    lineHeight: 20,
   },
   section: {
     paddingHorizontal: theme.spacing.base,
@@ -196,8 +284,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: theme.spacing.md,
   },
-  deleteIconContainer: {
-    backgroundColor: '#FEF2F2',
+  menuContent: {
+    flex: 1,
   },
   menuLabel: {
     flex: 1,
@@ -205,8 +293,61 @@ const styles = StyleSheet.create({
     fontWeight: theme.typography.fontWeight.medium,
     color: theme.colors.text,
   },
-  deleteLabel: {
-    color: '#EF4444',
+  menuValue: {
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.colors.textSecondary,
+    marginTop: theme.spacing.xs,
+  },
+  menuDivider: {
+    height: 1,
+    backgroundColor: theme.colors.divider,
+    marginLeft: 68,
+  },
+  detailRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: theme.spacing.base,
+  },
+  detailLabel: {
+    fontSize: theme.typography.fontSize.base,
+    color: theme.colors.textSecondary,
+  },
+  detailValue: {
+    fontSize: theme.typography.fontSize.base,
+    fontWeight: theme.typography.fontWeight.semibold,
+    color: theme.colors.text,
+  },
+  detailDivider: {
+    height: 1,
+    backgroundColor: theme.colors.divider,
+  },
+  demoModeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: theme.spacing.xs,
+  },
+  demoModeIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: theme.colors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: theme.spacing.md,
+  },
+  demoModeContent: {
+    flex: 1,
+  },
+  demoModeTitle: {
+    fontSize: theme.typography.fontSize.base,
+    fontWeight: theme.typography.fontWeight.semibold,
+    color: theme.colors.text,
+    marginBottom: theme.spacing.xs,
+  },
+  demoModeSubtitle: {
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.colors.textSecondary,
   },
   footer: {
     alignItems: 'center',
@@ -215,20 +356,13 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: theme.typography.fontSize.xs,
     color: theme.colors.textTertiary,
-    marginBottom: 4,
-  },
-  footerSubtext: {
-    fontSize: theme.typography.fontSize.xs,
-    color: theme.colors.textSecondary,
-    fontWeight: theme.typography.fontWeight.semibold,
   },
   editHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: theme.spacing.base,
-    paddingTop: 50,
-    paddingBottom: theme.spacing.base,
+    paddingVertical: theme.spacing.base,
     backgroundColor: theme.colors.surface,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.divider,
@@ -245,5 +379,37 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.base,
     color: theme.colors.primary,
     fontWeight: theme.typography.fontWeight.semibold,
+  },
+  completenessCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.md,
+    backgroundColor: '#FEF2F2',
+    borderWidth: 1,
+    borderColor: '#FEE2E2',
+  },
+  completenessContent: {
+    flex: 1,
+  },
+  completenessTitle: {
+    fontSize: theme.typography.fontSize.base,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: '#991B1B',
+    marginBottom: theme.spacing.xs,
+  },
+  completenessText: {
+    fontSize: theme.typography.fontSize.sm,
+    color: '#DC2626',
+  },
+  completeButton: {
+    backgroundColor: '#EF4444',
+    paddingHorizontal: theme.spacing.base,
+    paddingVertical: theme.spacing.sm,
+    borderRadius: 8,
+  },
+  completeButtonText: {
+    fontSize: theme.typography.fontSize.sm,
+    fontWeight: theme.typography.fontWeight.semibold,
+    color: '#FFFFFF',
   },
 });

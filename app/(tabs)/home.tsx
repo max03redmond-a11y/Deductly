@@ -1,7 +1,7 @@
 import { useEffect, useCallback, useMemo } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { useAuth } from '@/contexts/OfflineContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { EXPENSE_CATEGORIES } from '@/types/database';
 import { TrendingUp, DollarSign, Receipt, ChevronRight } from 'lucide-react-native';
 import { router } from 'expo-router';
@@ -46,7 +46,7 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <PageHeader
-        title="Good Day Driver!"
+        title={`Good day, ${profile?.full_name?.split(' ')[0] || 'Driver'}`}
         subtitle="Here's your business overview"
       />
 
