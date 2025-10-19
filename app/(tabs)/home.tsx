@@ -3,11 +3,10 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-nati
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '@/contexts/AuthContext';
 import { EXPENSE_CATEGORIES } from '@/types/database';
-import { TrendingUp, DollarSign, Receipt, ChevronRight, Gift } from 'lucide-react-native';
+import { TrendingUp, DollarSign, Receipt, ChevronRight } from 'lucide-react-native';
 import { router } from 'expo-router';
 import { PageHeader } from '@/components/PageHeader';
 import { EmptyState } from '@/components/EmptyState';
-import { ReferralCard } from '@/components/ReferralCard';
 import { useAppState } from '@/lib/state/appStore';
 import { calculateSummaryTotals, getYTDFilter } from '@/lib/calcs/summary';
 
@@ -16,7 +15,6 @@ export default function HomeScreen() {
   const allExpenses = useAppState((state) => state.expenses);
   const income = useAppState((state) => state.income);
   const mileage = useAppState((state) => state.mileage);
-  const referrals = useAppState((state) => state.referrals);
   const loading = useAppState((state) => state.loading);
   const initialized = useAppState((state) => state.initialized);
   const userId = useAppState((state) => state.userId);
@@ -161,26 +159,6 @@ export default function HomeScreen() {
           )}
         </View>
 
-        {/* Referral Hub */}
-        {referrals.length > 0 && (
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <View style={styles.referralTitleContainer}>
-                <Gift size={16} color="#059669" strokeWidth={2.5} />
-                <Text style={styles.sectionTitle}>RECOMMENDED FINANCIAL SERVICES</Text>
-              </View>
-            </View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.referralScroll}
-            >
-              {referrals.map((referral) => (
-                <ReferralCard key={referral.id} referral={referral} />
-              ))}
-            </ScrollView>
-          </View>
-        )}
       </ScrollView>
     </View>
   );
@@ -359,13 +337,5 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: '#059669',
     fontWeight: '600',
-  },
-  referralTitleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  referralScroll: {
-    paddingRight: 20,
   },
 });
