@@ -1,164 +1,332 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  FlatList,
-  Dimensions,
+  ScrollView,
+  TouchableOpacity,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
-import { BookOpen } from 'lucide-react-native';
-import { LearnCard, LearnArticle } from '@/components/LearnCard';
-import { LearnCardSkeleton } from '@/components/LearnCardSkeleton';
-import { ARTICLE_IMAGES } from '@/lib/imageCatalog';
+import { Info, FileText, Scale, TrendingUp } from 'lucide-react-native';
 import { theme } from '@/constants/theme';
 
-const ARTICLES: LearnArticle[] = [
-  {
-    id: '1',
-    title: 'Understanding GST/HST for Rideshare Drivers',
-    excerpt: 'Learn when you need to register for GST/HST, how to collect it, and claim input tax credits on business expenses.',
-    category: 'GST/HST',
-    readTime: 5,
-    imageUrl: ARTICLE_IMAGES.taxes,
-  },
-  {
-    id: '2',
-    title: 'Maximizing Your Mileage Deductions',
-    excerpt: 'Track every business kilometer to claim maximum deductions. We break down the simplified and detailed methods.',
-    category: 'Mileage',
-    readTime: 7,
-    imageUrl: ARTICLE_IMAGES.mileage,
-  },
-  {
-    id: '4',
-    title: 'Smart Tax Planning for Self-Employed',
-    excerpt: 'Set aside the right amount throughout the year, use RRSP contributions, and minimize your tax bill legally.',
-    category: 'Tax Planning',
-    readTime: 8,
-    imageUrl: ARTICLE_IMAGES.planning,
-  },
-  {
-    id: '5',
-    title: 'Operating as a Small Business',
-    excerpt: 'Separate accounts, professional record-keeping, and business strategies to maximize profitability and minimize stress.',
-    category: 'Business',
-    readTime: 6,
-    imageUrl: ARTICLE_IMAGES.business,
-  },
-  {
-    id: '6',
-    title: 'Insurance Options for Gig Workers',
-    excerpt: 'Protect your income and vehicle with the right insurance. Learn about commercial policies and what your current coverage may miss.',
-    category: 'Insurance',
-    readTime: 5,
-    imageUrl: ARTICLE_IMAGES.insurance,
-  },
-  {
-    id: '7',
-    title: 'Receipt Management Made Simple',
-    excerpt: 'Best practices for organizing receipts, digital scanning tools, and what the CRA requires for proof of expenses.',
-    category: 'Write-offs',
-    readTime: 4,
-    imageUrl: ARTICLE_IMAGES.notebook,
-  },
-  {
-    id: '8',
-    title: 'Building Emergency Savings',
-    excerpt: 'Irregular income requires a different approach to savings. Learn how to build a cushion for slow months and emergencies.',
-    category: 'Business',
-    readTime: 6,
-    imageUrl: ARTICLE_IMAGES.savings,
-  },
+type TabId = 'how-it-works' | 'tracking' | 'cra-rules' | 'maximize';
+
+interface Tab {
+  id: TabId;
+  title: string;
+  icon: typeof Info;
+  emoji: string;
+}
+
+const TABS: Tab[] = [
+  { id: 'how-it-works', title: 'How It Works', icon: Info, emoji: '📱' },
+  { id: 'tracking', title: 'Tracking', icon: FileText, emoji: '🧾' },
+  { id: 'cra-rules', title: 'CRA Rules', icon: Scale, emoji: '🇨🇦' },
+  { id: 'maximize', title: 'Maximize', icon: TrendingUp, emoji: '💰' },
 ];
 
-const { width } = Dimensions.get('window');
-const COLUMN_GAP = 16;
-const SIDE_PADDING = 20;
-const NUM_COLUMNS = width > 600 ? 2 : 1;
-const CARD_WIDTH = NUM_COLUMNS === 2
-  ? (width - SIDE_PADDING * 2 - COLUMN_GAP) / 2
-  : width - SIDE_PADDING * 2;
-
 export default function LearnScreen() {
-  const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabId>('how-it-works');
 
-  const handleArticlePress = useCallback((article: LearnArticle) => {
-    router.push({
-      pathname: '/learn/[id]',
-      params: { id: article.id },
-    });
-  }, []);
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'how-it-works':
+        return (
+          <View style={styles.content}>
+            <Text style={styles.emoji}>📱</Text>
+            <Text style={styles.contentTitle}>How Deductly Works</Text>
 
-  const renderHeader = () => (
-    <>
-      <LinearGradient
-        colors={[theme.colors.surface, theme.colors.primaryLight]}
-        style={styles.hero}
-      >
-        <Text style={styles.greeting}>Tax Resources</Text>
-        <Text style={styles.heroTitle}>Learn</Text>
-      </LinearGradient>
-      <View style={styles.contentHeader}>
-        <Text style={styles.sectionTitle}>
-          FEATURED ARTICLES
-        </Text>
-      </View>
-    </>
-  );
+            <Text style={styles.paragraph}>
+              Deductly is your personal bookkeeping assistant built for gig workers like Uber, Lyft, and DoorDash drivers.
+            </Text>
 
-  const renderEmptyState = () => (
-    <View style={styles.emptyState}>
-      <BookOpen size={48} color="#9CA3AF" />
-      <Text style={styles.emptyText}>
-        No articles yet
-      </Text>
-      <Text style={styles.emptySubtext}>
-        Check back soon for helpful tax tips
-      </Text>
-    </View>
-  );
+            <Text style={styles.paragraph}>
+              Every time you drive, buy gas, or repair your vehicle, Deductly helps you track and organize these expenses automatically.
+            </Text>
 
-  const renderItem = ({ item }: { item: LearnArticle }) => (
-    <View style={{ width: CARD_WIDTH }}>
-      <LearnCard article={item} onPress={() => handleArticlePress(item)} />
-    </View>
-  );
+            <Text style={styles.subheading}>Here's what Deductly does for you:</Text>
 
-  const renderFooter = () => {
-    if (!loading) return null;
-    return (
-      <View style={styles.loadingFooter}>
-        {[1, 2].map((i) => (
-          <View key={i} style={{ width: CARD_WIDTH }}>
-            <LearnCardSkeleton />
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                <Text style={styles.bold}>Tracks income:</Text> Connect your Uber or bank account to record deposits automatically.
+              </Text>
+            </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                <Text style={styles.bold}>Logs expenses:</Text> Enter purchases manually or upload receipts — the app matches them to CRA categories.
+              </Text>
+            </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                <Text style={styles.bold}>Monitors mileage:</Text> Use GPS tracking or manual entry to calculate your business-use percentage.
+              </Text>
+            </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                <Text style={styles.bold}>Generates your tax report:</Text> At year-end, export everything into a pre-filled CRA T2125 form, ready for your tax preparer or CRA submission.
+              </Text>
+            </View>
+
+            <Text style={[styles.paragraph, styles.highlight]}>
+              The goal is simple — help you keep more of what you earn by tracking everything the CRA allows you to deduct.
+            </Text>
           </View>
-        ))}
-      </View>
-    );
+        );
+
+      case 'tracking':
+        return (
+          <View style={styles.content}>
+            <Text style={styles.emoji}>🧾</Text>
+            <Text style={styles.contentTitle}>Proper Expense & Mileage Tracking</Text>
+
+            <Text style={styles.paragraph}>
+              To claim deductions, the CRA requires proof that your expenses are business-related. Proper tracking ensures you can back up every claim if asked.
+            </Text>
+
+            <Text style={styles.subheading}>What to Track:</Text>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                <Text style={styles.bold}>Fuel & Oil:</Text> Every gas purchase related to rides or deliveries.
+              </Text>
+            </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                <Text style={styles.bold}>Maintenance & Repairs:</Text> Oil changes, tires, brake work, cleaning, detailing.
+              </Text>
+            </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                <Text style={styles.bold}>Insurance & Licensing:</Text> Vehicle insurance, Uber or commercial licenses.
+              </Text>
+            </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                <Text style={styles.bold}>Phone & Data:</Text> The portion used for your rideshare or delivery work.
+              </Text>
+            </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                <Text style={styles.bold}>Car Washes & Parking:</Text> Small costs that add up over the year.
+              </Text>
+            </View>
+
+            <Text style={styles.subheading}>Mileage Tracking:</Text>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                Log your start and end odometer readings at the beginning and end of each trip or day.
+              </Text>
+            </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                Deductly will calculate your business-use % (e.g., 70% business, 30% personal).
+              </Text>
+            </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                This % is applied across all vehicle-related expenses to calculate your CRA-eligible deductions.
+              </Text>
+            </View>
+
+            <Text style={[styles.paragraph, styles.highlight]}>
+              The more accurately you track, the more you save — and the easier your tax season becomes.
+            </Text>
+          </View>
+        );
+
+      case 'cra-rules':
+        return (
+          <View style={styles.content}>
+            <Text style={styles.emoji}>🇨🇦</Text>
+            <Text style={styles.contentTitle}>CRA Rules for Uber/Delivery Drivers</Text>
+
+            <Text style={styles.paragraph}>
+              As a rideshare or delivery driver in Canada, you're considered self-employed. That means you don't get a T4 — instead, you report your income and claim deductions using Form T2125 – Statement of Business or Professional Activities.
+            </Text>
+
+            <Text style={styles.subheading}>Here's what the CRA expects from you:</Text>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                Report all income earned through platforms like Uber, Lyft, SkipTheDishes, etc.
+              </Text>
+            </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                Keep detailed records of business expenses and mileage.
+              </Text>
+            </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                Claim deductions only for the portion used for business purposes (e.g., if you use your car 70% for work, claim 70% of gas, insurance, etc.).
+              </Text>
+            </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                Keep records for 6 years, in case the CRA requests proof.
+              </Text>
+            </View>
+
+            <View style={styles.infoBox}>
+              <Text style={styles.infoBoxTitle}>GST/HST Note:</Text>
+              <Text style={styles.infoBoxText}>
+                If your total income exceeds $30,000 in any 12-month period, you must register for a GST/HST number and begin charging and remitting GST/HST on your fares.
+              </Text>
+            </View>
+
+            <Text style={[styles.paragraph, styles.highlight]}>
+              Deductly helps you stay compliant by keeping all your logs and expenses in one place, ready for your tax preparer or CRA upload.
+            </Text>
+          </View>
+        );
+
+      case 'maximize':
+        return (
+          <View style={styles.content}>
+            <Text style={styles.emoji}>💰</Text>
+            <Text style={styles.contentTitle}>Tips to Maximize Deductions</Text>
+
+            <Text style={styles.paragraph}>
+              Smart recordkeeping means bigger refunds and fewer headaches. Here's how to maximize your deductions:
+            </Text>
+
+            <View style={styles.tipCard}>
+              <Text style={styles.checkmark}>✅</Text>
+              <View style={styles.tipContent}>
+                <Text style={styles.tipTitle}>Track Every Trip</Text>
+                <Text style={styles.tipText}>
+                  Use Deductly's mileage tracker for every business drive. Even short trips matter.
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.tipCard}>
+              <Text style={styles.checkmark}>✅</Text>
+              <View style={styles.tipContent}>
+                <Text style={styles.tipTitle}>Snap Every Receipt</Text>
+                <Text style={styles.tipText}>
+                  Gas, maintenance, parking, and even car washes are deductible. Upload a quick photo — no more lost papers.
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.tipCard}>
+              <Text style={styles.checkmark}>✅</Text>
+              <View style={styles.tipContent}>
+                <Text style={styles.tipTitle}>Separate Business & Personal Spending</Text>
+                <Text style={styles.tipText}>
+                  Use a different card or account for your rideshare work to make recordkeeping cleaner.
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.tipCard}>
+              <Text style={styles.checkmark}>✅</Text>
+              <View style={styles.tipContent}>
+                <Text style={styles.tipTitle}>Claim Phone & Internet</Text>
+                <Text style={styles.tipText}>
+                  Estimate how much of your phone and data plan you use for work (usually 50–70%) and record it in Deductly.
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.tipCard}>
+              <Text style={styles.checkmark}>✅</Text>
+              <View style={styles.tipContent}>
+                <Text style={styles.tipTitle}>Don't Miss Home Office Deductions</Text>
+                <Text style={styles.tipText}>
+                  If you manage bookings or accounting from home, you may be able to claim a portion of your rent, utilities, and internet.
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.tipCard}>
+              <Text style={styles.checkmark}>✅</Text>
+              <View style={styles.tipContent}>
+                <Text style={styles.tipTitle}>Check Your Summary Often</Text>
+                <Text style={styles.tipText}>
+                  Deductly's dashboard shows your estimated deductions and potential tax savings in real time.
+                </Text>
+              </View>
+            </View>
+
+            <Text style={[styles.paragraph, styles.highlight]}>
+              More tracking = more deductions = less tax.
+            </Text>
+          </View>
+        );
+    }
   };
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={ARTICLES}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        numColumns={NUM_COLUMNS}
-        key={NUM_COLUMNS}
-        ListHeaderComponent={renderHeader}
-        ListEmptyComponent={renderEmptyState}
-        ListFooterComponent={renderFooter}
-        columnWrapperStyle={NUM_COLUMNS === 2 ? styles.row : undefined}
-        contentContainerStyle={styles.listContent}
+      <LinearGradient
+        colors={[theme.colors.surface, theme.colors.primaryLight]}
+        style={styles.hero}
+      >
+        <Text style={styles.greeting}>Tax Education</Text>
+        <Text style={styles.heroTitle}>Learn</Text>
+      </LinearGradient>
+
+      <View style={styles.tabBar}>
+        {TABS.map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          return (
+            <TouchableOpacity
+              key={tab.id}
+              style={[styles.tab, isActive && styles.tabActive]}
+              onPress={() => setActiveTab(tab.id)}
+            >
+              <Icon
+                size={20}
+                color={isActive ? theme.colors.primary : theme.colors.textSecondary}
+              />
+              <Text style={[styles.tabText, isActive && styles.tabTextActive]}>
+                {tab.title}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
-        removeClippedSubviews={true}
-        maxToRenderPerBatch={6}
-        updateCellsBatchingPeriod={50}
-        initialNumToRender={6}
-        windowSize={10}
-      />
+      >
+        {renderContent()}
+      </ScrollView>
     </View>
   );
 }
@@ -183,47 +351,141 @@ const styles = StyleSheet.create({
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.text,
   },
-  contentHeader: {
-    paddingHorizontal: theme.spacing.base,
-    paddingTop: theme.spacing.lg,
-    paddingBottom: theme.spacing.base,
+  tabBar: {
+    flexDirection: 'row',
+    backgroundColor: theme.colors.surface,
+    paddingHorizontal: theme.spacing.xs,
+    paddingVertical: theme.spacing.xs,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
   },
-  sectionTitle: {
-    fontSize: theme.typography.fontSize.xs,
-    fontWeight: theme.typography.fontWeight.semibold,
+  tab: {
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'center',
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.xs,
+    borderRadius: theme.borderRadius.sm,
+    gap: 4,
+  },
+  tabActive: {
+    backgroundColor: theme.colors.primaryLight,
+  },
+  tabText: {
+    fontSize: 11,
+    fontWeight: theme.typography.fontWeight.medium,
     color: theme.colors.textSecondary,
-    letterSpacing: 1.2,
-    textTransform: 'uppercase',
     textAlign: 'center',
   },
-  listContent: {
-    paddingBottom: 20,
+  tabTextActive: {
+    color: theme.colors.text,
+    fontWeight: theme.typography.fontWeight.semibold,
   },
-  row: {
-    paddingHorizontal: SIDE_PADDING,
-    justifyContent: 'space-between',
+  scrollView: {
+    flex: 1,
   },
-  emptyState: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 80,
-    paddingHorizontal: 40,
+  scrollContent: {
+    paddingBottom: 40,
   },
-  emptyText: {
+  content: {
+    padding: theme.spacing.lg,
+  },
+  emoji: {
+    fontSize: 48,
+    textAlign: 'center',
+    marginBottom: theme.spacing.base,
+  },
+  contentTitle: {
+    fontSize: theme.typography.fontSize.xl,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.text,
+    textAlign: 'center',
+    marginBottom: theme.spacing.lg,
+  },
+  paragraph: {
+    fontSize: theme.typography.fontSize.base,
+    color: theme.colors.text,
+    lineHeight: 24,
+    marginBottom: theme.spacing.base,
+  },
+  highlight: {
+    backgroundColor: theme.colors.primaryLight,
+    padding: theme.spacing.base,
+    borderRadius: theme.borderRadius.sm,
+    borderLeftWidth: 3,
+    borderLeftColor: theme.colors.primary,
+    fontWeight: theme.typography.fontWeight.medium,
+  },
+  subheading: {
     fontSize: theme.typography.fontSize.lg,
     fontWeight: theme.typography.fontWeight.semibold,
     color: theme.colors.text,
     marginTop: theme.spacing.base,
+    marginBottom: theme.spacing.sm,
+  },
+  bulletPoint: {
+    flexDirection: 'row',
+    marginBottom: theme.spacing.sm,
+    paddingLeft: theme.spacing.sm,
+  },
+  bullet: {
+    fontSize: theme.typography.fontSize.lg,
+    color: theme.colors.primary,
+    marginRight: theme.spacing.sm,
+    marginTop: 2,
+  },
+  bulletText: {
+    flex: 1,
+    fontSize: theme.typography.fontSize.base,
+    color: theme.colors.text,
+    lineHeight: 22,
+  },
+  bold: {
+    fontWeight: theme.typography.fontWeight.semibold,
+  },
+  infoBox: {
+    backgroundColor: theme.colors.secondaryLight,
+    padding: theme.spacing.base,
+    borderRadius: theme.borderRadius.base,
+    borderLeftWidth: 4,
+    borderLeftColor: theme.colors.primary,
+    marginVertical: theme.spacing.base,
+  },
+  infoBoxTitle: {
+    fontSize: theme.typography.fontSize.base,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.text,
     marginBottom: theme.spacing.xs,
   },
-  emptySubtext: {
+  infoBoxText: {
+    fontSize: theme.typography.fontSize.base,
+    color: theme.colors.text,
+    lineHeight: 22,
+  },
+  tipCard: {
+    flexDirection: 'row',
+    backgroundColor: theme.colors.surface,
+    padding: theme.spacing.base,
+    borderRadius: theme.borderRadius.base,
+    marginBottom: theme.spacing.sm,
+    ...theme.shadows.sm,
+  },
+  checkmark: {
+    fontSize: 24,
+    marginRight: theme.spacing.sm,
+  },
+  tipContent: {
+    flex: 1,
+  },
+  tipTitle: {
+    fontSize: theme.typography.fontSize.base,
+    fontWeight: theme.typography.fontWeight.semibold,
+    color: theme.colors.text,
+    marginBottom: 4,
+  },
+  tipText: {
     fontSize: theme.typography.fontSize.sm,
     color: theme.colors.textSecondary,
-    textAlign: 'center',
-  },
-  loadingFooter: {
-    flexDirection: NUM_COLUMNS === 2 ? 'row' : 'column',
-    paddingHorizontal: SIDE_PADDING,
-    justifyContent: 'space-between',
+    lineHeight: 20,
   },
 });
