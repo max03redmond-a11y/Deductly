@@ -1,7 +1,6 @@
 import { useEffect, useCallback, useMemo } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { useAuth } from '@/contexts/AuthContext';
 import { EXPENSE_CATEGORIES } from '@/types/database';
 import { TrendingUp, DollarSign, Receipt, ChevronRight } from 'lucide-react-native';
 import { router } from 'expo-router';
@@ -10,8 +9,9 @@ import { EmptyState } from '@/components/EmptyState';
 import { useAppState } from '@/lib/state/appStore';
 import { calculateSummaryTotals, getYTDFilter } from '@/lib/calcs/summary';
 
+const DEFAULT_USER_NAME = 'Driver';
+
 export default function HomeScreen() {
-  const { profile } = useAuth();
   const allExpenses = useAppState((state) => state.expenses);
   const income = useAppState((state) => state.income);
   const mileage = useAppState((state) => state.mileage);
@@ -26,14 +26,12 @@ export default function HomeScreen() {
   }, [allExpenses, income, mileage]);
 
   useEffect(() => {
-    if (profile?.id && profile.id !== userId) {
-      useAppState.getState().setUserId(profile.id);
+    if (!initialized) {
       useAppState.getState().loadAllData();
-
       const unsubscribe = useAppState.getState().subscribeToRealtime();
       return unsubscribe;
     }
-  }, [profile?.id, userId]);
+  }, [initialized]);
 
   useFocusEffect(
     useCallback(() => {
@@ -46,7 +44,7 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <PageHeader
-        title={`Good day, ${profile?.full_name?.split(' ')[0] || 'Driver'}`}
+        title={`Good day, ${DEFAULT_USER_NAME}`}
         subtitle="Here's your business overview"
       />
 
