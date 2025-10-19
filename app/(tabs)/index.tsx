@@ -8,7 +8,7 @@ import { Card } from '@/components/Card';
 import { Button } from '@/components/Button';
 import { ProfileEditForm } from '@/components/ProfileEditForm';
 
-const DEFAULT_USER_ID = 'default-user';
+const DEFAULT_USER_ID = '63dca12f-937b-4760-8f7d-c50dafcaaef3';
 const DEFAULT_PROFILE: any = {
   id: DEFAULT_USER_ID,
   email: 'driver@example.com',

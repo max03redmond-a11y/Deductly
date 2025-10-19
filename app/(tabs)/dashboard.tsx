@@ -11,7 +11,7 @@ import { generateT2125HTML, downloadHTML } from '@/lib/t2125/htmlExport';
 import { showToast } from '@/lib/toast';
 import ExportModal from '@/components/ExportModal';
 
-const DEFAULT_USER_ID = 'default-user';
+const DEFAULT_USER_ID = '63dca12f-937b-4760-8f7d-c50dafcaaef3';
 const DEFAULT_PROFILE: any = { business_name: 'Your Business', id: DEFAULT_USER_ID };
 
 export default function DashboardScreen() {

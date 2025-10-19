@@ -25,7 +25,7 @@ interface EnhancedExpenseModalProps {
   onSuccess: () => void;
 }
 
-const DEFAULT_USER_ID = 'default-user';
+const DEFAULT_USER_ID = '63dca12f-937b-4760-8f7d-c50dafcaaef3';
 
 export function EnhancedExpenseModal({
   visible,
