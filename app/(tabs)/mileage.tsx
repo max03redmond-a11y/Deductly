@@ -19,7 +19,7 @@ interface MileageLog {
   updated_at: string;
 }
 
-const DEFAULT_USER_ID = 'default-user';
+const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000001';
 
 export default function MileageScreen() {
   const currentYear = new Date().getFullYear();

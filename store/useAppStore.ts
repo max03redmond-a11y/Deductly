@@ -7,7 +7,7 @@ import { generateDemoData, clearDemoData } from '@/lib/demoData';
 import { AppStore } from '@/types/store';
 import { Expense } from '@/types/database';
 
-const DEFAULT_USER_ID = 'default-user';
+const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000001';
 
 export const useAppStore = create<AppStore>((set, get) => ({
   // Auth State (deprecated but kept for compatibility)

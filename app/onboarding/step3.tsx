@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Check, ChevronLeft } from 'lucide-react-native';
 
-const DEFAULT_USER_ID = 'default-user';
+const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000001';
 
 export default function OnboardingStep3() {
   const [gstHstRegistered, setGstHstRegistered] = useState<boolean | null>(null);

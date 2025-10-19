@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { CANADIAN_PROVINCES, BUSINESS_TYPES } from '@/types/database';
 
-const DEFAULT_USER_ID = 'default-user';
+const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000001';
 
 export default function ProfileSetupScreen() {
   const [province, setProvince] = useState('');
