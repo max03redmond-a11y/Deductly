@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, Platform } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/contexts/OfflineContext';
+import { localDB } from '@/lib/localDatabase';
 import { Plus, Receipt, Trash2, Car } from 'lucide-react-native';
 import { Expense, EXPENSE_CATEGORIES, MileageLog } from '@/types/database';
 import { EnhancedExpenseModal } from '@/components/EnhancedExpenseModal';

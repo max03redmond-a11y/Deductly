@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal, TextInput, Alert, Dimensions, Platform } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/contexts/OfflineContext';
+import { localDB } from '@/lib/localDatabase';
 import { TrendingUp, TrendingDown, Plus, Download, FileText, PieChart, DollarSign, Percent, FileSpreadsheet } from 'lucide-react-native';
 import { Expense, IncomeRecord, MileageLog, Asset, EXPENSE_CATEGORIES } from '@/types/database';
 import { PieChart as RNPieChart } from 'react-native-chart-kit';
@@ -23,52 +23,22 @@ export default function DashboardScreen() {
   const [showExportModal, setShowExportModal] = useState(false);
 
   const loadData = useCallback(async () => {
-    if (!profile) return;
-
-    const [expensesRes, incomeRes, mileageRes, assetsRes] = await Promise.all([
-      supabase.from('expenses').select('*').eq('user_id', profile.id),
-      supabase.from('income_records').select('*').eq('user_id', profile.id),
-      supabase.from('mileage_logs').select('*').eq('user_id', profile.id),
-      supabase.from('assets').select('*').eq('user_id', profile.id),
+    const [expensesData, incomeData, mileageData, assetsData] = await Promise.all([
+      localDB.getExpenses(),
+      localDB.getIncome(),
+      localDB.getMileage(),
+      localDB.getAssets(),
     ]);
 
-    if (expensesRes.data) setExpenses(expensesRes.data);
-    if (incomeRes.data) setIncome(incomeRes.data);
-    if (mileageRes.data) setMileage(mileageRes.data);
-    if (assetsRes.data) setAssets(assetsRes.data);
+    setExpenses(expensesData);
+    setIncome(incomeData);
+    setMileage(mileageData);
+    setAssets(assetsData);
     setLoading(false);
-  }, [profile]);
+  }, []);
 
   useEffect(() => {
     loadData();
-
-    // Subscribe to real-time changes
-    const expensesChannel = supabase
-      .channel('dashboard-expenses-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'expenses' }, () => {
-        loadData();
-      })
-      .subscribe();
-
-    const incomeChannel = supabase
-      .channel('dashboard-income-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'income_records' }, () => {
-        loadData();
-      })
-      .subscribe();
-
-    const mileageChannel = supabase
-      .channel('dashboard-mileage-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'mileage_logs' }, () => {
-        loadData();
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(expensesChannel);
-      supabase.removeChannel(incomeChannel);
-      supabase.removeChannel(mileageChannel);
-    };
   }, [loadData]);
 
   // Reload when screen comes into focus
@@ -373,7 +343,7 @@ function AddIncomeModal({
   const INCOME_SOURCES = ['Uber', 'Lyft', 'DoorDash', 'Skip The Dishes', 'Cash', 'Other'];
 
   const handleAdd = async () => {
-    if (!source || !amount || !profile) {
+    if (!source || !amount) {
       if (Platform.OS === 'web') {
         alert('Please fill in required fields');
       } else {
@@ -394,28 +364,28 @@ function AddIncomeModal({
 
     setLoading(true);
 
-    const { error } = await supabase.from('income_records').insert({
-      user_id: profile.id,
-      date,
-      source,
-      amount: amountNum,
-      trips_completed: trips ? parseInt(trips) : null,
-      imported_from: 'manual',
-    });
+    try {
+      await localDB.addIncome({
+        user_id: 'local-user',
+        date,
+        source,
+        amount: amountNum,
+        trips_completed: trips ? parseInt(trips) : null,
+        imported_from: 'manual',
+      });
 
-    if (error) {
-      if (Platform.OS === 'web') {
-        alert('Error: ' + error.message);
-      } else {
-        Alert.alert('Error', error.message);
-      }
-      setLoading(false);
-    } else {
       setSource('');
       setAmount('');
       setTrips('');
       setLoading(false);
       onSuccess();
+    } catch (error) {
+      if (Platform.OS === 'web') {
+        alert('Error adding income');
+      } else {
+        Alert.alert('Error', 'Failed to add income');
+      }
+      setLoading(false);
     }
   };
 

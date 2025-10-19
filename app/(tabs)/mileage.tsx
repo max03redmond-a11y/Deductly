@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput, Switch, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/contexts/OfflineContext';
+import { localDB } from '@/lib/localDatabase';
 import { Car, Plus, Calendar } from 'lucide-react-native';
 import { showToast } from '@/lib/toast';
 
@@ -40,38 +40,26 @@ export default function MileageScreen() {
   const [useOdometer, setUseOdometer] = useState(false);
 
   const loadData = useCallback(async () => {
-    if (!profile) return;
-
-    const [logsRes, settingsRes] = await Promise.all([
-      supabase
-        .from('mileage_logs')
-        .select('*')
-        .eq('user_id', profile.id)
-        .gte('date', `${currentYear}-01-01`)
-        .lte('date', `${currentYear}-12-31`)
-        .order('date', { ascending: false }),
-      supabase
-        .from('mileage_settings')
-        .select('*')
-        .eq('user_id', profile.id)
-        .eq('year', currentYear)
-        .maybeSingle(),
+    const [allLogs, settings] = await Promise.all([
+      localDB.getMileage(),
+      localDB.getMileageSettings(currentYear),
     ]);
 
-    if (logsRes.error) {
-      console.error('Error loading mileage logs:', logsRes.error);
-    } else {
-      setLogs(logsRes.data || []);
-    }
+    const filteredLogs = allLogs.filter(log => {
+      const logDate = new Date(log.date);
+      return logDate.getFullYear() === currentYear;
+    }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-    if (settingsRes.data) {
-      setYearStartOdo(settingsRes.data.jan1_odometer_km.toString());
-      setYearEndOdo(settingsRes.data.current_odometer_km.toString());
-      setYearSettingsId(settingsRes.data.id);
+    setLogs(filteredLogs);
+
+    if (settings) {
+      setYearStartOdo(settings.jan1_odometer_km.toString());
+      setYearEndOdo(settings.current_odometer_km.toString());
+      setYearSettingsId(settings.id);
     }
 
     setLoading(false);
-  }, [profile, currentYear]);
+  }, [currentYear]);
 
   useEffect(() => {
     loadData();
@@ -96,41 +84,20 @@ export default function MileageScreen() {
     : 0;
 
   const saveYearOdometer = async (startKm: string, endKm: string) => {
-    if (!profile) return;
-
     const startNum = parseFloat(startKm) || 0;
     const endNum = parseFloat(endKm) || 0;
 
-    const dataToSave = {
-      user_id: profile.id,
+    const savedSettings = await localDB.saveMileageSettings({
       year: currentYear,
       jan1_odometer_km: startNum,
       current_odometer_km: endNum,
       manual_total_km_ytd: null,
-      updated_at: new Date().toISOString(),
-    };
+    });
 
-    if (yearSettingsId) {
-      await supabase
-        .from('mileage_settings')
-        .update(dataToSave)
-        .eq('id', yearSettingsId);
-    } else {
-      const { data } = await supabase
-        .from('mileage_settings')
-        .insert([dataToSave])
-        .select()
-        .single();
-
-      if (data) {
-        setYearSettingsId(data.id);
-      }
-    }
+    setYearSettingsId(savedSettings.id);
   };
 
   const handleAddTrip = async () => {
-    if (!profile) return;
-
     let distanceNum: number;
     let startOdoNum = 0;
     let endOdoNum = 0;
@@ -164,10 +131,9 @@ export default function MileageScreen() {
       }
     }
 
-    const { error } = await supabase
-      .from('mileage_logs')
-      .insert([{
-        user_id: profile.id,
+    try {
+      await localDB.addMileage({
+        user_id: 'local-user',
         date: tripDate,
         start_odometer: startOdoNum,
         end_odometer: endOdoNum,
@@ -175,35 +141,29 @@ export default function MileageScreen() {
         business_km: isBusiness ? distanceNum : 0,
         purpose: purpose || null,
         is_business: isBusiness,
-      }]);
+      });
 
-    if (error) {
+      setStartOdo('');
+      setEndOdo('');
+      setDistance('');
+      setPurpose('');
+      setIsBusiness(true);
+      showToast('Trip added');
+      loadData();
+    } catch (error) {
       Alert.alert('Error', 'Failed to add trip');
       console.error(error);
-      return;
     }
-
-    setStartOdo('');
-    setEndOdo('');
-    setDistance('');
-    setPurpose('');
-    setIsBusiness(true);
-    showToast('Trip added');
-    loadData();
   };
 
   const handleDeleteTrip = async (id: string) => {
-    const { error} = await supabase
-      .from('mileage_logs')
-      .delete()
-      .eq('id', id);
-
-    if (error) {
-      Alert.alert('Error', 'Failed to delete trip');
-      console.error(error);
-    } else {
+    try {
+      await localDB.deleteMileage(id);
       showToast('Trip deleted');
       loadData();
+    } catch (error) {
+      Alert.alert('Error', 'Failed to delete trip');
+      console.error(error);
     }
   };
 

@@ -14,8 +14,8 @@ import {
   Keyboard,
 } from 'react-native';
 import { X, Check } from 'lucide-react-native';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/contexts/OfflineContext';
+import { localDB } from '@/lib/localDatabase';
 import { CRACategory } from '@/types/database';
 import { CategorySelector } from './CategorySelector';
 import { useCRACategories } from '@/hooks/useCRACategories';
@@ -66,25 +66,17 @@ export function EnhancedExpenseModal({
   }, [visible]);
 
   const loadMileageBusinessUse = async () => {
-    if (!profile) return;
-
     const currentYear = new Date().getFullYear();
-    const { data } = await supabase
-      .from('mileage_settings')
-      .select('jan1_odometer_km, current_odometer_km')
-      .eq('user_id', profile.id)
-      .eq('year', currentYear)
-      .maybeSingle();
+    const settings = await localDB.getMileageSettings(currentYear);
 
-    if (data && isMountedRef.current) {
-      const totalKm = data.current_odometer_km - data.jan1_odometer_km;
+    if (settings && isMountedRef.current) {
+      const totalKm = settings.current_odometer_km - settings.jan1_odometer_km;
       if (totalKm > 0) {
-        const { data: logs } = await supabase
-          .from('mileage_logs')
-          .select('distance_km, is_business')
-          .eq('user_id', profile.id)
-          .gte('date', `${currentYear}-01-01`)
-          .lte('date', `${currentYear}-12-31`);
+        const allLogs = await localDB.getMileage();
+        const logs = allLogs.filter(log => {
+          const logDate = new Date(log.date);
+          return logDate.getFullYear() === currentYear;
+        });
 
         if (logs && isMountedRef.current) {
           const businessKm = logs
@@ -120,7 +112,7 @@ export function EnhancedExpenseModal({
   };
 
   const handleAdd = async () => {
-    if (!vendor || !amountBeforeTax || !selectedCategory || !profile) {
+    if (!vendor || !amountBeforeTax || !selectedCategory) {
       const message = 'Please fill in vendor, amount, and select a category';
       if (Platform.OS === 'web') {
         alert(message);
@@ -159,38 +151,35 @@ export function EnhancedExpenseModal({
     const totalAmount = calculateTotalAmount();
     const deductibleAmount = calculateDeductibleAmount();
 
-    const { error } = await supabase.from('expenses').insert({
-      user_id: profile.id,
-      date,
-      vendor,
-      merchant_name: vendor,
-      amount_before_tax: beforeTax,
-      tax_paid_hst: tax,
-      total_amount: totalAmount,
-      amount: totalAmount,
-      tax_amount: tax,
-      deductible_amount: deductibleAmount,
-      category_code: selectedCategory.code,
-      category_label: selectedCategory.label,
-      category: selectedCategory.code,
-      business_percentage: percentageNum,
-      is_business: percentageNum > 0,
-      itc_eligible: selectedCategory.itc_eligible,
-      notes,
-      imported_from: 'manual',
-    });
+    try {
+      await localDB.addExpense({
+        user_id: 'local-user',
+        date,
+        merchant_name: vendor,
+        amount: totalAmount,
+        category: selectedCategory.code,
+        business_percentage: percentageNum,
+        notes: notes || null,
+        receipt_image_url: null,
+        imported_from: 'manual',
+      });
 
-    if (error) {
-      const message = error.message;
+      setVendor('');
+      setAmountBeforeTax('');
+      setTaxAmount('');
+      setSelectedCategory(null);
+      setBusinessPercentage('100');
+      setNotes('');
+      setLoading(false);
+      onSuccess();
+    } catch (error) {
+      const message = 'Failed to add expense';
       if (Platform.OS === 'web') {
         alert(message);
       } else {
         Alert.alert('Error', message);
       }
       setLoading(false);
-    } else {
-      setLoading(false);
-      onSuccess();
     }
   };
 

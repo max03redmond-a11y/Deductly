@@ -1,7 +1,7 @@
 import { useEffect, useCallback, useMemo } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/OfflineContext';
 import { EXPENSE_CATEGORIES } from '@/types/database';
 import { TrendingUp, DollarSign, Receipt, ChevronRight } from 'lucide-react-native';
 import { router } from 'expo-router';
