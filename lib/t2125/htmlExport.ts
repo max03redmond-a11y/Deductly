@@ -152,12 +152,12 @@ export function generateT2125HTML(data: T2125Data): string {
     <div class="row">
       <div class="line-number">8000</div>
       <div class="description">Adjusted gross sales</div>
-      <div class="amount">$${formatCurrency(data.income.line8000_grossIncome)}</div>
+      <div class="amount">$${formatCurrency(data.part3c_income.line8000_adjustedGrossSales)}</div>
     </div>
     <div class="row total">
       <div class="line-number">8299</div>
       <div class="description">Gross business or professional income</div>
-      <div class="amount">$${formatCurrency(data.income.line8299_grossBusinessIncome)}</div>
+      <div class="amount">$${formatCurrency(data.part3c_income.line8299_grossBusinessIncome)}</div>
     </div>
   </div>
 
@@ -169,155 +169,155 @@ export function generateT2125HTML(data: T2125Data): string {
       <div class="amount">Amount</div>
     </div>
 
-    ${data.expenses.line8521_advertising > 0 ? `
+    ${data.part4_expenses.line8521_advertising > 0 ? `
     <div class="row">
       <div class="line-number">8521</div>
       <div class="description">Advertising</div>
-      <div class="amount">$${formatCurrency(data.expenses.line8521_advertising)}</div>
+      <div class="amount">$${formatCurrency(data.part4_expenses.line8521_advertising)}</div>
     </div>` : ''}
 
-    ${data.expenses.line8523_mealsEntertainment > 0 ? `
+    ${data.part4_expenses.line8523_mealsEntertainment > 0 ? `
     <div class="row">
       <div class="line-number">8523</div>
       <div class="description">Meals and entertainment (50% deductible)</div>
-      <div class="amount">$${formatCurrency(data.expenses.line8523_mealsEntertainment)}</div>
+      <div class="amount">$${formatCurrency(data.part4_expenses.line8523_mealsEntertainment)}</div>
     </div>` : ''}
 
-    ${data.expenses.line8590_badDebts > 0 ? `
+    ${data.part4_expenses.line8590_badDebts > 0 ? `
     <div class="row">
       <div class="line-number">8590</div>
       <div class="description">Bad debts</div>
-      <div class="amount">$${formatCurrency(data.expenses.line8590_badDebts)}</div>
+      <div class="amount">$${formatCurrency(data.part4_expenses.line8590_badDebts)}</div>
     </div>` : ''}
 
-    ${data.expenses.line8690_insurance > 0 ? `
+    ${data.part4_expenses.line8690_insurance > 0 ? `
     <div class="row">
       <div class="line-number">8690</div>
       <div class="description">Insurance</div>
-      <div class="amount">$${formatCurrency(data.expenses.line8690_insurance)}</div>
+      <div class="amount">$${formatCurrency(data.part4_expenses.line8690_insurance)}</div>
     </div>` : ''}
 
-    ${data.expenses.line8710_interestBankCharges > 0 ? `
+    ${data.part4_expenses.line8710_interestBankCharges > 0 ? `
     <div class="row">
       <div class="line-number">8710</div>
       <div class="description">Interest and bank charges</div>
-      <div class="amount">$${formatCurrency(data.expenses.line8710_interestBankCharges)}</div>
+      <div class="amount">$${formatCurrency(data.part4_expenses.line8710_interestBankCharges)}</div>
     </div>` : ''}
 
-    ${data.expenses.line8760_businessTaxesLicences > 0 ? `
+    ${data.part4_expenses.line8760_businessTaxesLicences > 0 ? `
     <div class="row">
       <div class="line-number">8760</div>
       <div class="description">Business taxes, licences and memberships</div>
-      <div class="amount">$${formatCurrency(data.expenses.line8760_businessTaxesLicences)}</div>
+      <div class="amount">$${formatCurrency(data.part4_expenses.line8760_businessTaxesLicences)}</div>
     </div>` : ''}
 
-    ${data.expenses.line8810_officeExpenses > 0 ? `
+    ${data.part4_expenses.line8810_officeExpenses > 0 ? `
     <div class="row">
       <div class="line-number">8810</div>
       <div class="description">Office expenses</div>
-      <div class="amount">$${formatCurrency(data.expenses.line8810_officeExpenses)}</div>
+      <div class="amount">$${formatCurrency(data.part4_expenses.line8810_officeExpenses)}</div>
     </div>` : ''}
 
-    ${data.expenses.line8811_officeStationery > 0 ? `
+    ${data.part4_expenses.line8811_officeStationery > 0 ? `
     <div class="row">
       <div class="line-number">8811</div>
       <div class="description">Office stationery and supplies</div>
-      <div class="amount">$${formatCurrency(data.expenses.line8811_officeStationery)}</div>
+      <div class="amount">$${formatCurrency(data.part4_expenses.line8811_officeStationery)}</div>
     </div>` : ''}
 
-    ${data.expenses.line8860_professionalFees > 0 ? `
+    ${data.part4_expenses.line8860_professionalFees > 0 ? `
     <div class="row">
       <div class="line-number">8860</div>
       <div class="description">Professional fees</div>
-      <div class="amount">$${formatCurrency(data.expenses.line8860_professionalFees)}</div>
+      <div class="amount">$${formatCurrency(data.part4_expenses.line8860_professionalFees)}</div>
     </div>` : ''}
 
-    ${data.expenses.line8871_managementFees > 0 ? `
+    ${data.part4_expenses.line8871_managementFees > 0 ? `
     <div class="row">
       <div class="line-number">8871</div>
       <div class="description">Management and administration fees</div>
-      <div class="amount">$${formatCurrency(data.expenses.line8871_managementFees)}</div>
+      <div class="amount">$${formatCurrency(data.part4_expenses.line8871_managementFees)}</div>
     </div>` : ''}
 
-    ${data.expenses.line8910_rent > 0 ? `
+    ${data.part4_expenses.line8910_rent > 0 ? `
     <div class="row">
       <div class="line-number">8910</div>
       <div class="description">Rent</div>
-      <div class="amount">$${formatCurrency(data.expenses.line8910_rent)}</div>
+      <div class="amount">$${formatCurrency(data.part4_expenses.line8910_rent)}</div>
     </div>` : ''}
 
-    ${data.expenses.line8960_repairsMaintenance > 0 ? `
+    ${data.part4_expenses.line8960_repairsMaintenance > 0 ? `
     <div class="row">
       <div class="line-number">8960</div>
       <div class="description">Repairs and maintenance</div>
-      <div class="amount">$${formatCurrency(data.expenses.line8960_repairsMaintenance)}</div>
+      <div class="amount">$${formatCurrency(data.part4_expenses.line8960_repairsMaintenance)}</div>
     </div>` : ''}
 
-    ${data.expenses.line9060_salariesWages > 0 ? `
+    ${data.part4_expenses.line9060_salariesWages > 0 ? `
     <div class="row">
       <div class="line-number">9060</div>
       <div class="description">Salaries, wages and benefits</div>
-      <div class="amount">$${formatCurrency(data.expenses.line9060_salariesWages)}</div>
+      <div class="amount">$${formatCurrency(data.part4_expenses.line9060_salariesWages)}</div>
     </div>` : ''}
 
-    ${data.expenses.line9180_propertyTaxes > 0 ? `
+    ${data.part4_expenses.line9180_propertyTaxes > 0 ? `
     <div class="row">
       <div class="line-number">9180</div>
       <div class="description">Property taxes</div>
-      <div class="amount">$${formatCurrency(data.expenses.line9180_propertyTaxes)}</div>
+      <div class="amount">$${formatCurrency(data.part4_expenses.line9180_propertyTaxes)}</div>
     </div>` : ''}
 
-    ${data.expenses.line9200_travelExpenses > 0 ? `
+    ${data.part4_expenses.line9200_travelExpenses > 0 ? `
     <div class="row">
       <div class="line-number">9200</div>
       <div class="description">Travel expenses</div>
-      <div class="amount">$${formatCurrency(data.expenses.line9200_travelExpenses)}</div>
+      <div class="amount">$${formatCurrency(data.part4_expenses.line9200_travelExpenses)}</div>
     </div>` : ''}
 
-    ${data.expenses.line9220_utilities > 0 ? `
+    ${data.part4_expenses.line9220_utilities > 0 ? `
     <div class="row">
       <div class="line-number">9220</div>
       <div class="description">Utilities</div>
-      <div class="amount">$${formatCurrency(data.expenses.line9220_utilities)}</div>
+      <div class="amount">$${formatCurrency(data.part4_expenses.line9220_utilities)}</div>
     </div>` : ''}
 
-    ${data.expenses.line9224_fuelCosts > 0 ? `
+    ${data.part4_expenses.line9224_fuelCosts > 0 ? `
     <div class="row">
       <div class="line-number">9224</div>
       <div class="description">Fuel costs (except for motor vehicles)</div>
-      <div class="amount">$${formatCurrency(data.expenses.line9224_fuelCosts)}</div>
+      <div class="amount">$${formatCurrency(data.part4_expenses.line9224_fuelCosts)}</div>
     </div>` : ''}
 
-    ${data.expenses.line9275_deliveryFreight > 0 ? `
+    ${data.part4_expenses.line9275_deliveryFreight > 0 ? `
     <div class="row">
       <div class="line-number">9275</div>
       <div class="description">Delivery, freight and express</div>
-      <div class="amount">$${formatCurrency(data.expenses.line9275_deliveryFreight)}</div>
+      <div class="amount">$${formatCurrency(data.part4_expenses.line9275_deliveryFreight)}</div>
     </div>` : ''}
 
     <div class="row">
       <div class="line-number">9281</div>
       <div class="description">Motor vehicle expenses (not including CCA)</div>
-      <div class="amount">$${formatCurrency(data.expenses.line9281_motorVehicleExpenses)}</div>
+      <div class="amount">$${formatCurrency(data.part4_expenses.line9281_motorVehicleExpenses)}</div>
     </div>
 
-    ${data.expenses.line9936_cca > 0 ? `
+    ${data.part4_expenses.line9936_cca > 0 ? `
     <div class="row">
       <div class="line-number">9936</div>
       <div class="description">Capital cost allowance (CCA)</div>
-      <div class="amount">$${formatCurrency(data.expenses.line9936_cca)}</div>
+      <div class="amount">$${formatCurrency(data.part4_expenses.line9936_cca)}</div>
     </div>` : ''}
 
     <div class="row total">
       <div class="line-number">9368</div>
       <div class="description">Total expenses</div>
-      <div class="amount">$${formatCurrency(data.expenses.line9368_totalExpenses)}</div>
+      <div class="amount">$${formatCurrency(data.part4_expenses.line9368_totalExpenses)}</div>
     </div>
 
     <div class="row total">
       <div class="line-number">9369</div>
       <div class="description">Net income (loss) before adjustments</div>
-      <div class="amount">$${formatCurrency(data.netIncome.line9369_netIncomeBeforeAdjustments)}</div>
+      <div class="amount">$${formatCurrency(data.part5_netIncome.line9369_netIncomeBeforeAdjustments)}</div>
     </div>
   </div>
 
@@ -325,13 +325,13 @@ export function generateT2125HTML(data: T2125Data): string {
     <h2>Chart A - Motor Vehicle Expenses</h2>
     <div class="info-grid">
       <div class="info-label">Business kilometres:</div>
-      <div>${data.motorVehicle.businessKm.toFixed(0)} km</div>
+      <div>${data.chartA_motorVehicle.line1_businessKm.toFixed(0)} km</div>
 
       <div class="info-label">Total kilometres:</div>
-      <div>${data.motorVehicle.totalKm.toFixed(0)} km</div>
+      <div>${data.chartA_motorVehicle.line2_totalKm.toFixed(0)} km</div>
 
       <div class="info-label">Business use percentage:</div>
-      <div>${formatPercent(data.motorVehicle.businessUsePercent)}%</div>
+      <div>${formatPercent(data.chartA_motorVehicle.businessUsePercent)}%</div>
     </div>
 
     <div class="row header">
@@ -343,31 +343,31 @@ export function generateT2125HTML(data: T2125Data): string {
     <div class="row">
       <div class="line-number">3</div>
       <div class="description">Fuel and oil</div>
-      <div class="amount">$${formatCurrency(data.motorVehicle.fuelOil)}</div>
+      <div class="amount">$${formatCurrency(data.chartA_motorVehicle.line3_fuelOil)}</div>
     </div>
 
     <div class="row">
       <div class="line-number">5</div>
       <div class="description">Insurance</div>
-      <div class="amount">$${formatCurrency(data.motorVehicle.insurance)}</div>
+      <div class="amount">$${formatCurrency(data.chartA_motorVehicle.line5_insurance)}</div>
     </div>
 
     <div class="row">
       <div class="line-number">7</div>
       <div class="description">Maintenance and repairs</div>
-      <div class="amount">$${formatCurrency(data.motorVehicle.maintenance)}</div>
+      <div class="amount">$${formatCurrency(data.chartA_motorVehicle.line7_maintenance)}</div>
     </div>
 
     <div class="row total">
       <div class="line-number">12</div>
       <div class="description">Total motor vehicle expenses</div>
-      <div class="amount">$${formatCurrency(data.motorVehicle.totalExpenses)}</div>
+      <div class="amount">$${formatCurrency(data.chartA_motorVehicle.line12_totalExpenses)}</div>
     </div>
 
     <div class="row total">
       <div class="line-number">13</div>
       <div class="description">Business use part</div>
-      <div class="amount">$${formatCurrency(data.motorVehicle.businessPortion)}</div>
+      <div class="amount">$${formatCurrency(data.chartA_motorVehicle.line13_businessPortion)}</div>
     </div>
   </div>
 
@@ -376,7 +376,7 @@ export function generateT2125HTML(data: T2125Data): string {
     <div class="row total">
       <div class="line-number">9946</div>
       <div class="description">Your net income (loss)</div>
-      <div class="amount">$${formatCurrency(data.netIncome.line9946_yourNetIncome)}</div>
+      <div class="amount">$${formatCurrency(data.part5_netIncome.line9946_yourNetIncome)}</div>
     </div>
   </div>
 

@@ -108,14 +108,14 @@ export function generateT2125CSV(data: T2125Data): string {
     section: 'Part 3C',
     lineNumber: '8000',
     description: 'Adjusted gross sales or adjusted professional fees',
-    amount: formatCurrency(data.income.line8000_grossIncome),
+    amount: formatCurrency(data.part3c_income.line8000_adjustedGrossSales),
   });
 
   rows.push({
     section: 'Part 3C',
     lineNumber: '8299',
     description: 'Gross business or professional income',
-    amount: formatCurrency(data.income.line8299_grossBusinessIncome),
+    amount: formatCurrency(data.part3c_income.line8299_grossBusinessIncome),
   });
 
   rows.push({
@@ -129,175 +129,175 @@ export function generateT2125CSV(data: T2125Data): string {
     section: 'Part 4',
     lineNumber: '8521',
     description: 'Advertising',
-    amount: formatCurrency(data.expenses.line8521_advertising),
+    amount: formatCurrency(data.part4_expenses.line8521_advertising),
   });
 
   rows.push({
     section: 'Part 4',
     lineNumber: '8523',
     description: 'Meals and entertainment (50%)',
-    amount: formatCurrency(data.expenses.line8523_mealsEntertainment),
+    amount: formatCurrency(data.part4_expenses.line8523_mealsEntertainment),
   });
 
   rows.push({
     section: 'Part 4',
     lineNumber: '8590',
     description: 'Bad debts',
-    amount: formatCurrency(data.expenses.line8590_badDebts),
+    amount: formatCurrency(data.part4_expenses.line8590_badDebts),
   });
 
   rows.push({
     section: 'Part 4',
     lineNumber: '8690',
     description: 'Insurance',
-    amount: formatCurrency(data.expenses.line8690_insurance),
+    amount: formatCurrency(data.part4_expenses.line8690_insurance),
   });
 
   rows.push({
     section: 'Part 4',
     lineNumber: '8710',
     description: 'Interest and bank charges',
-    amount: formatCurrency(data.expenses.line8710_interestBankCharges),
+    amount: formatCurrency(data.part4_expenses.line8710_interestBankCharges),
   });
 
   rows.push({
     section: 'Part 4',
     lineNumber: '8760',
     description: 'Business taxes, licences and memberships',
-    amount: formatCurrency(data.expenses.line8760_businessTaxesLicences),
+    amount: formatCurrency(data.part4_expenses.line8760_businessTaxesLicences),
   });
 
   rows.push({
     section: 'Part 4',
     lineNumber: '8810',
     description: 'Office expenses',
-    amount: formatCurrency(data.expenses.line8810_officeExpenses),
+    amount: formatCurrency(data.part4_expenses.line8810_officeExpenses),
   });
 
   rows.push({
     section: 'Part 4',
     lineNumber: '8811',
     description: 'Office stationery and supplies',
-    amount: formatCurrency(data.expenses.line8811_officeStationery),
+    amount: formatCurrency(data.part4_expenses.line8811_officeStationery),
   });
 
   rows.push({
     section: 'Part 4',
     lineNumber: '8860',
     description: 'Professional fees',
-    amount: formatCurrency(data.expenses.line8860_professionalFees),
+    amount: formatCurrency(data.part4_expenses.line8860_professionalFees),
   });
 
   rows.push({
     section: 'Part 4',
     lineNumber: '8871',
     description: 'Management and administration fees',
-    amount: formatCurrency(data.expenses.line8871_managementFees),
+    amount: formatCurrency(data.part4_expenses.line8871_managementFees),
   });
 
   rows.push({
     section: 'Part 4',
     lineNumber: '8910',
     description: 'Rent',
-    amount: formatCurrency(data.expenses.line8910_rent),
+    amount: formatCurrency(data.part4_expenses.line8910_rent),
   });
 
   rows.push({
     section: 'Part 4',
     lineNumber: '8960',
     description: 'Repairs and maintenance',
-    amount: formatCurrency(data.expenses.line8960_repairsMaintenance),
+    amount: formatCurrency(data.part4_expenses.line8960_repairsMaintenance),
   });
 
   rows.push({
     section: 'Part 4',
     lineNumber: '9060',
     description: 'Salaries, wages and benefits',
-    amount: formatCurrency(data.expenses.line9060_salariesWages),
+    amount: formatCurrency(data.part4_expenses.line9060_salariesWages),
   });
 
   rows.push({
     section: 'Part 4',
     lineNumber: '9180',
     description: 'Property taxes',
-    amount: formatCurrency(data.expenses.line9180_propertyTaxes),
+    amount: formatCurrency(data.part4_expenses.line9180_propertyTaxes),
   });
 
   rows.push({
     section: 'Part 4',
     lineNumber: '9200',
     description: 'Travel expenses',
-    amount: formatCurrency(data.expenses.line9200_travelExpenses),
+    amount: formatCurrency(data.part4_expenses.line9200_travelExpenses),
   });
 
   rows.push({
     section: 'Part 4',
     lineNumber: '9225',
     description: 'Telephone and utilities',
-    amount: formatCurrency(data.expenses.line9225_telephone),
+    amount: formatCurrency(data.part4_expenses.line9225_telephone),
   });
 
   rows.push({
     section: 'Part 4',
     lineNumber: '9220',
     description: 'Utilities',
-    amount: formatCurrency(data.expenses.line9220_utilities),
+    amount: formatCurrency(data.part4_expenses.line9220_utilities),
   });
 
   rows.push({
     section: 'Part 4',
     lineNumber: '9224',
     description: 'Fuel costs (except for motor vehicles)',
-    amount: formatCurrency(data.expenses.line9224_fuelCosts),
+    amount: formatCurrency(data.part4_expenses.line9224_fuelCosts),
   });
 
   rows.push({
     section: 'Part 4',
     lineNumber: '9270',
     description: 'Other expenses',
-    amount: formatCurrency(data.expenses.line9270_other),
+    amount: formatCurrency(data.part4_expenses.line9270_other),
   });
 
   rows.push({
     section: 'Part 4',
     lineNumber: '9275',
     description: 'Delivery, freight and express',
-    amount: formatCurrency(data.expenses.line9275_deliveryFreight),
+    amount: formatCurrency(data.part4_expenses.line9275_deliveryFreight),
   });
 
   rows.push({
     section: 'Part 4',
     lineNumber: '9281',
     description: 'Motor vehicle expenses (not including CCA)',
-    amount: formatCurrency(data.expenses.line9281_motorVehicleExpenses),
+    amount: formatCurrency(data.part4_expenses.line9281_motorVehicleExpenses),
   });
 
   rows.push({
     section: 'Part 4',
     lineNumber: '9936',
     description: 'Capital cost allowance (CCA)',
-    amount: formatCurrency(data.expenses.line9936_cca),
+    amount: formatCurrency(data.part4_expenses.line9936_cca),
   });
 
   rows.push({
     section: 'Part 4',
     lineNumber: '9945',
     description: 'Business-use-of-home expenses',
-    amount: formatCurrency(data.expenses.line9945_homeOffice),
+    amount: formatCurrency(data.part5_netIncome.line9945_businessUseOfHome),
   });
 
   rows.push({
     section: 'Part 4',
     lineNumber: '9368',
     description: 'Total expenses',
-    amount: formatCurrency(data.expenses.line9368_totalExpenses),
+    amount: formatCurrency(data.part4_expenses.line9368_totalExpenses),
   });
 
   rows.push({
     section: 'Part 4',
     lineNumber: '9369',
     description: 'Net income (loss) before adjustments',
-    amount: formatCurrency(data.netIncome.line9369_netIncomeBeforeAdjustments),
+    amount: formatCurrency(data.part5_netIncome.line9369_netIncomeBeforeAdjustments),
   });
 
   rows.push({
@@ -311,70 +311,70 @@ export function generateT2125CSV(data: T2125Data): string {
     section: 'Chart A',
     lineNumber: '1',
     description: 'Business kilometres',
-    amount: data.motorVehicle.businessKm.toString(),
+    amount: data.chartA_motorVehicle.line1_businessKm.toString(),
   });
 
   rows.push({
     section: 'Chart A',
     lineNumber: '2',
     description: 'Total kilometres',
-    amount: data.motorVehicle.totalKm.toString(),
+    amount: data.chartA_motorVehicle.line2_totalKm.toString(),
   });
 
   rows.push({
     section: 'Chart A',
     lineNumber: '',
     description: 'Business use percentage',
-    amount: formatPercent(data.motorVehicle.businessUsePercent) + '%',
+    amount: formatPercent(data.chartA_motorVehicle.businessUsePercent) + '%',
   });
 
   rows.push({
     section: 'Chart A',
     lineNumber: '3',
     description: 'Fuel and oil',
-    amount: formatCurrency(data.motorVehicle.fuelOil),
+    amount: formatCurrency(data.chartA_motorVehicle.line3_fuelOil),
   });
 
   rows.push({
     section: 'Chart A',
     lineNumber: '5',
     description: 'Insurance',
-    amount: formatCurrency(data.motorVehicle.insurance),
+    amount: formatCurrency(data.chartA_motorVehicle.line5_insurance),
   });
 
   rows.push({
     section: 'Chart A',
     lineNumber: '6',
     description: 'Licence and registration',
-    amount: formatCurrency(data.motorVehicle.licence),
+    amount: formatCurrency(data.chartA_motorVehicle.line6_licenceRegistration),
   });
 
   rows.push({
     section: 'Chart A',
     lineNumber: '7',
     description: 'Maintenance and repairs',
-    amount: formatCurrency(data.motorVehicle.maintenance),
+    amount: formatCurrency(data.chartA_motorVehicle.line7_maintenance),
   });
 
   rows.push({
     section: 'Chart A',
     lineNumber: '12',
     description: 'Total motor vehicle expenses',
-    amount: formatCurrency(data.motorVehicle.totalExpenses),
+    amount: formatCurrency(data.chartA_motorVehicle.line12_totalExpenses),
   });
 
   rows.push({
     section: 'Chart A',
     lineNumber: '13',
     description: 'Business use part',
-    amount: formatCurrency(data.motorVehicle.businessPortion),
+    amount: formatCurrency(data.chartA_motorVehicle.line13_businessPortion),
   });
 
   rows.push({
     section: 'Part 5',
     lineNumber: '9946',
     description: 'Your net income (loss)',
-    amount: formatCurrency(data.netIncome.line9946_yourNetIncome),
+    amount: formatCurrency(data.part5_netIncome.line9946_yourNetIncome),
   });
 
   rows.push({
