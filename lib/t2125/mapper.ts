@@ -29,12 +29,31 @@ export interface T2125Data {
     fiscalPeriodEnd: string;
     mainProductService: string;
     industryCode: string;
+    accountingMethod: string;
+    lastYearOfBusiness: boolean;
   };
-  income: {
-    line8000_grossIncome: number;
+  part2_internet: {
+    numWebsites: number;
+    website1: string;
+    website2: string;
+    website3: string;
+    website4: string;
+    website5: string;
+    incomeFromWebPercent: number;
+  };
+  part3a_businessIncome: {
+    line3A_grossSales: number;
+    line3B_gstHstCollected: number;
+    line3C_subtotal: number;
+    line3G_adjustedGrossSales: number;
+  };
+  part3c_income: {
+    line8000_adjustedGrossSales: number;
+    line8290_reservesDeductedLastYear: number;
+    line8230_otherIncome: number;
     line8299_grossBusinessIncome: number;
   };
-  expenses: {
+  part4_expenses: {
     line8521_advertising: number;
     line8523_mealsEntertainment: number;
     line8590_badDebts: number;
@@ -50,37 +69,67 @@ export interface T2125Data {
     line9060_salariesWages: number;
     line9180_propertyTaxes: number;
     line9200_travelExpenses: number;
-    line9225_telephone: number;
     line9220_utilities: number;
     line9224_fuelCosts: number;
-    line9270_other: number;
     line9275_deliveryFreight: number;
     line9281_motorVehicleExpenses: number;
     line9936_cca: number;
-    line9945_homeOffice: number;
+    line9270_otherExpenses: number;
     line9368_totalExpenses: number;
   };
-  expenseDetails: ExpenseDetail[];
-  motorVehicle: {
-    businessKm: number;
-    totalKm: number;
+  chartA_motorVehicle: {
+    line1_businessKm: number;
+    line2_totalKm: number;
+    line3_fuelOil: number;
+    line4_interest: number;
+    line5_insurance: number;
+    line6_licenceRegistration: number;
+    line7_maintenance: number;
+    line8_leasing: number;
+    line9_electricity: number;
+    line10_otherExpenses: number;
+    line11_subcontractCosts: number;
+    line12_totalExpenses: number;
+    line13_businessPortion: number;
+    line14_businessParkingFees: number;
+    line15_supplementaryInsurance: number;
+    line16_allowableExpenses: number;
     businessUsePercent: number;
-    fuelOil: number;
-    insurance: number;
-    licence: number;
-    maintenance: number;
-    electricity: number;
-    totalExpenses: number;
-    businessPortion: number;
   };
-  netIncome: {
+  part5_netIncome: {
     line9369_netIncomeBeforeAdjustments: number;
+    line5A_yourShare: number;
+    line5B_canadianJournalismCredit: number;
+    line9974_gstHstRebate: number;
+    line5C_total: number;
+    line9943_otherDeductions: number;
+    line5D_netIncomeAfterAdjustments: number;
+    line9945_businessUseOfHome: number;
     line9946_yourNetIncome: number;
   };
+  part7_homeOffice: {
+    line7A_heat: number;
+    line7B_electricity: number;
+    line7C_insurance: number;
+    line7D_maintenance: number;
+    line7E_mortgageInterest: number;
+    line7F_propertyTaxes: number;
+    line7G_otherExpenses: number;
+    line7H_subtotal: number;
+    line7I_personalUsePart: number;
+    line7J_businessPart: number;
+    line7K_cca: number;
+    line7L_carriedForward: number;
+    line7M_totalAvailable: number;
+    line7N_netIncomeLimit: number;
+    line7O_carryForwardNext: number;
+    line7P_allowableClaim: number;
+  };
+  expenseDetails: ExpenseDetail[];
 }
 
-export function mapExpenseToT2125Line(categoryCode: string): keyof T2125Data['expenses'] | null {
-  const mapping: Record<string, keyof T2125Data['expenses']> = {
+export function mapExpenseToT2125Line(categoryCode: string): keyof T2125Data['part4_expenses'] | null {
+  const mapping: Record<string, keyof T2125Data['part4_expenses']> = {
     'ADVERTISING_PROMOS': 'line8521_advertising',
     '8521': 'line8521_advertising',
     'MEALS_CLIENT': 'line8523_mealsEntertainment',
@@ -110,8 +159,8 @@ export function mapExpenseToT2125Line(categoryCode: string): keyof T2125Data['ex
     '9225': 'line9225_telephone',
     '9220': 'line9220_utilities',
     '9224': 'line9224_fuelCosts',
-    'TRAINING_EDU': 'line9270_other',
-    '9270': 'line9270_other',
+    'TRAINING_EDU': 'line9270_otherExpenses',
+    '9270': 'line9270_otherExpenses',
     '9275': 'line9275_deliveryFreight',
     'GAS_FUEL': 'line9281_motorVehicleExpenses',
     'REPAIRS_MAINT': 'line9281_motorVehicleExpenses',
@@ -122,8 +171,6 @@ export function mapExpenseToT2125Line(categoryCode: string): keyof T2125Data['ex
     '9281': 'line9281_motorVehicleExpenses',
     'VEHICLE_DEPRECIATION_CCA': 'line9936_cca',
     '9936': 'line9936_cca',
-    'HOME_OFFICE': 'line9945_homeOffice',
-    '9945': 'line9945_homeOffice',
   };
 
   return mapping[categoryCode] || null;
@@ -139,9 +186,12 @@ export function generateT2125Data(
   const filter = getYTDFilter();
   const currentYear = new Date().getFullYear();
 
+  // Calculate income totals
   const totalIncome = income.reduce((sum, i) => sum + i.amount, 0);
+  const gstHstCollected = income.reduce((sum, i) => sum + (i.gst_hst_collected || 0), 0);
+  const tipsAndBonuses = income.reduce((sum, i) => sum + (i.tips || 0) + (i.bonuses || 0) + (i.incentives || 0), 0);
 
-  const expensesByLine: Partial<Record<keyof T2125Data['expenses'], number>> = {};
+  const expensesByLine: Partial<Record<keyof T2125Data['part4_expenses'], number>> = {};
 
   expenses.forEach((expense) => {
     const lineKey = mapExpenseToT2125Line(expense.category_code || expense.category);
@@ -151,6 +201,7 @@ export function generateT2125Data(
     }
   });
 
+  // Apply 50% meal rule
   const mealsTotal = expensesByLine.line8523_mealsEntertainment || 0;
   expensesByLine.line8523_mealsEntertainment = mealsTotal * 0.5;
 
@@ -233,6 +284,18 @@ export function generateT2125Data(
     return parts.join(', ');
   };
 
+  // Calculate Chart A motor vehicle totals
+  const vehicleOtherExpenses = expenses
+    .filter((e) => e.category === 'Other' && e.notes?.toLowerCase().includes('vehicle'))
+    .reduce((sum, e) => sum + (e.deductible_amount || (e.amount * (e.business_percentage / 100))), 0);
+
+  const chartA_line12 = vehicleFuel + vehicleInsurance + vehicleLicence + vehicleMaintenance + vehicleLease + vehicleOtherExpenses;
+  const chartA_line13 = chartA_line12 * (businessUsePercent / 100);
+  const chartA_line16 = chartA_line13 + vehicleParking;
+
+  // Part 7 - Home Office (if applicable)
+  const homeOfficeExpenses = expensesByLine.line9945_homeOffice || 0;
+
   return {
     identification: {
       yourName: profile?.legal_name || profile?.full_name || '—',
@@ -247,12 +310,31 @@ export function generateT2125Data(
       fiscalPeriodEnd: profile?.fiscal_year_end_date || `${currentYear}-12-31`,
       mainProductService: mainService,
       industryCode: profile?.naics_code || '485310',
+      accountingMethod: 'Cash',
+      lastYearOfBusiness: false,
     },
-    income: {
-      line8000_grossIncome: totalIncome,
-      line8299_grossBusinessIncome: totalIncome,
+    part2_internet: {
+      numWebsites: profile?.business_type === 'rideshare' ? 1 : 0,
+      website1: profile?.business_type === 'rideshare' ? 'uber.com' : '',
+      website2: '',
+      website3: '',
+      website4: '',
+      website5: '',
+      incomeFromWebPercent: profile?.business_type === 'rideshare' ? 100 : 0,
     },
-    expenses: {
+    part3a_businessIncome: {
+      line3A_grossSales: totalIncome + gstHstCollected,
+      line3B_gstHstCollected: gstHstCollected,
+      line3C_subtotal: totalIncome,
+      line3G_adjustedGrossSales: totalIncome,
+    },
+    part3c_income: {
+      line8000_adjustedGrossSales: totalIncome,
+      line8290_reservesDeductedLastYear: 0,
+      line8230_otherIncome: tipsAndBonuses,
+      line8299_grossBusinessIncome: totalIncome + tipsAndBonuses,
+    },
+    part4_expenses: {
       line8521_advertising: expensesByLine.line8521_advertising || 0,
       line8523_mealsEntertainment: expensesByLine.line8523_mealsEntertainment || 0,
       line8590_badDebts: expensesByLine.line8590_badDebts || 0,
@@ -268,33 +350,63 @@ export function generateT2125Data(
       line9060_salariesWages: expensesByLine.line9060_salariesWages || 0,
       line9180_propertyTaxes: expensesByLine.line9180_propertyTaxes || 0,
       line9200_travelExpenses: expensesByLine.line9200_travelExpenses || 0,
-      line9225_telephone: expensesByLine.line9225_telephone || 0,
       line9220_utilities: expensesByLine.line9220_utilities || 0,
       line9224_fuelCosts: expensesByLine.line9224_fuelCosts || 0,
-      line9270_other: expensesByLine.line9270_other || 0,
       line9275_deliveryFreight: expensesByLine.line9275_deliveryFreight || 0,
-      line9281_motorVehicleExpenses: expensesByLine.line9281_motorVehicleExpenses || 0,
+      line9281_motorVehicleExpenses: chartA_line16,
       line9936_cca: expensesByLine.line9936_cca || 0,
-      line9945_homeOffice: expensesByLine.line9945_homeOffice || 0,
+      line9270_otherExpenses: expensesByLine.line9270_otherExpenses || 0,
       line9368_totalExpenses: totalExpenses,
     },
-    expenseDetails,
-    motorVehicle: {
-      businessKm: mileageTotals.business,
-      totalKm: mileageTotals.total,
+    chartA_motorVehicle: {
+      line1_businessKm: mileageTotals.business,
+      line2_totalKm: mileageTotals.total,
+      line3_fuelOil: vehicleFuel,
+      line4_interest: 0,
+      line5_insurance: vehicleInsurance,
+      line6_licenceRegistration: vehicleLicence,
+      line7_maintenance: vehicleMaintenance,
+      line8_leasing: vehicleLease,
+      line9_electricity: 0,
+      line10_otherExpenses: vehicleOtherExpenses,
+      line11_subcontractCosts: 0,
+      line12_totalExpenses: chartA_line12,
+      line13_businessPortion: chartA_line13,
+      line14_businessParkingFees: vehicleParking,
+      line15_supplementaryInsurance: 0,
+      line16_allowableExpenses: chartA_line16,
       businessUsePercent: businessUsePercent,
-      fuelOil: vehicleFuel,
-      insurance: vehicleInsurance,
-      licence: vehicleLicence,
-      maintenance: vehicleMaintenance,
-      electricity: 0,
-      totalExpenses: totalVehicleExpenses,
-      businessPortion: totalVehicleExpenses,
     },
-    netIncome: {
+    part5_netIncome: {
       line9369_netIncomeBeforeAdjustments: netIncomeBeforeAdjustments,
-      line9946_yourNetIncome: netIncomeBeforeAdjustments,
+      line5A_yourShare: netIncomeBeforeAdjustments,
+      line5B_canadianJournalismCredit: 0,
+      line9974_gstHstRebate: 0,
+      line5C_total: netIncomeBeforeAdjustments,
+      line9943_otherDeductions: 0,
+      line5D_netIncomeAfterAdjustments: netIncomeBeforeAdjustments,
+      line9945_businessUseOfHome: homeOfficeExpenses,
+      line9946_yourNetIncome: netIncomeBeforeAdjustments - homeOfficeExpenses,
     },
+    part7_homeOffice: {
+      line7A_heat: 0,
+      line7B_electricity: 0,
+      line7C_insurance: 0,
+      line7D_maintenance: 0,
+      line7E_mortgageInterest: 0,
+      line7F_propertyTaxes: 0,
+      line7G_otherExpenses: 0,
+      line7H_subtotal: 0,
+      line7I_personalUsePart: 0,
+      line7J_businessPart: 0,
+      line7K_cca: 0,
+      line7L_carriedForward: 0,
+      line7M_totalAvailable: 0,
+      line7N_netIncomeLimit: netIncomeBeforeAdjustments,
+      line7O_carryForwardNext: 0,
+      line7P_allowableClaim: homeOfficeExpenses,
+    },
+    expenseDetails,
   };
 }
 
