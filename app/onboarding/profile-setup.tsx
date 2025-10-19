@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, Platform } from 'react-native';
 import { router } from 'expo-router';
-import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { CANADIAN_PROVINCES, BUSINESS_TYPES } from '@/types/database';
 
+const DEFAULT_USER_ID = 'default-user';
+
 export default function ProfileSetupScreen() {
-  const { user, refreshProfile } = useAuth();
   const [province, setProvince] = useState('');
   const [businessType, setBusinessType] = useState('');
   const [gstHstRegistered, setGstHstRegistered] = useState(false);
@@ -22,20 +22,11 @@ export default function ProfileSetupScreen() {
       return;
     }
 
-    if (!user) {
-      if (Platform.OS === 'web') {
-        alert('No user found');
-      } else {
-        Alert.alert('Error', 'No user found');
-      }
-      return;
-    }
-
     setLoading(true);
 
     const { error } = await supabase.from('profiles').insert({
-      id: user.id,
-      email: user.email!,
+      id: DEFAULT_USER_ID,
+      email: 'driver@example.com',
       province,
       business_type: businessType,
       gst_hst_registered: gstHstRegistered,
@@ -51,7 +42,6 @@ export default function ProfileSetupScreen() {
       return;
     }
 
-    await refreshProfile();
     setLoading(false);
     router.replace('/(tabs)');
   };

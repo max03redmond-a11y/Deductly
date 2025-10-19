@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Switch, ActivityIndicator } from 'react-native';
-import { useAuth } from '@/contexts/AuthContext';
 import { User, Shield, Building2, Sparkles, LogOut, ChevronRight, Edit3, FileText } from 'lucide-react-native';
 import { CANADIAN_PROVINCES, BUSINESS_TYPES } from '@/types/database';
 import { generateDemoData, clearDemoData } from '@/lib/demoData';
@@ -9,8 +8,19 @@ import { Card } from '@/components/Card';
 import { Button } from '@/components/Button';
 import { ProfileEditForm } from '@/components/ProfileEditForm';
 
+const DEFAULT_USER_ID = 'default-user';
+const DEFAULT_PROFILE: any = {
+  id: DEFAULT_USER_ID,
+  email: 'driver@example.com',
+  full_name: 'Driver',
+  province: 'ON',
+  business_type: 'rideshare',
+  gst_hst_registered: false,
+  profile_completed: true,
+};
+
 export default function ProfileScreen() {
-  const { user, profile, signOut, refreshProfile } = useAuth();
+  const profile = DEFAULT_PROFILE;
   const [demoMode, setDemoMode] = useState(false);
   const [demoLoading, setDemoLoading] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -19,15 +29,10 @@ export default function ProfileScreen() {
   const businessTypeName = BUSINESS_TYPES.find(b => b.value === profile?.business_type)?.label;
 
   const handleSignOut = async () => {
-    const confirmed = confirm('Are you sure you want to sign out?');
-    if (confirmed) {
-      await signOut();
-    }
+    console.log('Sign out not available without authentication');
   };
 
   const handleDemoModeToggle = async (value: boolean) => {
-    if (!profile) return;
-
     if (value) {
       setDemoLoading(true);
       try {
@@ -53,7 +58,6 @@ export default function ProfileScreen() {
   };
 
   const handleEditSuccess = async () => {
-    await refreshProfile();
     setEditMode(false);
   };
 
@@ -80,8 +84,8 @@ export default function ProfileScreen() {
           <View style={styles.avatarContainer}>
             <User size={48} color={theme.colors.primary} />
           </View>
-          <Text style={styles.userName}>{profile?.full_name || 'Driver'}</Text>
-          <Text style={styles.userEmail}>{user?.email}</Text>
+          <Text style={styles.userName}>{profile.full_name}</Text>
+          <Text style={styles.userEmail}>{profile.email}</Text>
         </View>
 
         {/* Profile Completeness Banner */}
@@ -165,7 +169,7 @@ export default function ProfileScreen() {
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>GST/HST Registered</Text>
               <Text style={styles.detailValue}>
-                {profile?.gst_hst_registered ? 'Yes' : 'No'}
+                {profile.gst_hst_registered ? 'Yes' : 'No'}
               </Text>
             </View>
           </Card>

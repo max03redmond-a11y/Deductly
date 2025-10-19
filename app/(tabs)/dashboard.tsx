@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal, TextInput, Alert, Dimensions, Platform } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { TrendingUp, TrendingDown, Plus, Download, FileText, PieChart, DollarSign, Percent, FileSpreadsheet } from 'lucide-react-native';
 import { Expense, IncomeRecord, MileageLog, Asset, EXPENSE_CATEGORIES } from '@/types/database';
@@ -12,8 +11,11 @@ import { generateT2125HTML, downloadHTML } from '@/lib/t2125/htmlExport';
 import { showToast } from '@/lib/toast';
 import ExportModal from '@/components/ExportModal';
 
+const DEFAULT_USER_ID = 'default-user';
+const DEFAULT_PROFILE: any = { business_name: 'Your Business', id: DEFAULT_USER_ID };
+
 export default function DashboardScreen() {
-  const { profile } = useAuth();
+  const profile = DEFAULT_PROFILE;
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [income, setIncome] = useState<IncomeRecord[]>([]);
   const [mileage, setMileage] = useState<MileageLog[]>([]);
@@ -23,8 +25,6 @@ export default function DashboardScreen() {
   const [showExportModal, setShowExportModal] = useState(false);
 
   const loadData = useCallback(async () => {
-    if (!profile) return;
-
     const [expensesRes, incomeRes, mileageRes, assetsRes] = await Promise.all([
       supabase.from('expenses').select('*').eq('user_id', profile.id),
       supabase.from('income_records').select('*').eq('user_id', profile.id),
@@ -37,7 +37,7 @@ export default function DashboardScreen() {
     if (mileageRes.data) setMileage(mileageRes.data);
     if (assetsRes.data) setAssets(assetsRes.data);
     setLoading(false);
-  }, [profile]);
+  }, []);
 
   useEffect(() => {
     loadData();
@@ -363,7 +363,7 @@ function AddIncomeModal({
   onClose: () => void;
   onSuccess: () => void;
 }) {
-  const { profile } = useAuth();
+  const profile = DEFAULT_PROFILE;
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [source, setSource] = useState('');
   const [amount, setAmount] = useState('');

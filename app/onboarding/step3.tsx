@@ -1,18 +1,18 @@
 import { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, Platform } from 'react-native';
 import { router } from 'expo-router';
-import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Check, ChevronLeft } from 'lucide-react-native';
 
+const DEFAULT_USER_ID = 'default-user';
+
 export default function OnboardingStep3() {
-  const { user, refreshProfile } = useAuth();
   const [gstHstRegistered, setGstHstRegistered] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleComplete = async () => {
-    if (gstHstRegistered === null || !user) return;
+    if (gstHstRegistered === null) return;
 
     setLoading(true);
 
@@ -30,8 +30,8 @@ export default function OnboardingStep3() {
     }
 
     const { error } = await supabase.from('profiles').upsert({
-      id: user.id,
-      email: user.email!,
+      id: DEFAULT_USER_ID,
+      email: 'driver@example.com',
       province,
       business_type: businessType,
       gst_hst_registered: gstHstRegistered,
@@ -50,7 +50,6 @@ export default function OnboardingStep3() {
     }
 
     await AsyncStorage.multiRemove(['onboarding_province', 'onboarding_business_type']);
-    await refreshProfile();
     setLoading(false);
     router.replace('/(tabs)');
   };
