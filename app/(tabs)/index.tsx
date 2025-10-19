@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Switch, ActivityIndicator } from 'react-native';
-import { User, Shield, Building2, Sparkles, LogOut, ChevronRight, Edit3, FileText } from 'lucide-react-native';
+import { User, Shield, Building2, Sparkles, ChevronRight, Edit3, FileText } from 'lucide-react-native';
 import { CANADIAN_PROVINCES, BUSINESS_TYPES } from '@/types/database';
 import { generateDemoData, clearDemoData } from '@/lib/demoData';
 import { theme } from '@/constants/theme';
@@ -27,10 +27,6 @@ export default function ProfileScreen() {
 
   const provinceName = CANADIAN_PROVINCES.find(p => p.value === profile?.province)?.label;
   const businessTypeName = BUSINESS_TYPES.find(b => b.value === profile?.business_type)?.label;
-
-  const handleSignOut = async () => {
-    console.log('Sign out not available without authentication');
-  };
 
   const handleDemoModeToggle = async (value: boolean) => {
     if (value) {
@@ -206,16 +202,6 @@ export default function ProfileScreen() {
               )}
             </View>
           </Card>
-        </View>
-
-        {/* Sign Out */}
-        <View style={styles.section}>
-          <Button
-            title="Sign Out"
-            onPress={handleSignOut}
-            variant="secondary"
-            testID="btn-logout"
-          />
         </View>
 
         <View style={styles.footer}>
