@@ -1,23 +1,22 @@
-import { useEffect, useCallback, useMemo } from 'react';
+import { useEffect, useCallback, useMemo, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { EXPENSE_CATEGORIES } from '@/types/database';
+import { EXPENSE_CATEGORIES, Expense, IncomeRecord, MileageLog } from '@/types/database';
 import { TrendingUp, DollarSign, Receipt, ChevronRight } from 'lucide-react-native';
 import { router } from 'expo-router';
 import { PageHeader } from '@/components/PageHeader';
 import { EmptyState } from '@/components/EmptyState';
-import { useAppState } from '@/lib/state/appStore';
+import { supabase } from '@/lib/supabase';
 import { calculateSummaryTotals, getYTDFilter } from '@/lib/calcs/summary';
 
 const DEFAULT_USER_NAME = 'Driver';
+const DEFAULT_USER_ID = '63dca12f-937b-4760-8f7d-c50dafcaaef3';
 
 export default function HomeScreen() {
-  const allExpenses = useAppState((state) => state.expenses);
-  const income = useAppState((state) => state.income);
-  const mileage = useAppState((state) => state.mileage);
-  const loading = useAppState((state) => state.loading);
-  const initialized = useAppState((state) => state.initialized);
-  const userId = useAppState((state) => state.userId);
+  const [allExpenses, setAllExpenses] = useState<Expense[]>([]);
+  const [income, setIncome] = useState<IncomeRecord[]>([]);
+  const [mileage, setMileage] = useState<MileageLog[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const expenses = useMemo(() => allExpenses.slice(0, 5), [allExpenses]);
 
@@ -25,20 +24,33 @@ export default function HomeScreen() {
     return calculateSummaryTotals(allExpenses, income, mileage, getYTDFilter());
   }, [allExpenses, income, mileage]);
 
-  useEffect(() => {
-    if (!initialized) {
-      useAppState.getState().loadAllData();
-      const unsubscribe = useAppState.getState().subscribeToRealtime();
-      return unsubscribe;
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [expensesRes, incomeRes, mileageRes] = await Promise.all([
+        supabase.from('expenses').select('*').eq('user_id', DEFAULT_USER_ID).order('date', { ascending: false }),
+        supabase.from('income_records').select('*').eq('user_id', DEFAULT_USER_ID),
+        supabase.from('mileage_logs').select('*').eq('user_id', DEFAULT_USER_ID),
+      ]);
+
+      if (expensesRes.data) setAllExpenses(expensesRes.data);
+      if (incomeRes.data) setIncome(incomeRes.data);
+      if (mileageRes.data) setMileage(mileageRes.data);
+    } catch (error) {
+      console.error('Error loading data:', error);
+    } finally {
+      setLoading(false);
     }
-  }, [initialized]);
+  }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   useFocusEffect(
     useCallback(() => {
-      if (initialized && userId) {
-        useAppState.getState().loadAllData();
-      }
-    }, [initialized, userId])
+      loadData();
+    }, [loadData])
   );
 
   return (
