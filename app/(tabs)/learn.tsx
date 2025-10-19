@@ -1,14 +1,18 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  TextInput,
+  Animated,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Info, FileText, Scale, TrendingUp } from 'lucide-react-native';
+import { Info, FileText, Scale, TrendingUp, Search, Bookmark, Calculator } from 'lucide-react-native';
 import { theme } from '@/constants/theme';
+import { useAppState } from '@/lib/state/appStore';
+import { calculateSummaryTotals, getYTDFilter } from '@/lib/calcs/summary';
 
 type TabId = 'how-it-works' | 'tracking' | 'cra-rules' | 'maximize';
 
@@ -28,14 +32,52 @@ const TABS: Tab[] = [
 
 export default function LearnScreen() {
   const [activeTab, setActiveTab] = useState<TabId>('how-it-works');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [bookmarkedSections, setBookmarkedSections] = useState<Set<TabId>>(new Set());
+  const [readSections, setReadSections] = useState<Set<TabId>>(new Set());
+
+  const expenses = useAppState((state) => state.expenses);
+  const income = useAppState((state) => state.income);
+  const mileage = useAppState((state) => state.mileage);
+
+  const totals = useMemo(() => {
+    return calculateSummaryTotals(expenses, income, mileage, getYTDFilter());
+  }, [expenses, income, mileage]);
+
+  const estimatedTaxRate = 0.30;
+  const estimatedTaxOwing = Math.max(0, (totals.totalIncome - totals.totalDeductible) * estimatedTaxRate);
+  const taxSavings = totals.totalDeductible * estimatedTaxRate;
+
+  const toggleBookmark = (tabId: TabId) => {
+    setBookmarkedSections(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(tabId)) {
+        newSet.delete(tabId);
+      } else {
+        newSet.add(tabId);
+      }
+      return newSet;
+    });
+  };
+
+  const markAsRead = (tabId: TabId) => {
+    setReadSections(prev => new Set(prev).add(tabId));
+  };
 
   const renderContent = () => {
     switch (activeTab) {
       case 'how-it-works':
         return (
           <View style={styles.content}>
-            <Text style={styles.emoji}>📱</Text>
-            <Text style={styles.contentTitle}>How Deductly Works (Beta)</Text>
+            <View style={styles.contentHeader}>
+              <View style={styles.emojiCircle}>
+                <Text style={styles.emoji}>📱</Text>
+              </View>
+              <Text style={styles.contentTitle}>How Deductly Works (Beta)</Text>
+              <View style={styles.progressBadge}>
+                <Text style={styles.progressText}>Getting Started</Text>
+              </View>
+            </View>
 
             <Text style={styles.paragraph}>
               Deductly helps gig workers like Uber, Lyft, and DoorDash drivers organize income, mileage, and expenses so that tax time is easy — even if you're doing it all manually right now.
@@ -146,8 +188,15 @@ export default function LearnScreen() {
       case 'tracking':
         return (
           <View style={styles.content}>
-            <Text style={styles.emoji}>🧾</Text>
-            <Text style={styles.contentTitle}>Tracking Expenses & Mileage</Text>
+            <View style={styles.contentHeader}>
+              <View style={styles.emojiCircle}>
+                <Text style={styles.emoji}>🧾</Text>
+              </View>
+              <Text style={styles.contentTitle}>Tracking Expenses & Mileage</Text>
+              <View style={styles.progressBadge}>
+                <Text style={styles.progressText}>Essential Skills</Text>
+              </View>
+            </View>
 
             <Text style={styles.paragraph}>
               In Deductly Beta, everything needs to be logged manually — but doing it right now saves you hours later at tax time. The CRA requires you to keep detailed records for all your self-employment expenses and mileage.
@@ -228,8 +277,15 @@ export default function LearnScreen() {
       case 'cra-rules':
         return (
           <View style={styles.content}>
-            <Text style={styles.emoji}>🇨🇦</Text>
-            <Text style={styles.contentTitle}>CRA Rules for Rideshare & Delivery Drivers</Text>
+            <View style={styles.contentHeader}>
+              <View style={styles.emojiCircle}>
+                <Text style={styles.emoji}>🇨🇦</Text>
+              </View>
+              <Text style={styles.contentTitle}>CRA Rules for Rideshare & Delivery Drivers</Text>
+              <View style={styles.progressBadge}>
+                <Text style={styles.progressText}>Compliance Guide</Text>
+              </View>
+            </View>
 
             <Text style={styles.paragraph}>
               When you drive for Uber, Lyft, or do deliveries, the Canada Revenue Agency (CRA) considers you self-employed — not an employee.
@@ -405,8 +461,15 @@ export default function LearnScreen() {
       case 'maximize':
         return (
           <View style={styles.content}>
-            <Text style={styles.emoji}>💰</Text>
-            <Text style={styles.contentTitle}>Maximize Your Deductions</Text>
+            <View style={styles.contentHeader}>
+              <View style={styles.emojiCircle}>
+                <Text style={styles.emoji}>💰</Text>
+              </View>
+              <Text style={styles.contentTitle}>Maximize Your Deductions</Text>
+              <View style={styles.progressBadge}>
+                <Text style={styles.progressText}>Pro Tips</Text>
+              </View>
+            </View>
 
             <Text style={styles.paragraph}>
               Every dollar you track matters. As a self-employed driver, your taxes are based on profit (income minus expenses) — so the more expenses you claim, the less tax you pay.
@@ -559,37 +622,115 @@ export default function LearnScreen() {
     }
   };
 
+  const filteredTabs = useMemo(() => {
+    if (!searchQuery.trim()) return TABS;
+    const query = searchQuery.toLowerCase();
+    return TABS.filter(tab =>
+      tab.title.toLowerCase().includes(query)
+    );
+  }, [searchQuery]);
+
   return (
     <View style={styles.container}>
       <LinearGradient
         colors={[theme.colors.surface, theme.colors.primaryLight]}
         style={styles.hero}
       >
-        <Text style={styles.greeting}>Tax Education</Text>
-        <Text style={styles.heroTitle}>Learn</Text>
+        <View style={styles.heroHeader}>
+          <View>
+            <Text style={styles.greeting}>Tax Education</Text>
+            <Text style={styles.heroTitle}>Learn</Text>
+          </View>
+          <View style={styles.heroStats}>
+            <Text style={styles.statLabel}>Read</Text>
+            <Text style={styles.statValue}>{readSections.size}/{TABS.length}</Text>
+          </View>
+        </View>
+
+        <View style={styles.searchContainer}>
+          <Search size={20} color={theme.colors.textSecondary} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search topics..."
+            placeholderTextColor={theme.colors.textSecondary}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+        </View>
+
+        {totals.totalIncome > 0 && (
+          <View style={styles.calculatorCard}>
+            <View style={styles.calculatorHeader}>
+              <Calculator size={20} color={theme.colors.primary} />
+              <Text style={styles.calculatorTitle}>Quick Tax Estimate</Text>
+            </View>
+            <View style={styles.calculatorRow}>
+              <Text style={styles.calculatorLabel}>Gross Income:</Text>
+              <Text style={styles.calculatorValue}>${totals.totalIncome.toFixed(2)}</Text>
+            </View>
+            <View style={styles.calculatorRow}>
+              <Text style={styles.calculatorLabel}>Deductions:</Text>
+              <Text style={[styles.calculatorValue, styles.successText]}>-${totals.totalDeductible.toFixed(2)}</Text>
+            </View>
+            <View style={styles.calculatorDivider} />
+            <View style={styles.calculatorRow}>
+              <Text style={styles.calculatorLabelBold}>Est. Tax (30%):</Text>
+              <Text style={styles.calculatorValueBold}>${estimatedTaxOwing.toFixed(2)}</Text>
+            </View>
+            <View style={styles.calculatorSavings}>
+              <Text style={styles.savingsText}>You saved ~${taxSavings.toFixed(2)} in taxes!</Text>
+            </View>
+          </View>
+        )}
       </LinearGradient>
 
-      <View style={styles.tabBar}>
-        {TABS.map((tab) => {
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.tabBar}
+        contentContainerStyle={styles.tabBarContent}
+      >
+        {filteredTabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
+          const isBookmarked = bookmarkedSections.has(tab.id);
+          const isRead = readSections.has(tab.id);
           return (
             <TouchableOpacity
               key={tab.id}
               style={[styles.tab, isActive && styles.tabActive]}
-              onPress={() => setActiveTab(tab.id)}
+              onPress={() => {
+                setActiveTab(tab.id);
+                markAsRead(tab.id);
+              }}
             >
-              <Icon
-                size={20}
-                color={isActive ? theme.colors.primary : theme.colors.textSecondary}
-              />
+              <View style={styles.tabIconRow}>
+                <Icon
+                  size={20}
+                  color={isActive ? theme.colors.primary : theme.colors.textSecondary}
+                />
+                {isRead && <View style={styles.readDot} />}
+              </View>
               <Text style={[styles.tabText, isActive && styles.tabTextActive]}>
                 {tab.title}
               </Text>
+              <TouchableOpacity
+                style={styles.bookmarkButton}
+                onPress={(e) => {
+                  e.stopPropagation();
+                  toggleBookmark(tab.id);
+                }}
+              >
+                <Bookmark
+                  size={14}
+                  color={isBookmarked ? theme.colors.warning : theme.colors.border}
+                  fill={isBookmarked ? theme.colors.warning : 'none'}
+                />
+              </TouchableOpacity>
             </TouchableOpacity>
           );
         })}
-      </View>
+      </ScrollView>
 
       <ScrollView
         style={styles.scrollView}
@@ -610,7 +751,13 @@ const styles = StyleSheet.create({
   hero: {
     paddingTop: 60,
     paddingHorizontal: theme.spacing.base,
-    paddingBottom: theme.spacing.xl,
+    paddingBottom: theme.spacing.base,
+  },
+  heroHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: theme.spacing.base,
   },
   greeting: {
     fontSize: theme.typography.fontSize.sm,
@@ -622,25 +769,130 @@ const styles = StyleSheet.create({
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.text,
   },
-  tabBar: {
+  heroStats: {
+    alignItems: 'flex-end',
+  },
+  statLabel: {
+    fontSize: 11,
+    color: theme.colors.textSecondary,
+    marginBottom: 2,
+  },
+  statValue: {
+    fontSize: 20,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.primary,
+  },
+  searchContainer: {
     flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: theme.colors.surface,
-    paddingHorizontal: theme.spacing.xs,
-    paddingVertical: theme.spacing.xs,
+    borderRadius: theme.borderRadius.base,
+    paddingHorizontal: theme.spacing.base,
+    paddingVertical: theme.spacing.sm,
+    marginBottom: theme.spacing.base,
+    gap: theme.spacing.sm,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: theme.typography.fontSize.base,
+    color: theme.colors.text,
+    padding: 0,
+  },
+  calculatorCard: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.base,
+    padding: theme.spacing.base,
+    marginTop: theme.spacing.sm,
+  },
+  calculatorHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    marginBottom: theme.spacing.sm,
+  },
+  calculatorTitle: {
+    fontSize: theme.typography.fontSize.base,
+    fontWeight: theme.typography.fontWeight.semibold,
+    color: theme.colors.text,
+  },
+  calculatorRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 4,
+  },
+  calculatorLabel: {
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.colors.textSecondary,
+  },
+  calculatorValue: {
+    fontSize: theme.typography.fontSize.sm,
+    fontWeight: theme.typography.fontWeight.medium,
+    color: theme.colors.text,
+  },
+  calculatorLabelBold: {
+    fontSize: theme.typography.fontSize.base,
+    fontWeight: theme.typography.fontWeight.semibold,
+    color: theme.colors.text,
+  },
+  calculatorValueBold: {
+    fontSize: theme.typography.fontSize.base,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.text,
+  },
+  calculatorDivider: {
+    height: 1,
+    backgroundColor: theme.colors.border,
+    marginVertical: theme.spacing.sm,
+  },
+  calculatorSavings: {
+    backgroundColor: theme.colors.successLight,
+    padding: theme.spacing.sm,
+    borderRadius: theme.borderRadius.sm,
+    marginTop: theme.spacing.sm,
+    alignItems: 'center',
+  },
+  savingsText: {
+    fontSize: theme.typography.fontSize.sm,
+    fontWeight: theme.typography.fontWeight.semibold,
+    color: theme.colors.success,
+  },
+  successText: {
+    color: theme.colors.success,
+  },
+  tabBar: {
+    backgroundColor: theme.colors.surface,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
   },
+  tabBarContent: {
+    paddingHorizontal: theme.spacing.xs,
+    paddingVertical: theme.spacing.xs,
+    gap: theme.spacing.xs,
+  },
   tab: {
-    flex: 1,
+    minWidth: 100,
     flexDirection: 'column',
     alignItems: 'center',
     paddingVertical: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.xs,
+    paddingHorizontal: theme.spacing.sm,
     borderRadius: theme.borderRadius.sm,
     gap: 4,
+    position: 'relative',
   },
   tabActive: {
     backgroundColor: theme.colors.primaryLight,
+  },
+  tabIconRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  readDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: theme.colors.success,
   },
   tabText: {
     fontSize: 11,
@@ -652,6 +904,12 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
     fontWeight: theme.typography.fontWeight.semibold,
   },
+  bookmarkButton: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    padding: 2,
+  },
   scrollView: {
     flex: 1,
   },
@@ -661,17 +919,39 @@ const styles = StyleSheet.create({
   content: {
     padding: theme.spacing.lg,
   },
-  emoji: {
-    fontSize: 48,
-    textAlign: 'center',
+  contentHeader: {
+    alignItems: 'center',
+    marginBottom: theme.spacing.lg,
+  },
+  emojiCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: theme.colors.primaryLight,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: theme.spacing.base,
+  },
+  emoji: {
+    fontSize: 40,
   },
   contentTitle: {
     fontSize: theme.typography.fontSize.xl,
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.text,
     textAlign: 'center',
-    marginBottom: theme.spacing.lg,
+    marginBottom: theme.spacing.sm,
+  },
+  progressBadge: {
+    backgroundColor: theme.colors.primary,
+    paddingHorizontal: theme.spacing.base,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  progressText: {
+    fontSize: 12,
+    fontWeight: theme.typography.fontWeight.semibold,
+    color: '#fff',
   },
   paragraph: {
     fontSize: theme.typography.fontSize.base,

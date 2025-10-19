@@ -31,7 +31,8 @@ export const colors = {
   iconInactive: '#CCCCCC',      // Inactive tab icons
 
   // Utility Colors
-  success: '#A8E6CF',           // Success (same as primary)
+  success: '#059669',           // Success green
+  successLight: '#D1FAE5',      // Light success background
   error: '#FF6B6B',             // Error red (soft)
   warning: '#FFD93D',           // Warning yellow
   info: '#A8E6CF',              // Info (primary)
