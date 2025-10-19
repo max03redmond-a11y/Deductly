@@ -335,25 +335,6 @@ export default function DashboardScreen() {
           </View>
         </View>
 
-        <View style={styles.actionsSection}>
-          <Text style={styles.actionsSectionTitle}>REPORTS & EXPORTS</Text>
-
-          <TouchableOpacity style={styles.actionCard}>
-            <Download size={20} color="#111827" />
-            <View style={styles.actionContent}>
-              <Text style={styles.actionTitle}>Download T2125 Report</Text>
-              <Text style={styles.actionDescription}>Tax-ready PDF for filing</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.actionCard}>
-            <Download size={20} color="#111827" />
-            <View style={styles.actionContent}>
-              <Text style={styles.actionTitle}>Export to CSV</Text>
-              <Text style={styles.actionDescription}>All transactions for your accountant</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
       </ScrollView>
 
       <AddIncomeModal
@@ -804,47 +785,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontFamily: 'Montserrat-Regular',
     color: '#D1D5DB',
-  },
-  actionsSection: {
-    marginBottom: 20,
-  },
-  actionsSectionTitle: {
-    fontSize: 11,
-    fontFamily: 'Montserrat-SemiBold',
-    color: '#9CA3AF',
-    letterSpacing: 1.2,
-    marginBottom: 16,
-    paddingHorizontal: 0,
-  },
-  actionCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 12,
-    elevation: 1,
-    borderWidth: 1,
-    borderColor: '#F3F4F6',
-  },
-  actionContent: {
-    flex: 1,
-  },
-  actionTitle: {
-    fontSize: 15,
-    fontFamily: 'Montserrat-SemiBold',
-    color: '#111827',
-    marginBottom: 4,
-  },
-  actionDescription: {
-    fontSize: 13,
-    fontFamily: 'Montserrat-Regular',
-    color: '#9CA3AF',
   },
   modalOverlay: {
     flex: 1,
