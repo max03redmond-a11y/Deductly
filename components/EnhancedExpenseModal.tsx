@@ -14,7 +14,6 @@ import {
   Keyboard,
 } from 'react-native';
 import { X, Check } from 'lucide-react-native';
-import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { CRACategory } from '@/types/database';
 import { CategorySelector } from './CategorySelector';
@@ -26,12 +25,13 @@ interface EnhancedExpenseModalProps {
   onSuccess: () => void;
 }
 
+const DEFAULT_USER_ID = 'default-user';
+
 export function EnhancedExpenseModal({
   visible,
   onClose,
   onSuccess,
 }: EnhancedExpenseModalProps) {
-  const { profile } = useAuth();
   const { categories, loading: categoriesLoading, getVehicleCategories } = useCRACategories();
 
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -66,13 +66,11 @@ export function EnhancedExpenseModal({
   }, [visible]);
 
   const loadMileageBusinessUse = async () => {
-    if (!profile) return;
-
     const currentYear = new Date().getFullYear();
     const { data } = await supabase
       .from('mileage_settings')
       .select('jan1_odometer_km, current_odometer_km')
-      .eq('user_id', profile.id)
+      .eq('user_id', DEFAULT_USER_ID)
       .eq('year', currentYear)
       .maybeSingle();
 
@@ -82,7 +80,7 @@ export function EnhancedExpenseModal({
         const { data: logs } = await supabase
           .from('mileage_logs')
           .select('distance_km, is_business')
-          .eq('user_id', profile.id)
+          .eq('user_id', DEFAULT_USER_ID)
           .gte('date', `${currentYear}-01-01`)
           .lte('date', `${currentYear}-12-31`);
 
@@ -120,7 +118,7 @@ export function EnhancedExpenseModal({
   };
 
   const handleAdd = async () => {
-    if (!vendor || !amountBeforeTax || !selectedCategory || !profile) {
+    if (!vendor || !amountBeforeTax || !selectedCategory) {
       const message = 'Please fill in vendor, amount, and select a category';
       if (Platform.OS === 'web') {
         alert(message);
@@ -160,7 +158,7 @@ export function EnhancedExpenseModal({
     const deductibleAmount = calculateDeductibleAmount();
 
     const { error } = await supabase.from('expenses').insert({
-      user_id: profile.id,
+      user_id: DEFAULT_USER_ID,
       date,
       vendor,
       merchant_name: vendor,
