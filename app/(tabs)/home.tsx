@@ -53,7 +53,7 @@ export default function HomeScreen() {
         <View style={styles.statsGrid}>
           <TouchableOpacity
             style={styles.statCard}
-            onPress={() => router.push('/dashboard')}
+            onPress={() => router.push('/(tabs)/dashboard')}
             activeOpacity={0.7}
           >
             <View style={styles.statIconContainer}>
@@ -65,7 +65,7 @@ export default function HomeScreen() {
 
           <TouchableOpacity
             style={styles.statCard}
-            onPress={() => router.push('/expenses')}
+            onPress={() => router.push('/(tabs)/expenses')}
             activeOpacity={0.7}
           >
             <View style={styles.statIconContainer}>
@@ -78,7 +78,7 @@ export default function HomeScreen() {
 
         <TouchableOpacity
           style={[styles.statCard, styles.deductionCard]}
-          onPress={() => router.push('/dashboard')}
+          onPress={() => router.push('/(tabs)/dashboard')}
           activeOpacity={0.7}
         >
           <View style={styles.deductionHeader}>
@@ -97,7 +97,7 @@ export default function HomeScreen() {
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>RECENT EXPENSES</Text>
             <TouchableOpacity
-              onPress={() => router.push('/expenses')}
+              onPress={() => router.push('/(tabs)/expenses')}
               style={styles.seeAllButton}
             >
               <Text style={styles.seeAllText}>See all</Text>

@@ -43,6 +43,8 @@ export interface AppState {
   subscribeToRealtime: () => () => void;
 }
 
+const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000001';
+
 export const useAppState = create<AppState>((set, get) => ({
   expenses: [],
   income: [],
@@ -50,7 +52,7 @@ export const useAppState = create<AppState>((set, get) => ({
   assets: [],
   referrals: [],
   profile: null,
-  userId: null,
+  userId: DEFAULT_USER_ID,
   loading: false,
   initialized: false,
 
