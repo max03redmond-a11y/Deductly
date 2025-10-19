@@ -46,7 +46,7 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <PageHeader
-        title={`Good day, ${profile?.full_name?.split(' ')[0] || 'Driver'}`}
+        title="Good Day Driver!"
         subtitle="Here's your business overview"
       />
 
