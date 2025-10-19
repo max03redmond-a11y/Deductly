@@ -35,48 +35,110 @@ export default function LearnScreen() {
         return (
           <View style={styles.content}>
             <Text style={styles.emoji}>📱</Text>
-            <Text style={styles.contentTitle}>How Deductly Works</Text>
+            <Text style={styles.contentTitle}>How Deductly Works (Beta)</Text>
 
             <Text style={styles.paragraph}>
-              Deductly is your personal bookkeeping assistant built for gig workers like Uber, Lyft, and DoorDash drivers.
+              Deductly helps gig workers like Uber, Lyft, and DoorDash drivers organize income, mileage, and expenses so that tax time is easy — even if you're doing it all manually right now.
             </Text>
 
             <Text style={styles.paragraph}>
-              Every time you drive, buy gas, or repair your vehicle, Deductly helps you track and organize these expenses automatically.
+              Because Deductly is in beta, you'll need to manually record everything you spend and earn. Here's how to do it properly:
             </Text>
 
-            <Text style={styles.subheading}>Here's what Deductly does for you:</Text>
+            <Text style={styles.sectionHeader}>💵 1. Record Your Income</Text>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                <Text style={styles.bold}>Tracks income:</Text> Connect your Uber or bank account to record deposits automatically.
+                Open the Revenue or Income tab each time you receive a payout from Uber, Lyft, or another platform.
               </Text>
             </View>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                <Text style={styles.bold}>Logs expenses:</Text> Enter purchases manually or upload receipts — the app matches them to CRA categories.
+                Enter the amount received, date, and source (e.g., "Uber – Weekly Payout").
               </Text>
             </View>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                <Text style={styles.bold}>Monitors mileage:</Text> Use GPS tracking or manual entry to calculate your business-use percentage.
+                Keep notes for bonuses or tips so they're included in your tax totals later.
+              </Text>
+            </View>
+
+            <Text style={styles.sectionHeader}>🧾 2. Log Every Expense</Text>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                Record any cost directly related to your gig work — gas, maintenance, repairs, insurance, phone bill, parking, or car washes.
               </Text>
             </View>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                <Text style={styles.bold}>Generates your tax report:</Text> At year-end, export everything into a pre-filled CRA T2125 form, ready for your tax preparer or CRA submission.
+                Always enter the amount, date, and short description (e.g., "Gas – Shell Station").
+              </Text>
+            </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                Keep receipts! Snap photos and store them securely for CRA records.
+              </Text>
+            </View>
+
+            <Text style={styles.sectionHeader}>🚗 3. Track Your Mileage</Text>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                Log your start and end odometer readings each day or trip.
+              </Text>
+            </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                Deductly will calculate your business-use percentage automatically (e.g., 75% business use = 75% of vehicle costs deductible).
+              </Text>
+            </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                <Text style={styles.bold}>Tip:</Text> Reset your odometer log every January 1st for accurate yearly totals.
+              </Text>
+            </View>
+
+            <Text style={styles.sectionHeader}>🧮 4. Export When You're Ready to File</Text>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                When tax season comes, use the Export feature to automatically fill out your CRA Form T2125 – Statement of Business or Professional Activities.
+              </Text>
+            </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                This form summarizes your total income, total expenses, and vehicle deductions for self-employed drivers.
+              </Text>
+            </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                You can download the T2125 PDF and send it to your tax preparer or upload it with your return.
               </Text>
             </View>
 
             <Text style={[styles.paragraph, styles.highlight]}>
-              The goal is simple — help you keep more of what you earn by tracking everything the CRA allows you to deduct.
+              Even though Deductly is still in beta, these steps help you stay organized and compliant — so you're always ready for tax season and never miss a deduction.
             </Text>
           </View>
         );
@@ -422,6 +484,13 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
     marginTop: theme.spacing.base,
     marginBottom: theme.spacing.sm,
+  },
+  sectionHeader: {
+    fontSize: theme.typography.fontSize.lg,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.text,
+    marginTop: theme.spacing.lg,
+    marginBottom: theme.spacing.base,
   },
   bulletPoint: {
     flexDirection: 'row',
