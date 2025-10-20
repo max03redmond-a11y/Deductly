@@ -5,7 +5,7 @@ import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { showToast } from '@/lib/toast';
 import { generateDemoData, clearDemoData } from '@/lib/demoData';
 import { AppStore } from '@/types/store';
-import { Expense } from '@/types/database';
+import { Expense, IncomeEntry } from '@/types/database';
 
 const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -115,6 +115,67 @@ export const useAppStore = create<AppStore>((set, get) => ({
     } catch (error: any) {
       console.error('Load expenses error:', error);
       showToast('Failed to load expenses: ' + error.message, 'error');
+    }
+  },
+
+  // Income State
+  incomeEntries: [],
+
+  setIncomeEntries: (entries) => set({ incomeEntries: entries }),
+
+  addIncomeEntry: (entry) => {
+    set((state) => ({
+      incomeEntries: [entry, ...state.incomeEntries],
+    }));
+  },
+
+  removeIncomeEntry: async (id: string) => {
+    const { incomeEntries } = get();
+    const entryToDelete = incomeEntries.find((e) => e.id === id);
+
+    if (!entryToDelete) {
+      showToast('Income entry not found', 'error');
+      return false;
+    }
+
+    // Optimistic update
+    const previousEntries = [...incomeEntries];
+    set({ incomeEntries: incomeEntries.filter((e) => e.id !== id) });
+
+    try {
+      const { error } = await supabase
+        .from('income_entries')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', DEFAULT_USER_ID);
+
+      if (error) throw error;
+
+      showToast('Income entry deleted', 'success');
+      return true;
+    } catch (error: any) {
+      console.error('Delete income error:', error);
+      // Rollback on failure
+      set({ incomeEntries: previousEntries });
+      showToast('Failed to delete income entry: ' + error.message, 'error');
+      return false;
+    }
+  },
+
+  loadIncomeEntries: async () => {
+    try {
+      const { data, error } = await supabase
+        .from('income_entries')
+        .select('*')
+        .eq('user_id', DEFAULT_USER_ID)
+        .order('date', { ascending: false });
+
+      if (error) throw error;
+
+      set({ incomeEntries: data || [] });
+    } catch (error: any) {
+      console.error('Load income entries error:', error);
+      showToast('Failed to load income entries: ' + error.message, 'error');
     }
   },
 

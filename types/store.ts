@@ -1,5 +1,5 @@
 import { User } from '@supabase/supabase-js';
-import { Profile, Expense, IncomeRecord } from './database';
+import { Profile, Expense, IncomeRecord, IncomeEntry } from './database';
 
 export interface AuthState {
   user: User | null;
@@ -23,10 +23,18 @@ export interface ExpensesState {
   loadExpenses: () => Promise<void>;
 }
 
+export interface IncomeState {
+  incomeEntries: IncomeEntry[];
+  setIncomeEntries: (entries: IncomeEntry[]) => void;
+  addIncomeEntry: (entry: IncomeEntry) => void;
+  removeIncomeEntry: (id: string) => Promise<boolean>;
+  loadIncomeEntries: () => Promise<void>;
+}
+
 export interface UIState {
   demoModeEnabled: boolean;
   setDemoMode: (enabled: boolean) => Promise<void>;
   showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
 }
 
-export interface AppStore extends AuthState, ExpensesState, UIState {}
+export interface AppStore extends AuthState, ExpensesState, IncomeState, UIState {}
