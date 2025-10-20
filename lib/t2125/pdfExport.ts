@@ -545,71 +545,108 @@ export function generateT2125PDF(data: T2125Data): string {
   </div>
 
   <div class="section" style="page-break-before: always;">
-    <div class="section-title">CHART A — MOTOR VEHICLE EXPENSES</div>
-    <div class="field-grid" style="margin-bottom: 15px;">
-      <div class="field-label">Business kilometres (Line 1):</div>
-      <div class="field-value">${pdfData.chartA_vehicle.line1_business_km.toFixed(0)} km</div>
+    <div class="section-title">Chart A – Motor vehicle expenses</div>
 
-      <div class="field-label">Total kilometres (Line 2):</div>
-      <div class="field-value">${pdfData.chartA_vehicle.line2_total_km.toFixed(0)} km</div>
+    <div style="margin: 20px 0;">
+      <div style="display: grid; grid-template-columns: 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">1</div>
+        <div>Kilometres you drove in the fiscal period that was part of earning business income . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">${pdfData.chartA_vehicle.line1_business_km.toFixed(0)}</div>
+      </div>
 
-      <div class="field-label">Business use % (Line 13):</div>
-      <div class="field-value">${pdfData.chartA_vehicle.line13_business_use_percent.toFixed(2)}%</div>
-    </div>
+      <div style="display: grid; grid-template-columns: 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">2</div>
+        <div>Total kilometres you drove in the fiscal period . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">${pdfData.chartA_vehicle.line2_total_km.toFixed(0)}</div>
+      </div>
 
-    <div class="line-item header">
-      <div>Line</div>
-      <div>Description</div>
-      <div>Amount</div>
-    </div>
-    <div class="line-item">
-      <div class="line-number">3</div>
-      <div>Fuel and oil</div>
-      <div class="amount">$${formatCurrency(pdfData.chartA_vehicle.line3_fuel_oil)}</div>
-    </div>
-    ${pdfData.chartA_vehicle.line4_interest > 0 ? `
-    <div class="line-item">
-      <div class="line-number">4</div>
-      <div>Interest</div>
-      <div class="amount">$${formatCurrency(pdfData.chartA_vehicle.line4_interest)}</div>
-    </div>` : ''}
-    <div class="line-item">
-      <div class="line-number">5</div>
-      <div>Insurance</div>
-      <div class="amount">$${formatCurrency(pdfData.chartA_vehicle.line5_insurance)}</div>
-    </div>
-    ${pdfData.chartA_vehicle.line6_licence_registration > 0 ? `
-    <div class="line-item">
-      <div class="line-number">6</div>
-      <div>Licence and registration</div>
-      <div class="amount">$${formatCurrency(pdfData.chartA_vehicle.line6_licence_registration)}</div>
-    </div>` : ''}
-    <div class="line-item">
-      <div class="line-number">7</div>
-      <div>Maintenance and repairs</div>
-      <div class="amount">$${formatCurrency(pdfData.chartA_vehicle.line7_maintenance_repairs)}</div>
-    </div>
-    ${pdfData.chartA_vehicle.line8_leasing > 0 ? `
-    <div class="line-item">
-      <div class="line-number">8</div>
-      <div>Leasing costs</div>
-      <div class="amount">$${formatCurrency(pdfData.chartA_vehicle.line8_leasing)}</div>
-    </div>` : ''}
-    ${pdfData.chartA_vehicle.line9_electricity > 0 ? `
-    <div class="line-item">
-      <div class="line-number">9</div>
-      <div>Electricity for electric vehicle</div>
-      <div class="amount">$${formatCurrency(pdfData.chartA_vehicle.line9_electricity)}</div>
-    </div>` : ''}
-    <div class="line-item total">
-      <div class="line-number">12</div>
-      <div>Total motor vehicle expenses</div>
-      <div class="amount">$${formatCurrency(pdfData.chartA_vehicle.line12_total_expenses)}</div>
-    </div>
-    <div class="line-item total">
-      <div class="line-number">16</div>
-      <div>Allowable motor vehicle expenses (business portion)</div>
-      <div class="amount">$${formatCurrency(pdfData.chartA_vehicle.line16_allowable_expenses)}</div>
+      <div style="display: grid; grid-template-columns: 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">3</div>
+        <div>Fuel and oil . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.chartA_vehicle.line3_fuel_oil)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">4</div>
+        <div>Interest (use Chart B below) . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.chartA_vehicle.line4_interest)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">5</div>
+        <div>Insurance . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.chartA_vehicle.line5_insurance)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">6</div>
+        <div>Licence and registration . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.chartA_vehicle.line6_licence_registration)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">7</div>
+        <div>Maintenance and repairs . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.chartA_vehicle.line7_maintenance_repairs)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">8</div>
+        <div>Leasing (use Chart C below) . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.chartA_vehicle.line8_leasing)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">9</div>
+        <div>Electricity for zero-emission vehicles . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.chartA_vehicle.line9_electricity)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">10</div>
+        <div>Other expenses (specify):</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.chartA_vehicle.line10_other)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">11</div>
+        <div></div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;"></div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 2px solid #000; background: #f5f5f5; font-weight: bold;">
+        <div>12</div>
+        <div>Total motor vehicle expenses: Add amounts 3 to 11.</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.chartA_vehicle.line12_total_expenses)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd; background: #fffbea;">
+        <div style="font-weight: bold;">13</div>
+        <div>Business use part: amount 1: <strong>${pdfData.chartA_vehicle.line1_business_km.toFixed(0)}</strong> ÷ amount 2: <strong>${pdfData.chartA_vehicle.line2_total_km.toFixed(0)}</strong> × amount 12: <strong>$${formatCurrency(pdfData.chartA_vehicle.line12_total_expenses)}</strong> = </div>
+        <div style="text-align: right; font-family: 'Courier New', monospace; font-weight: bold;">$${formatCurrency(pdfData.chartA_vehicle.line13_business_use_percent * pdfData.chartA_vehicle.line12_total_expenses / 100)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">14</div>
+        <div>Business parking fees . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.chartA_vehicle.line14_parking)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">15</div>
+        <div>Supplementary business insurance . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.chartA_vehicle.line15_supplementary_insurance)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 30px 1fr 150px; gap: 10px; padding: 12px 5px; border-bottom: 2px solid #000; background: #e8f4f8; font-weight: bold;">
+        <div>16</div>
+        <div>Allowable motor vehicle expenses: Add amounts 13 to 15 (enter this total on line 9281 of Part 4) . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.chartA_vehicle.line16_allowable_expenses)}</div>
+      </div>
+
+      <div style="margin-top: 10px; padding: 10px; background: #f9fafb; border-left: 3px solid #3b82f6;">
+        <strong>Note:</strong> You can claim capital cost allowance on motor vehicles in Area A.
+      </div>
     </div>
   </div>
 
