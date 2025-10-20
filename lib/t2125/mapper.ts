@@ -319,13 +319,15 @@ export function generateT2125Data(
       lastYearOfBusiness: false,
     },
     part2_internet: {
-      numWebsites: profile?.business_type === 'rideshare' ? 1 : 0,
-      website1: profile?.business_type === 'rideshare' ? 'uber.com' : '',
+      // Only applicable for businesses with their own websites/online sales
+      // Not for platform-based gig workers (Uber, DoorDash, etc.)
+      numWebsites: 0,
+      website1: '',
       website2: '',
       website3: '',
       website4: '',
       website5: '',
-      incomeFromWebPercent: profile?.business_type === 'rideshare' ? 100 : 0,
+      incomeFromWebPercent: 0,
     },
     part3a_businessIncome: {
       line3A_grossSales: totalIncome + gstHstCollected,

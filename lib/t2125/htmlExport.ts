@@ -147,6 +147,33 @@ export function generateT2125HTML(data: T2125Data): string {
     </div>
   </div>
 
+  ${data.part2_internet.numWebsites > 0 ? `
+  <div class="section">
+    <h2>Part 2 - Internet Business Activities</h2>
+    <p style="margin-bottom: 15px; color: #6B7280; font-size: 13px;">
+      Only complete this section if you earn income through your own website(s) or online sales platform
+    </p>
+    <div class="info-grid">
+      <div class="info-label">Number of websites:</div>
+      <div>${data.part2_internet.numWebsites}</div>
+
+      ${data.part2_internet.website1 ? `
+      <div class="info-label">Website 1:</div>
+      <div>${data.part2_internet.website1}</div>` : ''}
+
+      ${data.part2_internet.website2 ? `
+      <div class="info-label">Website 2:</div>
+      <div>${data.part2_internet.website2}</div>` : ''}
+
+      ${data.part2_internet.website3 ? `
+      <div class="info-label">Website 3:</div>
+      <div>${data.part2_internet.website3}</div>` : ''}
+
+      <div class="info-label">Income from website(s):</div>
+      <div>${data.part2_internet.incomeFromWebPercent}%</div>
+    </div>
+  </div>` : ''}
+
   <div class="section">
     <h2>Part 3C - Gross Business Income</h2>
     <div class="row">

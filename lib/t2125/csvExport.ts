@@ -104,6 +104,57 @@ export function generateT2125CSV(data: T2125Data): string {
     amount: data.identification.industryCode,
   });
 
+  // Only include Part 2 if there are internet business activities
+  if (data.part2_internet.numWebsites > 0) {
+    rows.push({
+      section: 'Part 2',
+      lineNumber: '',
+      description: 'INTERNET BUSINESS ACTIVITIES',
+      amount: '',
+    });
+
+    rows.push({
+      section: 'Part 2',
+      lineNumber: '',
+      description: 'Number of websites',
+      amount: data.part2_internet.numWebsites.toString(),
+    });
+
+    if (data.part2_internet.website1) {
+      rows.push({
+        section: 'Part 2',
+        lineNumber: '',
+        description: 'Website 1',
+        amount: data.part2_internet.website1,
+      });
+    }
+
+    if (data.part2_internet.website2) {
+      rows.push({
+        section: 'Part 2',
+        lineNumber: '',
+        description: 'Website 2',
+        amount: data.part2_internet.website2,
+      });
+    }
+
+    if (data.part2_internet.website3) {
+      rows.push({
+        section: 'Part 2',
+        lineNumber: '',
+        description: 'Website 3',
+        amount: data.part2_internet.website3,
+      });
+    }
+
+    rows.push({
+      section: 'Part 2',
+      lineNumber: '',
+      description: 'Percentage of income from website(s)',
+      amount: data.part2_internet.incomeFromWebPercent.toString() + '%',
+    });
+  }
+
   rows.push({
     section: 'Part 3C',
     lineNumber: '8000',
