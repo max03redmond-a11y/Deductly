@@ -27,6 +27,16 @@ interface EnhancedExpenseModalProps {
 
 const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000001';
 
+const VEHICLE_EXPENSE_CODES = [
+  'GAS_FUEL',
+  'LOAN_INTEREST',
+  'INSURANCE_AUTO',
+  'LIC_REG',
+  'REPAIRS_MAINT',
+  'LEASE_PAYMENTS',
+  'VEHICLE_ELECTRICITY'
+];
+
 export function EnhancedExpenseModal({
   visible,
   onClose,
@@ -55,9 +65,17 @@ export function EnhancedExpenseModal({
     }
   }, [visible]);
 
+  const isVehicleExpense = (categoryCode: string): boolean => {
+    return VEHICLE_EXPENSE_CODES.includes(categoryCode);
+  };
+
   useEffect(() => {
     if (selectedCategory) {
-      setBusinessPercentage(selectedCategory.default_business_use_target.toString());
+      if (isVehicleExpense(selectedCategory.code)) {
+        setBusinessPercentage('100');
+      } else {
+        setBusinessPercentage(selectedCategory.default_business_use_target.toString());
+      }
     }
   }, [selectedCategory]);
 
@@ -278,7 +296,7 @@ export function EnhancedExpenseModal({
             </View>
 
             {/* Step 4: Business Use */}
-            {selectedCategory && (
+            {selectedCategory && !isVehicleExpense(selectedCategory.code) && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>BUSINESS USE</Text>
 
@@ -341,6 +359,18 @@ export function EnhancedExpenseModal({
                     </Text>
                   </View>
                 )}
+              </View>
+            )}
+
+            {/* Vehicle Expense Info */}
+            {selectedCategory && isVehicleExpense(selectedCategory.code) && (
+              <View style={styles.section}>
+                <View style={styles.vehicleExpenseNotice}>
+                  <Text style={styles.vehicleExpenseNoticeTitle}>Vehicle Expense</Text>
+                  <Text style={styles.vehicleExpenseNoticeText}>
+                    This expense will be recorded at 100% of the total amount. Business-use percentage is calculated separately based on your mileage tracking.
+                  </Text>
+                </View>
               </View>
             )}
 
@@ -690,5 +720,23 @@ const styles = StyleSheet.create({
   },
   modalOverlayBackground: {
     flex: 1,
+  },
+  vehicleExpenseNotice: {
+    backgroundColor: '#EFF6FF',
+    borderRadius: 12,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: '#DBEAFE',
+  },
+  vehicleExpenseNoticeTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#1E40AF',
+    marginBottom: 8,
+  },
+  vehicleExpenseNoticeText: {
+    fontSize: 13,
+    color: '#1E40AF',
+    lineHeight: 20,
   },
 });
