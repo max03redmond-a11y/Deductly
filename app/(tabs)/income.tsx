@@ -144,8 +144,10 @@ export default function IncomeScreen() {
 
       {incomeEntries.length > 0 && (
         <TouchableOpacity style={styles.fab} onPress={handleAddIncome}>
-          <Plus color="#fff" size={20} />
-          <Text style={styles.fabText}>Add Income</Text>
+          <View style={styles.fabContent}>
+            <Plus color="#fff" size={20} />
+            <Text style={styles.fabText}>Add Income</Text>
+          </View>
         </TouchableOpacity>
       )}
 
@@ -283,22 +285,25 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 24,
     right: 24,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+    backgroundColor: theme.colors.primary,
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderRadius: 28,
-    backgroundColor: theme.colors.primary,
-    elevation: 4,
+    elevation: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  fabContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   fabText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
+    marginLeft: 8,
   },
 });
