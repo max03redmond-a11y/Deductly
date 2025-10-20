@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal, TextInput, Alert, Dimensions, Platform } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { supabase } from '@/lib/supabase';
-import { TrendingUp, TrendingDown, Plus, Download, FileText, PieChart, DollarSign, Percent, FileSpreadsheet } from 'lucide-react-native';
+import { TrendingUp, TrendingDown, Download, FileText, PieChart, DollarSign, Percent } from 'lucide-react-native';
 import { Expense, IncomeRecord, MileageLog, Asset, EXPENSE_CATEGORIES } from '@/types/database';
 import { PieChart as RNPieChart } from 'react-native-chart-kit';
 import { generateT2125Data } from '@/lib/t2125/mapper';
@@ -21,7 +21,6 @@ export default function DashboardScreen() {
   const [mileage, setMileage] = useState<MileageLog[]>([]);
   const [assets, setAssets] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showAddIncomeModal, setShowAddIncomeModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
 
   const loadData = useCallback(async () => {
@@ -149,9 +148,6 @@ export default function DashboardScreen() {
             <Text style={styles.headerLabel}>Year to Date</Text>
             <Text style={styles.headerCompany}>{profile?.business_name || 'Your Business'}</Text>
           </View>
-          <TouchableOpacity onPress={() => setShowAddIncomeModal(true)} style={styles.addButton}>
-            <Plus size={20} color="#FFFFFF" />
-          </TouchableOpacity>
         </View>
       </View>
 
@@ -337,169 +333,11 @@ export default function DashboardScreen() {
 
       </ScrollView>
 
-      <AddIncomeModal
-        visible={showAddIncomeModal}
-        onClose={() => setShowAddIncomeModal(false)}
-        onSuccess={() => {
-          setShowAddIncomeModal(false);
-          loadData();
-        }}
-      />
-
       <ExportModal
         visible={showExportModal}
         onClose={() => setShowExportModal(false)}
       />
     </View>
-  );
-}
-
-function AddIncomeModal({
-  visible,
-  onClose,
-  onSuccess,
-}: {
-  visible: boolean;
-  onClose: () => void;
-  onSuccess: () => void;
-}) {
-  const profile = DEFAULT_PROFILE;
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  const [source, setSource] = useState('');
-  const [amount, setAmount] = useState('');
-  const [trips, setTrips] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const INCOME_SOURCES = ['Uber', 'Lyft', 'DoorDash', 'Skip The Dishes', 'Cash', 'Other'];
-
-  const handleAdd = async () => {
-    if (!source || !amount || !profile) {
-      if (Platform.OS === 'web') {
-        alert('Please fill in required fields');
-      } else {
-        Alert.alert('Error', 'Please fill in required fields');
-      }
-      return;
-    }
-
-    const amountNum = parseFloat(amount);
-    if (isNaN(amountNum) || amountNum <= 0) {
-      if (Platform.OS === 'web') {
-        alert('Please enter a valid amount');
-      } else {
-        Alert.alert('Error', 'Please enter a valid amount');
-      }
-      return;
-    }
-
-    setLoading(true);
-
-    const { error } = await supabase.from('income_records').insert({
-      user_id: profile.id,
-      date,
-      source,
-      amount: amountNum,
-      trips_completed: trips ? parseInt(trips) : null,
-      imported_from: 'manual',
-    });
-
-    if (error) {
-      if (Platform.OS === 'web') {
-        alert('Error: ' + error.message);
-      } else {
-        Alert.alert('Error', error.message);
-      }
-      setLoading(false);
-    } else {
-      setSource('');
-      setAmount('');
-      setTrips('');
-      setLoading(false);
-      onSuccess();
-    }
-  };
-
-  return (
-    <Modal visible={visible} animationType="slide" transparent>
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Add Income</Text>
-            <TouchableOpacity onPress={onClose}>
-              <Text style={styles.modalClose}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
-
-          <ScrollView style={styles.modalForm}>
-            <Text style={styles.inputLabel}>Date</Text>
-            <TextInput
-              style={styles.input}
-              value={date}
-              onChangeText={setDate}
-              placeholder="YYYY-MM-DD"
-              placeholderTextColor="#9CA3AF"
-              editable={!loading}
-            />
-
-            <Text style={styles.inputLabel}>Source</Text>
-            <View style={styles.sourceGrid}>
-              {INCOME_SOURCES.map((src) => (
-                <TouchableOpacity
-                  key={src}
-                  style={[
-                    styles.sourceOption,
-                    source === src && styles.sourceOptionSelected,
-                  ]}
-                  onPress={() => setSource(src)}
-                  disabled={loading}
-                >
-                  <Text
-                    style={[
-                      styles.sourceOptionText,
-                      source === src && styles.sourceOptionTextSelected,
-                    ]}
-                  >
-                    {src}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-
-            <Text style={styles.inputLabel}>Amount</Text>
-            <TextInput
-              style={styles.input}
-              value={amount}
-              onChangeText={setAmount}
-              placeholder="0.00"
-              placeholderTextColor="#9CA3AF"
-              keyboardType="decimal-pad"
-              editable={!loading}
-            />
-
-            <Text style={styles.inputLabel}>Trips Completed (Optional)</Text>
-            <TextInput
-              style={styles.input}
-              value={trips}
-              onChangeText={setTrips}
-              placeholder="0"
-              placeholderTextColor="#9CA3AF"
-              keyboardType="number-pad"
-              editable={!loading}
-            />
-
-            <TouchableOpacity
-              style={[styles.submitButton, loading && styles.submitButtonDisabled]}
-              onPress={handleAdd}
-              disabled={loading}
-            >
-              <Text style={styles.submitButtonText}>
-                {loading ? 'Adding...' : 'Add Income'}
-              </Text>
-            </TouchableOpacity>
-          </ScrollView>
-        </View>
-      </View>
-    </Modal>
   );
 }
 
@@ -535,19 +373,6 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontFamily: 'Montserrat-SemiBold',
     color: '#111827',
-  },
-  addButton: {
-    backgroundColor: '#000000',
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
   },
   content: {
     flex: 1,
@@ -785,102 +610,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontFamily: 'Montserrat-Regular',
     color: '#D1D5DB',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    justifyContent: 'flex-end',
-  },
-  modalContent: {
-    backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
-    maxHeight: '90%',
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 24,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
-  },
-  modalTitle: {
-    fontSize: 24,
-    fontFamily: 'Montserrat-SemiBold',
-    color: '#111827',
-  },
-  modalClose: {
-    fontSize: 16,
-    fontFamily: 'Montserrat-SemiBold',
-    color: '#000000',
-  },
-  modalForm: {
-    padding: 24,
-  },
-  inputLabel: {
-    fontSize: 13,
-    fontFamily: 'Montserrat-SemiBold',
-    color: '#374151',
-    marginBottom: 10,
-    marginTop: 16,
-  },
-  input: {
-    backgroundColor: '#F9FAFB',
-    borderRadius: 16,
-    padding: 16,
-    fontSize: 16,
-    fontFamily: 'Montserrat-Regular',
-    borderWidth: 1,
-    borderColor: '#F3F4F6',
-    color: '#111827',
-  },
-  sourceGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-  },
-  sourceOption: {
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 18,
-    paddingVertical: 12,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    borderColor: '#E5E7EB',
-  },
-  sourceOptionSelected: {
-    backgroundColor: '#000000',
-    borderColor: '#000000',
-  },
-  sourceOptionText: {
-    fontSize: 14,
-    fontFamily: 'Montserrat-Medium',
-    color: '#6B7280',
-  },
-  sourceOptionTextSelected: {
-    color: '#FFFFFF',
-    fontFamily: 'Montserrat-SemiBold',
-  },
-  submitButton: {
-    backgroundColor: '#000000',
-    borderRadius: 16,
-    padding: 18,
-    alignItems: 'center',
-    marginTop: 24,
-    marginBottom: 40,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  submitButtonDisabled: {
-    opacity: 0.5,
-  },
-  submitButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontFamily: 'Montserrat-SemiBold',
   },
   exportSection: {
     backgroundColor: '#FFFFFF',
