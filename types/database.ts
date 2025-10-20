@@ -120,6 +120,7 @@ export type IncomeEntry = {
   other_income: number;
   platform_fees: number;
   net_payout: number;
+  trips_completed: number | null;
   source_ref: string | null;
   notes: string | null;
   created_at: string;

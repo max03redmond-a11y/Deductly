@@ -32,6 +32,7 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
   const [platform, setPlatform] = useState('');
   const [grossIncome, setGrossIncome] = useState('');
   const [platformFees, setPlatformFees] = useState('');
+  const [tripsCompleted, setTripsCompleted] = useState('');
   const [notes, setNotes] = useState('');
 
   useEffect(() => {
@@ -40,6 +41,7 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
       setPlatform(entry.platform);
       setGrossIncome(entry.gross_income.toString());
       setPlatformFees(entry.platform_fees.toString());
+      setTripsCompleted(entry.trips_completed?.toString() || '');
       setNotes(entry.notes || '');
     } else {
       resetForm();
@@ -52,6 +54,7 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
     setPlatform('');
     setGrossIncome('');
     setPlatformFees('0');
+    setTripsCompleted('');
     setNotes('');
   };
 
@@ -73,6 +76,7 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
         bonuses: 0,
         other_income: 0,
         platform_fees: parseFloat(platformFees) || 0,
+        trips_completed: tripsCompleted ? parseInt(tripsCompleted) : null,
         notes: notes || null,
       };
 
@@ -176,6 +180,18 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
               onChangeText={setPlatformFees}
               placeholder="0.00"
               keyboardType="decimal-pad"
+              placeholderTextColor={theme.colors.textSecondary}
+            />
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.label}>Number of Trips</Text>
+            <TextInput
+              style={styles.input}
+              value={tripsCompleted}
+              onChangeText={setTripsCompleted}
+              placeholder="Optional"
+              keyboardType="number-pad"
               placeholderTextColor={theme.colors.textSecondary}
             />
           </View>

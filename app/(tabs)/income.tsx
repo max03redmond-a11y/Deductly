@@ -72,6 +72,9 @@ export default function IncomeScreen() {
           <View style={styles.incomeDetails}>
             <Text style={styles.platform}>{item.platform}</Text>
             <Text style={styles.date}>{dateStr}</Text>
+            {item.trips_completed && (
+              <Text style={styles.trips}>{item.trips_completed} trips</Text>
+            )}
           </View>
           <View style={styles.incomeAmount}>
             <Text style={styles.amount}>${Number(item.net_payout).toFixed(2)}</Text>
@@ -230,6 +233,12 @@ const styles = StyleSheet.create({
   date: {
     fontSize: 14,
     color: theme.colors.textSecondary,
+  },
+  trips: {
+    fontSize: 13,
+    color: theme.colors.primary,
+    marginTop: 2,
+    fontWeight: '500',
   },
   incomeAmount: {
     alignItems: 'flex-end',

@@ -3,7 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Dimensions } from
 import { useFocusEffect } from '@react-navigation/native';
 import { supabase } from '@/lib/supabase';
 import { TrendingUp, TrendingDown, Download, FileText, PieChart, DollarSign, Percent } from 'lucide-react-native';
-import { Expense, IncomeRecord, MileageLog, Asset, EXPENSE_CATEGORIES } from '@/types/database';
+import { Expense, IncomeEntry, MileageLog, Asset, EXPENSE_CATEGORIES } from '@/types/database';
 import { PieChart as RNPieChart } from 'react-native-chart-kit';
 import { generateT2125Data } from '@/lib/t2125/mapper';
 import { generateT2125CSV, downloadCSV } from '@/lib/t2125/csvExport';
@@ -17,7 +17,7 @@ const DEFAULT_PROFILE: any = { business_name: 'Your Business', id: DEFAULT_USER_
 export default function DashboardScreen() {
   const profile = DEFAULT_PROFILE;
   const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [income, setIncome] = useState<IncomeRecord[]>([]);
+  const [income, setIncome] = useState<IncomeEntry[]>([]);
   const [mileage, setMileage] = useState<MileageLog[]>([]);
   const [assets, setAssets] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(true);
@@ -26,7 +26,7 @@ export default function DashboardScreen() {
   const loadData = useCallback(async () => {
     const [expensesRes, incomeRes, mileageRes, assetsRes] = await Promise.all([
       supabase.from('expenses').select('*').eq('user_id', profile.id),
-      supabase.from('income_records').select('*').eq('user_id', profile.id),
+      supabase.from('income_entries').select('*').eq('user_id', profile.id),
       supabase.from('mileage_logs').select('*').eq('user_id', profile.id),
       supabase.from('assets').select('*').eq('user_id', profile.id),
     ]);
@@ -51,7 +51,7 @@ export default function DashboardScreen() {
 
     const incomeChannel = supabase
       .channel('dashboard-income-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'income_records' }, () => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'income_entries' }, () => {
         loadData();
       })
       .subscribe();
@@ -77,7 +77,7 @@ export default function DashboardScreen() {
     }, [loadData])
   );
 
-  const totalIncome = income.reduce((sum, record) => sum + record.amount, 0);
+  const totalIncome = income.reduce((sum, entry) => sum + Number(entry.net_payout), 0);
 
   const expensesByCategory = expenses.reduce((acc, expense) => {
     const category = expense.category;
