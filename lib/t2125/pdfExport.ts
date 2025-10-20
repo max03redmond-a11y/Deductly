@@ -606,6 +606,91 @@ export function generateT2125PDF(data: T2125Data): string {
     </div>
   </div>
 
+  <div class="section">
+    <div class="section-title">Part 5 – Your net income (loss)</div>
+
+    <div style="margin: 20px 0;">
+      <div style="display: grid; grid-template-columns: 60px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div></div>
+        <div style="font-weight: bold;">5A</div>
+        <div></div>
+      </div>
+      <div style="display: grid; grid-template-columns: 60px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div></div>
+        <div>Your share of line 9369 or the amount from your T5013 slip, Statement of Partnership Income. . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace; font-weight: bold;">$${formatCurrency(pdfData.part4_expenses.line9369_net_income)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 60px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div></div>
+        <div style="font-weight: bold;">5B</div>
+        <div></div>
+      </div>
+      <div style="display: grid; grid-template-columns: 60px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div></div>
+        <div>Canadian journalism labour tax credit allocated to you in the year (box 236 of your T5013 slip) . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$0.00</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 60px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">9974</div>
+        <div>GST/HST rebate for partners received in the year . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$0.00</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 60px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd; background: #f5f5f5;">
+        <div></div>
+        <div style="font-weight: bold;">5C</div>
+        <div></div>
+      </div>
+      <div style="display: grid; grid-template-columns: 60px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 2px solid #000; background: #f5f5f5; font-weight: bold;">
+        <div></div>
+        <div>Total: Amount 5A plus amount 5B plus line 9974 ►</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.part4_expenses.line9369_net_income)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 60px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">9943</div>
+        <div>Other amounts deductible from your share of net partnership income (loss) (amount 6F). . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$0.00</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 60px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div></div>
+        <div style="font-weight: bold;">5D</div>
+        <div></div>
+      </div>
+      <div style="display: grid; grid-template-columns: 60px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 2px solid #000; background: #f0f9ff; font-weight: bold;">
+        <div></div>
+        <div>Net income (loss) after adjustments: Amount 5C minus line 9943 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.part4_expenses.line9369_net_income)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 60px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">9945</div>
+        <div>Business-use-of-home expenses (amount 7P) . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.part4_expenses.line9945_home_office)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 60px 1fr 150px; gap: 10px; padding: 12px 5px; border-bottom: 3px solid #000; background: #e8f4f8; font-weight: bold; font-size: 11pt;">
+        <div>9946</div>
+        <div>Your net income (loss): Amount 5D minus line 9945 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.summary.net_income)}</div>
+      </div>
+
+      <div style="margin-top: 20px; padding: 15px; background: #fffbea; border-left: 4px solid #f59e0b;">
+        <p style="margin: 0 0 10px 0; font-weight: bold;">Report the net income amount from line 9946 on the applicable line of your income tax and benefit return as indicated below:</p>
+        <ul style="margin: 10px 0; padding-left: 20px;">
+          <li style="margin: 5px 0;">business income on line 13500</li>
+          <li style="margin: 5px 0;">professional income on line 13700</li>
+          <li style="margin: 5px 0;">commission income on line 13900</li>
+        </ul>
+        <p style="margin: 10px 0 0 0; font-size: 9pt;"><strong>Note:</strong> Do not report a loss resulting from the disposition of a flipped property on your income tax and benefit return, but include the details on this form.</p>
+        <p style="margin: 5px 0 0 0; font-size: 9pt;">Any loss resulting from the disposition of a flipped property is deemed to be nil. For more information, read Chapter 1 of Guide T4002</p>
+      </div>
+    </div>
+  </div>
+
   <div class="section" style="page-break-before: always;">
     <div class="section-title">Chart A – Motor vehicle expenses</div>
 
