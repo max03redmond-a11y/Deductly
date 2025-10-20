@@ -100,8 +100,13 @@ export function generateT2125HTML(data: T2125Data): string {
   </style>
 </head>
 <body>
-  <h1>CRA Form T2125 - Statement of Business or Professional Activities</h1>
-  <p style="text-align: center; font-size: 11px; color: #666;">Tax Year ${currentYear} - Export from Deductly</p>
+  <h1>Statement of Business or Professional Activities</h1>
+  <p style="text-align: center; font-size: 11px; margin-top: 5px; line-height: 1.6;">
+    • Use this form to calculate your self-employment business and professional income.<br>
+    • For each business or profession, fill in a separate Form T2125.<br>
+    • Fill in this form and send it with your income tax and benefit return.<br>
+    • For more information on how to fill in this form, see Guide T4002, Self-employed Business, Professional, Commission, Farming, and Fishing Income.
+  </p>
 
   <div class="notice">
     <div class="notice-title">⚠️ IMPORTANT NOTICE</div>
@@ -110,40 +115,61 @@ export function generateT2125HTML(data: T2125Data): string {
   </div>
 
   <div class="section">
-    <h2>Part 1 - Identification</h2>
+    <h2>Part 1 – Identification</h2>
     <div class="info-grid">
-      <div class="info-label">Your name:</div>
+      <div class="info-label">Your name</div>
       <div>${data.identification.yourName || 'Not provided'}</div>
 
-      <div class="info-label">Social Insurance Number:</div>
+      <div class="info-label">Your social insurance number</div>
       <div>${data.identification.sin || 'Not provided'}</div>
 
-      <div class="info-label">Business name:</div>
+      <div class="info-label">Business name</div>
       <div>${data.identification.businessName || 'Not provided'}</div>
 
-      <div class="info-label">Business number:</div>
+      <div class="info-label">Business number</div>
       <div>${data.identification.businessNumber || 'Not provided'}</div>
 
-      <div class="info-label">Business address:</div>
+      <div class="info-label">Business address</div>
       <div>${data.identification.businessAddress || 'Not provided'}</div>
 
-      <div class="info-label">City:</div>
+      <div class="info-label">City</div>
       <div>${data.identification.city || 'Not provided'}</div>
 
-      <div class="info-label">Province:</div>
+      <div class="info-label">Prov./Terr.</div>
       <div>${data.identification.province}</div>
 
-      <div class="info-label">Postal code:</div>
+      <div class="info-label">Postal code</div>
       <div>${data.identification.postalCode || 'Not provided'}</div>
 
-      <div class="info-label">Fiscal period:</div>
-      <div>${data.identification.fiscalPeriodStart} to ${data.identification.fiscalPeriodEnd}</div>
+      <div class="info-label">Fiscal period – From</div>
+      <div>Date (YYYYMMDD): ${data.identification.fiscalPeriodStart.replace(/-/g, '')}</div>
 
-      <div class="info-label">Main product/service:</div>
+      <div class="info-label">Fiscal period – To</div>
+      <div>Date (YYYYMMDD): ${data.identification.fiscalPeriodEnd.replace(/-/g, '')}</div>
+
+      <div class="info-label">Was this your last year of business?</div>
+      <div>${data.identification.lastYearOfBusiness ? 'Yes' : 'No'}</div>
+
+      <div class="info-label">Main product or service</div>
       <div>${data.identification.mainProductService}</div>
 
-      <div class="info-label">Industry code:</div>
+      <div class="info-label">Industry code (see Chapter 2 in Guide T4002)</div>
       <div>${data.identification.industryCode || 'Not provided'}</div>
+
+      <div class="info-label">Accounting method</div>
+      <div>${data.identification.accountingMethod === 'cash' ? 'Cash' : 'Accrual'}</div>
+
+      ${data.identification.taxShelterId ? `
+      <div class="info-label">Tax shelter identification number</div>
+      <div>${data.identification.taxShelterId}</div>` : ''}
+
+      ${data.identification.partnershipBusinessNumber ? `
+      <div class="info-label">Partnership business number</div>
+      <div>${data.identification.partnershipBusinessNumber}</div>` : ''}
+
+      ${data.identification.partnershipPercentage !== undefined && data.identification.partnershipPercentage !== null ? `
+      <div class="info-label">Your percentage of the partnership</div>
+      <div>${data.identification.partnershipPercentage}%</div>` : ''}
     </div>
   </div>
 

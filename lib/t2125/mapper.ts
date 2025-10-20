@@ -31,6 +31,9 @@ export interface T2125Data {
     industryCode: string;
     accountingMethod: string;
     lastYearOfBusiness: boolean;
+    taxShelterId?: string;
+    partnershipBusinessNumber?: string;
+    partnershipPercentage?: number;
   };
   part2_internet: {
     numWebsites: number;
@@ -302,10 +305,10 @@ export function generateT2125Data(
 
   const mainService = businessTypes[profile?.business_type || ''] || 'Rideshare Driver';
 
-  const formatAddress = () => {
-    if (!profile?.mailing_address_line1) return '—';
-    const parts = [profile.mailing_address_line1];
-    if (profile.mailing_address_line2) parts.push(profile.mailing_address_line2);
+  const formatBusinessAddress = () => {
+    if (!profile?.business_address_line1) return '—';
+    const parts = [profile.business_address_line1];
+    if (profile.business_address_line2) parts.push(profile.business_address_line2);
     return parts.join(', ');
   };
 
@@ -317,19 +320,22 @@ export function generateT2125Data(
   return {
     identification: {
       yourName: profile?.legal_name || profile?.full_name || '—',
-      sin: '—',
+      sin: profile?.sin_encrypted ? '•••-•••-•••' : '—',
       businessName: profile?.business_name || '—',
       businessNumber: profile?.business_number || '—',
-      businessAddress: formatAddress(),
-      city: profile?.mailing_city || '—',
-      province: profile?.province || 'ON',
-      postalCode: profile?.mailing_postal_code || '—',
+      businessAddress: formatBusinessAddress(),
+      city: profile?.business_city || '—',
+      province: profile?.business_province || profile?.province || 'ON',
+      postalCode: profile?.business_postal_code || '—',
       fiscalPeriodStart: profile?.fiscal_year_start || `${currentYear}-01-01`,
       fiscalPeriodEnd: profile?.fiscal_year_end_date || `${currentYear}-12-31`,
-      mainProductService: mainService,
-      industryCode: profile?.naics_code || '485310',
-      accountingMethod: 'Cash',
-      lastYearOfBusiness: false,
+      mainProductService: profile?.main_product_service || mainService,
+      industryCode: profile?.industry_code || profile?.naics_code || '485310',
+      accountingMethod: profile?.accounting_method === 'accrual' ? 'Accrual' : 'Cash',
+      lastYearOfBusiness: profile?.last_year_of_business || false,
+      taxShelterId: profile?.tax_shelter_id || undefined,
+      partnershipBusinessNumber: profile?.partnership_business_number || undefined,
+      partnershipPercentage: profile?.partnership_percentage || undefined,
     },
     part2_internet: {
       // Only applicable for businesses with their own websites/online sales
