@@ -124,10 +124,10 @@ export function generateT2125HTML(data: T2125Data): string {
       <div>${data.identification.sin || 'Not provided'}</div>
 
       <div class="info-label">Business name</div>
-      <div>${data.identification.businessName || 'Not provided'}</div>
+      <div>${data.identification.businessName || '<em style="color: #6B7280;">Leave blank or use "Self-employed – Uber Driver"</em>'}</div>
 
       <div class="info-label">Business number</div>
-      <div>${data.identification.businessNumber || 'Not provided'}</div>
+      <div>${data.identification.businessNumber && data.identification.businessNumber !== '—' ? data.identification.businessNumber : '<em style="color: #6B7280;">Not applicable (only required if GST/HST registered)</em>'}</div>
 
       <div class="info-label">Business address</div>
       <div>${data.identification.businessAddress || 'Not provided'}</div>
@@ -157,19 +157,16 @@ export function generateT2125HTML(data: T2125Data): string {
       <div>${data.identification.industryCode || 'Not provided'}</div>
 
       <div class="info-label">Accounting method</div>
-      <div>${data.identification.accountingMethod === 'cash' ? 'Cash' : 'Accrual'}</div>
+      <div>${data.identification.accountingMethod === 'cash' || data.identification.accountingMethod === 'Cash' ? '☑ Cash   ☐ Accrual' : '☐ Cash   ☑ Accrual'} <em style="color: #6B7280; font-size: 11px;">(Rideshare drivers use Cash)</em></div>
 
-      ${data.identification.taxShelterId ? `
       <div class="info-label">Tax shelter identification number</div>
-      <div>${data.identification.taxShelterId}</div>` : ''}
+      <div>${data.identification.taxShelterId || '<em style="color: #6B7280;">Not applicable (Uber driving is not a tax shelter)</em>'}</div>
 
-      ${data.identification.partnershipBusinessNumber ? `
       <div class="info-label">Partnership business number</div>
-      <div>${data.identification.partnershipBusinessNumber}</div>` : ''}
+      <div>${data.identification.partnershipBusinessNumber || '<em style="color: #6B7280;">Not applicable (only if driving as part of a formal partnership)</em>'}</div>
 
-      ${data.identification.partnershipPercentage !== undefined && data.identification.partnershipPercentage !== null ? `
       <div class="info-label">Your percentage of the partnership</div>
-      <div>${data.identification.partnershipPercentage}%</div>` : ''}
+      <div>${data.identification.partnershipPercentage !== undefined && data.identification.partnershipPercentage !== null ? data.identification.partnershipPercentage + '%' : '<em style="color: #6B7280;">Not applicable</em>'}</div>
     </div>
   </div>
 
