@@ -101,9 +101,21 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
       return;
     }
 
-    if (sin && sin.replace(/\D/g, '').length !== 9) {
-      const msg = 'SIN must be 9 digits';
-      Platform.OS === 'web' ? alert(msg) : Alert.alert('Invalid SIN', msg);
+    if (!sin || sin.replace(/\D/g, '').length !== 9) {
+      const msg = 'SIN is required and must be 9 digits';
+      Platform.OS === 'web' ? alert(msg) : Alert.alert('Required Field', msg);
+      return;
+    }
+
+    if (!naicsCode || !mainProductService || !industryCode || !fiscalYearStart || !fiscalYearEnd) {
+      const msg = 'Please complete all required business fields (NAICS, Product/Service, Industry Code, Fiscal Period)';
+      Platform.OS === 'web' ? alert(msg) : Alert.alert('Required Fields', msg);
+      return;
+    }
+
+    if (!businessAddressLine1 || !businessCity || !businessProvince || !businessPostalCode) {
+      const msg = 'Please complete all required business address fields';
+      Platform.OS === 'web' ? alert(msg) : Alert.alert('Required Fields', msg);
       return;
     }
 
@@ -303,19 +315,20 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
         <Text style={styles.sectionTitle}>BUSINESS INFORMATION</Text>
 
         <View style={styles.field}>
-          <Text style={styles.label}>Business Name</Text>
+          <Text style={styles.label}>Business Name (Optional)</Text>
           <TextInput
             style={styles.input}
             value={businessName}
             onChangeText={setBusinessName}
-            placeholder="Your Business Name"
+            placeholder="e.g., Self-employed – Uber Driver"
             placeholderTextColor="#9CA3AF"
             editable={!loading}
           />
+          <Text style={styles.hint}>Leave blank or write "Self-employed – Uber Driver"</Text>
         </View>
 
         <View style={styles.field}>
-          <Text style={styles.label}>Business Number (BN)</Text>
+          <Text style={styles.label}>Business Number (BN) (Optional)</Text>
           <TextInput
             style={styles.input}
             value={businessNumber}
@@ -326,11 +339,11 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
             maxLength={9}
             editable={!loading}
           />
-          <Text style={styles.hint}>9-digit CRA business number</Text>
+          <Text style={styles.hint}>9-digit CRA business number (only if you have one)</Text>
         </View>
 
         <View style={styles.field}>
-          <Text style={styles.label}>NAICS Code</Text>
+          <Text style={styles.label}>NAICS Code *</Text>
           <TextInput
             style={styles.input}
             value={naicsCode}
@@ -341,24 +354,24 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
             maxLength={6}
             editable={!loading}
           />
-          <Text style={styles.hint}>6-digit industry classification code</Text>
+          <Text style={styles.hint}>Use 485310 for rideshare/taxi services</Text>
         </View>
 
         <View style={styles.field}>
-          <Text style={styles.label}>Main Product or Service</Text>
+          <Text style={styles.label}>Main Product or Service *</Text>
           <TextInput
             style={styles.input}
             value={mainProductService}
             onChangeText={setMainProductService}
-            placeholder="e.g., Taxi and ridesharing services"
+            placeholder="Rideshare transportation"
             placeholderTextColor="#9CA3AF"
             editable={!loading}
           />
-          <Text style={styles.hint}>Brief description of your main business activity</Text>
+          <Text style={styles.hint}>For Uber drivers: "Rideshare transportation" or "Driving services"</Text>
         </View>
 
         <View style={styles.field}>
-          <Text style={styles.label}>Industry Code (Guide T4002)</Text>
+          <Text style={styles.label}>Industry Code (Guide T4002) *</Text>
           <TextInput
             style={styles.input}
             value={industryCode}
@@ -369,7 +382,7 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
             maxLength={6}
             editable={!loading}
           />
-          <Text style={styles.hint}>From Chapter 2 in Guide T4002</Text>
+          <Text style={styles.hint}>Use 485310 – Taxi service (CRA code for rideshare drivers)</Text>
         </View>
 
         <View style={styles.field}>
@@ -385,10 +398,11 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
             </View>
             <Text style={styles.checkboxLabel}>This is my last year of business</Text>
           </TouchableOpacity>
+          <Text style={styles.hint}>Only check if you permanently stopped driving</Text>
         </View>
 
         <View style={styles.field}>
-          <Text style={styles.label}>Accounting Method</Text>
+          <Text style={styles.label}>Accounting Method *</Text>
           <View style={styles.radioGroup}>
             <TouchableOpacity
               style={[
@@ -432,40 +446,45 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
               </Text>
             </TouchableOpacity>
           </View>
+          <Text style={styles.hint}>Rideshare drivers should use Cash basis (report income when received)</Text>
         </View>
 
         <View style={styles.row}>
           <View style={[styles.field, styles.fieldHalf]}>
-            <Text style={styles.label}>Fiscal Year Start</Text>
+            <Text style={styles.label}>Fiscal Year Start *</Text>
             <TextInput
               style={styles.input}
               value={fiscalYearStart}
               onChangeText={setFiscalYearStart}
-              placeholder="YYYY-MM-DD"
+              placeholder="2025-01-01"
               placeholderTextColor="#9CA3AF"
               editable={!loading}
             />
           </View>
 
           <View style={[styles.field, styles.fieldHalf]}>
-            <Text style={styles.label}>Fiscal Year End</Text>
+            <Text style={styles.label}>Fiscal Year End *</Text>
             <TextInput
               style={styles.input}
               value={fiscalYearEnd}
               onChangeText={setFiscalYearEnd}
-              placeholder="YYYY-MM-DD"
+              placeholder="2025-12-31"
               placeholderTextColor="#9CA3AF"
               editable={!loading}
             />
           </View>
         </View>
+        <Text style={styles.hint}>Most drivers use January 1 to December 31</Text>
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>BUSINESS ADDRESS</Text>
+        <Text style={[styles.hint, { marginBottom: 16 }]}>
+          For Uber drivers, use your home address (where you operate from)
+        </Text>
 
         <View style={styles.field}>
-          <Text style={styles.label}>Street Address</Text>
+          <Text style={styles.label}>Street Address *</Text>
           <TextInput
             style={styles.input}
             value={businessAddressLine1}
@@ -490,7 +509,7 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
 
         <View style={styles.row}>
           <View style={[styles.field, styles.fieldHalf]}>
-            <Text style={styles.label}>City</Text>
+            <Text style={styles.label}>City *</Text>
             <TextInput
               style={styles.input}
               value={businessCity}
@@ -502,7 +521,7 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
           </View>
 
           <View style={[styles.field, styles.fieldHalf]}>
-            <Text style={styles.label}>Province</Text>
+            <Text style={styles.label}>Province *</Text>
             <TextInput
               style={styles.input}
               value={businessProvince}
@@ -517,7 +536,7 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
         </View>
 
         <View style={styles.field}>
-          <Text style={styles.label}>Postal Code</Text>
+          <Text style={styles.label}>Postal Code *</Text>
           <TextInput
             style={styles.input}
             value={businessPostalCode}
