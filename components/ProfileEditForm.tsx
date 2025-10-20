@@ -34,12 +34,25 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
 
   const [businessName, setBusinessName] = useState(profile.business_name || '');
   const [businessNumber, setBusinessNumber] = useState(profile.business_number || '');
+  const [businessAddressLine1, setBusinessAddressLine1] = useState(profile.business_address_line1 || '');
+  const [businessAddressLine2, setBusinessAddressLine2] = useState(profile.business_address_line2 || '');
+  const [businessCity, setBusinessCity] = useState(profile.business_city || '');
+  const [businessProvince, setBusinessProvince] = useState(profile.business_province || '');
+  const [businessPostalCode, setBusinessPostalCode] = useState(profile.business_postal_code || '');
+  const [mainProductService, setMainProductService] = useState(profile.main_product_service || '');
+  const [industryCode, setIndustryCode] = useState(profile.industry_code || '');
   const [naicsCode, setNaicsCode] = useState(profile.naics_code || '');
+  const [lastYearOfBusiness, setLastYearOfBusiness] = useState(profile.last_year_of_business || false);
   const [accountingMethod, setAccountingMethod] = useState<'cash' | 'accrual'>(
     profile.accounting_method || 'cash'
   );
   const [fiscalYearStart, setFiscalYearStart] = useState(profile.fiscal_year_start || '');
   const [fiscalYearEnd, setFiscalYearEnd] = useState(profile.fiscal_year_end_date || '');
+  const [taxShelterId, setTaxShelterId] = useState(profile.tax_shelter_id || '');
+  const [partnershipBN, setPartnershipBN] = useState(profile.partnership_business_number || '');
+  const [partnershipPercent, setPartnershipPercent] = useState(
+    profile.partnership_percentage?.toString() || ''
+  );
 
   const [gstRegistered, setGstRegistered] = useState(profile.gst_hst_registered || false);
   const [gstNumber, setGstNumber] = useState(profile.gst_hst_number || '');
@@ -114,10 +127,21 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
       province,
       business_name: businessName,
       business_number: businessNumber,
+      business_address_line1: businessAddressLine1,
+      business_address_line2: businessAddressLine2,
+      business_city: businessCity,
+      business_province: businessProvince,
+      business_postal_code: businessPostalCode,
+      main_product_service: mainProductService,
+      industry_code: industryCode,
       naics_code: naicsCode,
+      last_year_of_business: lastYearOfBusiness,
       accounting_method: accountingMethod,
       fiscal_year_start: fiscalYearStart,
       fiscal_year_end_date: fiscalYearEnd,
+      tax_shelter_id: taxShelterId || null,
+      partnership_business_number: partnershipBN || null,
+      partnership_percentage: partnershipPercent ? parseFloat(partnershipPercent) : null,
       gst_hst_registered: gstRegistered,
       gst_hst_number: gstNumber,
       gst_hst_method: gstMethod,
@@ -321,6 +345,49 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
         </View>
 
         <View style={styles.field}>
+          <Text style={styles.label}>Main Product or Service</Text>
+          <TextInput
+            style={styles.input}
+            value={mainProductService}
+            onChangeText={setMainProductService}
+            placeholder="e.g., Taxi and ridesharing services"
+            placeholderTextColor="#9CA3AF"
+            editable={!loading}
+          />
+          <Text style={styles.hint}>Brief description of your main business activity</Text>
+        </View>
+
+        <View style={styles.field}>
+          <Text style={styles.label}>Industry Code (Guide T4002)</Text>
+          <TextInput
+            style={styles.input}
+            value={industryCode}
+            onChangeText={setIndustryCode}
+            placeholder="485310"
+            placeholderTextColor="#9CA3AF"
+            keyboardType="number-pad"
+            maxLength={6}
+            editable={!loading}
+          />
+          <Text style={styles.hint}>From Chapter 2 in Guide T4002</Text>
+        </View>
+
+        <View style={styles.field}>
+          <TouchableOpacity
+            style={styles.checkbox}
+            onPress={() => setLastYearOfBusiness(!lastYearOfBusiness)}
+            disabled={loading}
+          >
+            <View
+              style={[styles.checkboxBox, lastYearOfBusiness && styles.checkboxBoxActive]}
+            >
+              {lastYearOfBusiness && <Check size={16} color="#FFFFFF" />}
+            </View>
+            <Text style={styles.checkboxLabel}>This is my last year of business</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.field}>
           <Text style={styles.label}>Accounting Method</Text>
           <View style={styles.radioGroup}>
             <TouchableOpacity
@@ -391,6 +458,123 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
               editable={!loading}
             />
           </View>
+        </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>BUSINESS ADDRESS</Text>
+
+        <View style={styles.field}>
+          <Text style={styles.label}>Street Address</Text>
+          <TextInput
+            style={styles.input}
+            value={businessAddressLine1}
+            onChangeText={setBusinessAddressLine1}
+            placeholder="123 Main Street"
+            placeholderTextColor="#9CA3AF"
+            editable={!loading}
+          />
+        </View>
+
+        <View style={styles.field}>
+          <Text style={styles.label}>Suite/Unit (Optional)</Text>
+          <TextInput
+            style={styles.input}
+            value={businessAddressLine2}
+            onChangeText={setBusinessAddressLine2}
+            placeholder="Suite 100"
+            placeholderTextColor="#9CA3AF"
+            editable={!loading}
+          />
+        </View>
+
+        <View style={styles.row}>
+          <View style={[styles.field, styles.fieldHalf]}>
+            <Text style={styles.label}>City</Text>
+            <TextInput
+              style={styles.input}
+              value={businessCity}
+              onChangeText={setBusinessCity}
+              placeholder="Toronto"
+              placeholderTextColor="#9CA3AF"
+              editable={!loading}
+            />
+          </View>
+
+          <View style={[styles.field, styles.fieldHalf]}>
+            <Text style={styles.label}>Province</Text>
+            <TextInput
+              style={styles.input}
+              value={businessProvince}
+              onChangeText={(text) => setBusinessProvince(text.toUpperCase())}
+              placeholder="ON"
+              placeholderTextColor="#9CA3AF"
+              autoCapitalize="characters"
+              maxLength={2}
+              editable={!loading}
+            />
+          </View>
+        </View>
+
+        <View style={styles.field}>
+          <Text style={styles.label}>Postal Code</Text>
+          <TextInput
+            style={styles.input}
+            value={businessPostalCode}
+            onChangeText={(text) => setBusinessPostalCode(formatPostalCode(text))}
+            placeholder="A1A 1A1"
+            placeholderTextColor="#9CA3AF"
+            autoCapitalize="characters"
+            maxLength={7}
+            editable={!loading}
+          />
+        </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>PARTNERSHIP INFORMATION (If Applicable)</Text>
+
+        <View style={styles.field}>
+          <Text style={styles.label}>Tax Shelter ID (Optional)</Text>
+          <TextInput
+            style={styles.input}
+            value={taxShelterId}
+            onChangeText={setTaxShelterId}
+            placeholder="Tax shelter identification number"
+            placeholderTextColor="#9CA3AF"
+            editable={!loading}
+          />
+        </View>
+
+        <View style={styles.field}>
+          <Text style={styles.label}>Partnership Business Number (Optional)</Text>
+          <TextInput
+            style={styles.input}
+            value={partnershipBN}
+            onChangeText={setPartnershipBN}
+            placeholder="123456789"
+            placeholderTextColor="#9CA3AF"
+            keyboardType="number-pad"
+            maxLength={9}
+            editable={!loading}
+          />
+        </View>
+
+        <View style={styles.field}>
+          <Text style={styles.label}>Your Partnership Percentage (Optional)</Text>
+          <View style={styles.percentInput}>
+            <TextInput
+              style={styles.percentField}
+              value={partnershipPercent}
+              onChangeText={setPartnershipPercent}
+              placeholder="0"
+              placeholderTextColor="#9CA3AF"
+              keyboardType="decimal-pad"
+              editable={!loading}
+            />
+            <Text style={styles.percentSign}>%</Text>
+          </View>
+          <Text style={styles.hint}>Only fill if your business is a partnership</Text>
         </View>
       </View>
 
