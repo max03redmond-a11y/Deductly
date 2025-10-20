@@ -26,21 +26,24 @@ const VEHICLE_EXPENSE_CODES = [
 
 export default function DashboardScreen() {
   const profile = DEFAULT_PROFILE;
+  const currentYear = new Date().getFullYear();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [income, setIncome] = useState<IncomeEntry[]>([]);
   const [mileage, setMileage] = useState<MileageLog[]>([]);
   const [assets, setAssets] = useState<Asset[]>([]);
   const [craCategories, setCraCategories] = useState<CRACategory[]>([]);
+  const [mileageSettings, setMileageSettings] = useState<{ jan1_odometer_km: number; current_odometer_km: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [showExportModal, setShowExportModal] = useState(false);
 
   const loadData = useCallback(async () => {
-    const [expensesRes, incomeRes, mileageRes, assetsRes, categoriesRes] = await Promise.all([
+    const [expensesRes, incomeRes, mileageRes, assetsRes, categoriesRes, settingsRes] = await Promise.all([
       supabase.from('expenses').select('*').eq('user_id', profile.id),
       supabase.from('income_entries').select('*').eq('user_id', profile.id),
-      supabase.from('mileage_logs').select('*').eq('user_id', profile.id),
+      supabase.from('mileage_logs').select('*').eq('user_id', profile.id).gte('date', `${currentYear}-01-01`).lte('date', `${currentYear}-12-31`),
       supabase.from('assets').select('*').eq('user_id', profile.id),
       supabase.from('cra_categories').select('*'),
+      supabase.from('mileage_settings').select('*').eq('user_id', profile.id).eq('year', currentYear).maybeSingle(),
     ]);
 
     if (expensesRes.data) setExpenses(expensesRes.data);
@@ -48,8 +51,9 @@ export default function DashboardScreen() {
     if (mileageRes.data) setMileage(mileageRes.data);
     if (assetsRes.data) setAssets(assetsRes.data);
     if (categoriesRes.data) setCraCategories(categoriesRes.data);
+    if (settingsRes.data) setMileageSettings(settingsRes.data);
     setLoading(false);
-  }, []);
+  }, [currentYear]);
 
   useEffect(() => {
     loadData();
@@ -104,9 +108,18 @@ export default function DashboardScreen() {
     return VEHICLE_EXPENSE_CODES.includes(categoryCode);
   };
 
-  const totalKm = mileage.reduce((sum, log) => sum + log.distance_km, 0);
-  const businessKm = mileage.reduce((sum, log) => sum + log.business_km, 0);
-  const mileageBusinessUsePercentage = totalKm > 0 ? (businessKm / totalKm) * 100 : 0;
+  // Calculate business use % exactly as the mileage page does
+  const businessKmYTD = mileage
+    .filter((log) => log.is_business)
+    .reduce((sum, log) => sum + log.distance_km, 0);
+
+  const totalKmYTD = mileageSettings
+    ? mileageSettings.current_odometer_km - mileageSettings.jan1_odometer_km
+    : 0;
+
+  const mileageBusinessUsePercentage = totalKmYTD > 0
+    ? Math.min(100, Math.max(0, (businessKmYTD / totalKmYTD) * 100))
+    : 0;
 
   const vehicleExpensesByCategory = expenses.reduce((acc, expense) => {
     if (isVehicleExpense(expense.category)) {
