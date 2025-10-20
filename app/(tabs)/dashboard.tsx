@@ -3,7 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Dimensions } from
 import { useFocusEffect } from '@react-navigation/native';
 import { supabase } from '@/lib/supabase';
 import { TrendingUp, TrendingDown, Download, FileText, PieChart, DollarSign, Percent } from 'lucide-react-native';
-import { Expense, IncomeEntry, MileageLog, Asset, EXPENSE_CATEGORIES } from '@/types/database';
+import { Expense, IncomeEntry, MileageLog, Asset, EXPENSE_CATEGORIES, CRACategory } from '@/types/database';
 import { PieChart as RNPieChart } from 'react-native-chart-kit';
 import { generateT2125Data } from '@/lib/t2125/mapper';
 import { generateT2125CSV, downloadCSV } from '@/lib/t2125/csvExport';
@@ -14,27 +14,40 @@ import ExportModal from '@/components/ExportModal';
 const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000001';
 const DEFAULT_PROFILE: any = { business_name: 'Your Business', id: DEFAULT_USER_ID };
 
+const VEHICLE_EXPENSE_CODES = [
+  'GAS_FUEL',
+  'LOAN_INTEREST',
+  'INSURANCE_AUTO',
+  'LIC_REG',
+  'REPAIRS_MAINT',
+  'LEASE_PAYMENTS',
+  'VEHICLE_ELECTRICITY'
+];
+
 export default function DashboardScreen() {
   const profile = DEFAULT_PROFILE;
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [income, setIncome] = useState<IncomeEntry[]>([]);
   const [mileage, setMileage] = useState<MileageLog[]>([]);
   const [assets, setAssets] = useState<Asset[]>([]);
+  const [craCategories, setCraCategories] = useState<CRACategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [showExportModal, setShowExportModal] = useState(false);
 
   const loadData = useCallback(async () => {
-    const [expensesRes, incomeRes, mileageRes, assetsRes] = await Promise.all([
+    const [expensesRes, incomeRes, mileageRes, assetsRes, categoriesRes] = await Promise.all([
       supabase.from('expenses').select('*').eq('user_id', profile.id),
       supabase.from('income_entries').select('*').eq('user_id', profile.id),
       supabase.from('mileage_logs').select('*').eq('user_id', profile.id),
       supabase.from('assets').select('*').eq('user_id', profile.id),
+      supabase.from('cra_categories').select('*'),
     ]);
 
     if (expensesRes.data) setExpenses(expensesRes.data);
     if (incomeRes.data) setIncome(incomeRes.data);
     if (mileageRes.data) setMileage(mileageRes.data);
     if (assetsRes.data) setAssets(assetsRes.data);
+    if (categoriesRes.data) setCraCategories(categoriesRes.data);
     setLoading(false);
   }, []);
 
@@ -79,17 +92,47 @@ export default function DashboardScreen() {
 
   const totalIncome = income.reduce((sum, entry) => sum + Number(entry.net_payout), 0);
 
-  const expensesByCategory = expenses.reduce((acc, expense) => {
-    const category = expense.category;
-    const deductibleAmount = expense.amount * (expense.business_percentage / 100);
-    if (!acc[category]) {
-      acc[category] = 0;
+  const getCategoryLabel = (categoryCode: string): string => {
+    const craCategory = craCategories.find(c => c.code === categoryCode);
+    if (craCategory) return craCategory.label;
+
+    const legacyCategory = EXPENSE_CATEGORIES.find(c => c.value === categoryCode);
+    return legacyCategory?.label || categoryCode;
+  };
+
+  const isVehicleExpense = (categoryCode: string): boolean => {
+    return VEHICLE_EXPENSE_CODES.includes(categoryCode);
+  };
+
+  const vehicleExpensesByCategory = expenses.reduce((acc, expense) => {
+    if (isVehicleExpense(expense.category)) {
+      const category = expense.category;
+      const deductibleAmount = expense.amount * (expense.business_percentage / 100);
+      if (!acc[category]) {
+        acc[category] = 0;
+      }
+      acc[category] += deductibleAmount;
     }
-    acc[category] += deductibleAmount;
     return acc;
   }, {} as Record<string, number>);
 
-  const totalExpenses = Object.values(expensesByCategory).reduce((sum, val) => sum + val, 0);
+  const operatingExpensesByCategory = expenses.reduce((acc, expense) => {
+    if (!isVehicleExpense(expense.category)) {
+      const category = expense.category;
+      const deductibleAmount = expense.amount * (expense.business_percentage / 100);
+      if (!acc[category]) {
+        acc[category] = 0;
+      }
+      acc[category] += deductibleAmount;
+    }
+    return acc;
+  }, {} as Record<string, number>);
+
+  const expensesByCategory = { ...vehicleExpensesByCategory, ...operatingExpensesByCategory };
+
+  const totalVehicleExpenses = Object.values(vehicleExpensesByCategory).reduce((sum, val) => sum + val, 0);
+  const totalOperatingExpenses = Object.values(operatingExpensesByCategory).reduce((sum, val) => sum + val, 0);
+  const totalExpenses = totalVehicleExpenses + totalOperatingExpenses;
   const netProfit = totalIncome - totalExpenses;
   const profitMargin = totalIncome > 0 ? (netProfit / totalIncome) * 100 : 0;
 
@@ -265,30 +308,71 @@ export default function DashboardScreen() {
 
           <View style={styles.statementSection}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>OPERATING EXPENSES</Text>
+              <Text style={styles.sectionTitle}>VEHICLE EXPENSES</Text>
             </View>
 
-            {Object.entries(expensesByCategory)
+            {Object.entries(vehicleExpensesByCategory)
               .sort(([, a], [, b]) => b - a)
               .map(([category, amount]) => {
-                const categoryInfo = EXPENSE_CATEGORIES.find(c => c.value === category);
                 return (
                   <View key={category} style={styles.lineItem}>
-                    <Text style={styles.lineItemLabel}>{categoryInfo?.label || category}</Text>
+                    <Text style={styles.lineItemLabel}>{getCategoryLabel(category)}</Text>
                     <Text style={styles.lineItemAmount}>${amount.toFixed(2)}</Text>
                   </View>
                 );
               })}
 
-            {Object.keys(expensesByCategory).length === 0 && (
+            {Object.keys(vehicleExpensesByCategory).length === 0 && (
               <View style={styles.lineItem}>
                 <Text style={[styles.lineItemLabel, { fontStyle: 'italic', color: '#9CA3AF' }]}>
-                  No expenses recorded
+                  No vehicle expenses recorded
                 </Text>
                 <Text style={styles.lineItemAmount}>$0.00</Text>
               </View>
             )}
 
+            <View style={[styles.lineItem, styles.subtotalLine]}>
+              <Text style={styles.subtotalLabel}>Vehicle Expenses Subtotal</Text>
+              <Text style={styles.subtotalAmount}>
+                ${totalVehicleExpenses.toFixed(2)}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.statementSection}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>OPERATING EXPENSES</Text>
+            </View>
+
+            {Object.entries(operatingExpensesByCategory)
+              .sort(([, a], [, b]) => b - a)
+              .map(([category, amount]) => {
+                return (
+                  <View key={category} style={styles.lineItem}>
+                    <Text style={styles.lineItemLabel}>{getCategoryLabel(category)}</Text>
+                    <Text style={styles.lineItemAmount}>${amount.toFixed(2)}</Text>
+                  </View>
+                );
+              })}
+
+            {Object.keys(operatingExpensesByCategory).length === 0 && (
+              <View style={styles.lineItem}>
+                <Text style={[styles.lineItemLabel, { fontStyle: 'italic', color: '#9CA3AF' }]}>
+                  No operating expenses recorded
+                </Text>
+                <Text style={styles.lineItemAmount}>$0.00</Text>
+              </View>
+            )}
+
+            <View style={[styles.lineItem, styles.subtotalLine]}>
+              <Text style={styles.subtotalLabel}>Operating Expenses Subtotal</Text>
+              <Text style={styles.subtotalAmount}>
+                ${totalOperatingExpenses.toFixed(2)}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.statementSection}>
             <View style={[styles.lineItem, styles.totalLine]}>
               <Text style={styles.totalLabel}>Total Expenses</Text>
               <Text style={[styles.totalAmount, { color: '#DC2626' }]}>
@@ -540,9 +624,25 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat-SemiBold',
     color: '#111827',
   },
-  totalLine: {
+  subtotalLine: {
     borderTopWidth: 1,
     borderTopColor: '#F3F4F6',
+    marginTop: 8,
+    paddingTop: 12,
+  },
+  subtotalLabel: {
+    fontSize: 14,
+    fontFamily: 'Montserrat-SemiBold',
+    color: '#6B7280',
+  },
+  subtotalAmount: {
+    fontSize: 15,
+    fontFamily: 'Montserrat-SemiBold',
+    color: '#6B7280',
+  },
+  totalLine: {
+    borderTopWidth: 2,
+    borderTopColor: '#E5E7EB',
     marginTop: 12,
     paddingTop: 16,
   },
