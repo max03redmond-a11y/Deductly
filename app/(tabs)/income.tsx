@@ -96,7 +96,7 @@ export default function IncomeScreen() {
         <Card style={styles.summaryCard}>
           <View style={styles.summaryRow}>
             <View style={styles.summaryItem}>
-              <Text style={styles.summaryLabel}>Net Income</Text>
+              <Text style={styles.summaryLabel}>Income after Fees</Text>
               <Text style={styles.summaryValue}>${totalIncome.toFixed(2)}</Text>
             </View>
             <View style={styles.summaryDivider} />
