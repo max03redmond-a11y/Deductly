@@ -33,7 +33,6 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
   const [province, setProvince] = useState(profile.province || '');
 
   const [businessName, setBusinessName] = useState(profile.business_name || '');
-  const [businessNumber, setBusinessNumber] = useState(profile.business_number || '');
   const [businessAddressLine1, setBusinessAddressLine1] = useState(profile.business_address_line1 || '');
   const [businessAddressLine2, setBusinessAddressLine2] = useState(profile.business_address_line2 || '');
   const [businessCity, setBusinessCity] = useState(profile.business_city || '');
@@ -41,48 +40,23 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
   const [businessPostalCode, setBusinessPostalCode] = useState(profile.business_postal_code || '');
   const [mainProductService, setMainProductService] = useState(profile.main_product_service || '');
   const [industryCode, setIndustryCode] = useState(profile.industry_code || '');
-  const [naicsCode, setNaicsCode] = useState(profile.naics_code || '');
   const [lastYearOfBusiness, setLastYearOfBusiness] = useState(profile.last_year_of_business || false);
   const [accountingMethod, setAccountingMethod] = useState<'cash' | 'accrual'>(
     profile.accounting_method || 'cash'
   );
   const [fiscalYearStart, setFiscalYearStart] = useState(profile.fiscal_year_start || '');
   const [fiscalYearEnd, setFiscalYearEnd] = useState(profile.fiscal_year_end_date || '');
-  const [taxShelterId, setTaxShelterId] = useState(profile.tax_shelter_id || '');
-  const [partnershipBN, setPartnershipBN] = useState(profile.partnership_business_number || '');
-  const [partnershipPercent, setPartnershipPercent] = useState(
-    profile.partnership_percentage?.toString() || ''
-  );
-
-  const [gstRegistered, setGstRegistered] = useState(profile.gst_hst_registered || false);
-  const [gstNumber, setGstNumber] = useState(profile.gst_hst_number || '');
-  const [gstMethod, setGstMethod] = useState<'regular' | 'quick'>(
-    profile.gst_hst_method || 'regular'
-  );
-
-  const [internetUrl1, setInternetUrl1] = useState('');
-  const [internetUrl2, setInternetUrl2] = useState('');
-  const [internetIncome, setInternetIncome] = useState(
-    profile.internet_income_percentage?.toString() || '0'
-  );
-
-  useEffect(() => {
-    if (profile.internet_business_urls && profile.internet_business_urls.length > 0) {
-      setInternetUrl1(profile.internet_business_urls[0] || '');
-      setInternetUrl2(profile.internet_business_urls[1] || '');
-    }
-  }, [profile]);
 
   const calculateCompleteness = (): number => {
     const fields = [
       legalName,
       sin,
-      addressLine1,
-      city,
-      postalCode,
-      province,
-      businessName,
-      naicsCode,
+      businessAddressLine1,
+      businessCity,
+      businessProvince,
+      businessPostalCode,
+      mainProductService,
+      industryCode,
       accountingMethod,
       fiscalYearStart,
       fiscalYearEnd,
@@ -95,70 +69,47 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
   const completeness = calculateCompleteness();
 
   const handleSave = async () => {
-    if (!legalName || !addressLine1 || !city || !postalCode) {
-      const msg = 'Please fill in your legal name and mailing address';
+    if (!legalName || !sin) {
+      const msg = 'Please fill in your legal name and SIN';
       Platform.OS === 'web' ? alert(msg) : Alert.alert('Required Fields', msg);
       return;
     }
 
-    if (!sin || sin.replace(/\D/g, '').length !== 9) {
-      const msg = 'SIN is required and must be 9 digits';
-      Platform.OS === 'web' ? alert(msg) : Alert.alert('Required Field', msg);
+    if (sin.replace(/\D/g, '').length !== 9) {
+      const msg = 'SIN must be 9 digits';
+      Platform.OS === 'web' ? alert(msg) : Alert.alert('Invalid SIN', msg);
       return;
     }
 
-    if (!naicsCode || !mainProductService || !industryCode || !fiscalYearStart || !fiscalYearEnd) {
-      const msg = 'Please complete all required business fields (NAICS, Product/Service, Industry Code, Fiscal Period)';
+    if (!mainProductService || !industryCode || !fiscalYearStart || !fiscalYearEnd) {
+      const msg = 'Please complete all required business fields';
       Platform.OS === 'web' ? alert(msg) : Alert.alert('Required Fields', msg);
       return;
     }
 
     if (!businessAddressLine1 || !businessCity || !businessProvince || !businessPostalCode) {
-      const msg = 'Please complete all required business address fields';
+      const msg = 'Please complete business address (where you operate from)';
       Platform.OS === 'web' ? alert(msg) : Alert.alert('Required Fields', msg);
-      return;
-    }
-
-    if (businessNumber && businessNumber.replace(/\D/g, '').length !== 9) {
-      const msg = 'Business number must be 9 digits';
-      Platform.OS === 'web' ? alert(msg) : Alert.alert('Invalid Business Number', msg);
       return;
     }
 
     setLoading(true);
 
-    const urls = [internetUrl1, internetUrl2].filter((url) => url.trim().length > 0);
-
     const updates: Partial<Profile> = {
       legal_name: legalName,
       sin_encrypted: sin,
-      mailing_address_line1: addressLine1,
-      mailing_address_line2: addressLine2,
-      mailing_city: city,
-      mailing_postal_code: postalCode,
-      province,
-      business_name: businessName,
-      business_number: businessNumber,
+      business_name: businessName || null,
       business_address_line1: businessAddressLine1,
-      business_address_line2: businessAddressLine2,
+      business_address_line2: businessAddressLine2 || null,
       business_city: businessCity,
       business_province: businessProvince,
       business_postal_code: businessPostalCode,
       main_product_service: mainProductService,
       industry_code: industryCode,
-      naics_code: naicsCode,
       last_year_of_business: lastYearOfBusiness,
       accounting_method: accountingMethod,
       fiscal_year_start: fiscalYearStart,
       fiscal_year_end_date: fiscalYearEnd,
-      tax_shelter_id: taxShelterId || null,
-      partnership_business_number: partnershipBN || null,
-      partnership_percentage: partnershipPercent ? parseFloat(partnershipPercent) : null,
-      gst_hst_registered: gstRegistered,
-      gst_hst_number: gstNumber,
-      gst_hst_method: gstMethod,
-      internet_business_urls: urls.length > 0 ? urls : null,
-      internet_income_percentage: parseFloat(internetIncome) || 0,
       profile_completed: completeness === 100,
       profile_completed_at: completeness === 100 ? new Date().toISOString() : null,
       updated_at: new Date().toISOString(),
@@ -256,62 +207,6 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>MAILING ADDRESS</Text>
-
-        <View style={styles.field}>
-          <Text style={styles.label}>Street Address *</Text>
-          <TextInput
-            style={styles.input}
-            value={addressLine1}
-            onChangeText={setAddressLine1}
-            placeholder="123 Main Street"
-            placeholderTextColor="#9CA3AF"
-            editable={!loading}
-          />
-        </View>
-
-        <View style={styles.field}>
-          <Text style={styles.label}>Apt/Unit (Optional)</Text>
-          <TextInput
-            style={styles.input}
-            value={addressLine2}
-            onChangeText={setAddressLine2}
-            placeholder="Unit 456"
-            placeholderTextColor="#9CA3AF"
-            editable={!loading}
-          />
-        </View>
-
-        <View style={styles.row}>
-          <View style={[styles.field, styles.fieldHalf]}>
-            <Text style={styles.label}>City *</Text>
-            <TextInput
-              style={styles.input}
-              value={city}
-              onChangeText={setCity}
-              placeholder="Toronto"
-              placeholderTextColor="#9CA3AF"
-              editable={!loading}
-            />
-          </View>
-
-          <View style={[styles.field, styles.fieldHalf]}>
-            <Text style={styles.label}>Postal Code *</Text>
-            <TextInput
-              style={styles.input}
-              value={postalCode}
-              onChangeText={(text) => setPostalCode(formatPostalCode(text))}
-              placeholder="A1A 1A1"
-              placeholderTextColor="#9CA3AF"
-              autoCapitalize="characters"
-              maxLength={7}
-              editable={!loading}
-            />
-          </View>
-        </View>
-      </View>
-
-      <View style={styles.section}>
         <Text style={styles.sectionTitle}>BUSINESS INFORMATION</Text>
 
         <View style={styles.field}>
@@ -325,36 +220,6 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
             editable={!loading}
           />
           <Text style={styles.hint}>Leave blank or write "Self-employed – Uber Driver"</Text>
-        </View>
-
-        <View style={styles.field}>
-          <Text style={styles.label}>Business Number (BN) (Optional)</Text>
-          <TextInput
-            style={styles.input}
-            value={businessNumber}
-            onChangeText={setBusinessNumber}
-            placeholder="123456789"
-            placeholderTextColor="#9CA3AF"
-            keyboardType="number-pad"
-            maxLength={9}
-            editable={!loading}
-          />
-          <Text style={styles.hint}>9-digit CRA business number (only if you have one)</Text>
-        </View>
-
-        <View style={styles.field}>
-          <Text style={styles.label}>NAICS Code *</Text>
-          <TextInput
-            style={styles.input}
-            value={naicsCode}
-            onChangeText={setNaicsCode}
-            placeholder="485310"
-            placeholderTextColor="#9CA3AF"
-            keyboardType="number-pad"
-            maxLength={6}
-            editable={!loading}
-          />
-          <Text style={styles.hint}>Use 485310 for rideshare/taxi services</Text>
         </View>
 
         <View style={styles.field}>
@@ -547,183 +412,6 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
             maxLength={7}
             editable={!loading}
           />
-        </View>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>PARTNERSHIP INFORMATION (If Applicable)</Text>
-
-        <View style={styles.field}>
-          <Text style={styles.label}>Tax Shelter ID (Optional)</Text>
-          <TextInput
-            style={styles.input}
-            value={taxShelterId}
-            onChangeText={setTaxShelterId}
-            placeholder="Tax shelter identification number"
-            placeholderTextColor="#9CA3AF"
-            editable={!loading}
-          />
-        </View>
-
-        <View style={styles.field}>
-          <Text style={styles.label}>Partnership Business Number (Optional)</Text>
-          <TextInput
-            style={styles.input}
-            value={partnershipBN}
-            onChangeText={setPartnershipBN}
-            placeholder="123456789"
-            placeholderTextColor="#9CA3AF"
-            keyboardType="number-pad"
-            maxLength={9}
-            editable={!loading}
-          />
-        </View>
-
-        <View style={styles.field}>
-          <Text style={styles.label}>Your Partnership Percentage (Optional)</Text>
-          <View style={styles.percentInput}>
-            <TextInput
-              style={styles.percentField}
-              value={partnershipPercent}
-              onChangeText={setPartnershipPercent}
-              placeholder="0"
-              placeholderTextColor="#9CA3AF"
-              keyboardType="decimal-pad"
-              editable={!loading}
-            />
-            <Text style={styles.percentSign}>%</Text>
-          </View>
-          <Text style={styles.hint}>Only fill if your business is a partnership</Text>
-        </View>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>GST/HST REGISTRATION</Text>
-
-        <View style={styles.field}>
-          <TouchableOpacity
-            style={styles.checkbox}
-            onPress={() => setGstRegistered(!gstRegistered)}
-            disabled={loading}
-          >
-            <View
-              style={[styles.checkboxBox, gstRegistered && styles.checkboxBoxActive]}
-            >
-              {gstRegistered && <Check size={16} color="#FFFFFF" />}
-            </View>
-            <Text style={styles.checkboxLabel}>GST/HST Registered</Text>
-          </TouchableOpacity>
-        </View>
-
-        {gstRegistered && (
-          <>
-            <View style={styles.field}>
-              <Text style={styles.label}>GST/HST Number</Text>
-              <TextInput
-                style={styles.input}
-                value={gstNumber}
-                onChangeText={setGstNumber}
-                placeholder="123456789RT0001"
-                placeholderTextColor="#9CA3AF"
-                editable={!loading}
-              />
-            </View>
-
-            <View style={styles.field}>
-              <Text style={styles.label}>Filing Method</Text>
-              <View style={styles.radioGroup}>
-                <TouchableOpacity
-                  style={[
-                    styles.radioButton,
-                    gstMethod === 'regular' && styles.radioButtonActive,
-                  ]}
-                  onPress={() => setGstMethod('regular')}
-                  disabled={loading}
-                >
-                  {gstMethod === 'regular' && (
-                    <Check size={16} color="#059669" style={styles.checkIcon} />
-                  )}
-                  <Text
-                    style={[
-                      styles.radioText,
-                      gstMethod === 'regular' && styles.radioTextActive,
-                    ]}
-                  >
-                    Regular
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={[
-                    styles.radioButton,
-                    gstMethod === 'quick' && styles.radioButtonActive,
-                  ]}
-                  onPress={() => setGstMethod('quick')}
-                  disabled={loading}
-                >
-                  {gstMethod === 'quick' && (
-                    <Check size={16} color="#059669" style={styles.checkIcon} />
-                  )}
-                  <Text
-                    style={[
-                      styles.radioText,
-                      gstMethod === 'quick' && styles.radioTextActive,
-                    ]}
-                  >
-                    Quick Method
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </>
-        )}
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>INTERNET BUSINESS ACTIVITIES</Text>
-
-        <View style={styles.field}>
-          <Text style={styles.label}>Business Website URL 1 (Optional)</Text>
-          <TextInput
-            style={styles.input}
-            value={internetUrl1}
-            onChangeText={setInternetUrl1}
-            placeholder="https://example.com"
-            placeholderTextColor="#9CA3AF"
-            autoCapitalize="none"
-            keyboardType="url"
-            editable={!loading}
-          />
-        </View>
-
-        <View style={styles.field}>
-          <Text style={styles.label}>Business Website URL 2 (Optional)</Text>
-          <TextInput
-            style={styles.input}
-            value={internetUrl2}
-            onChangeText={setInternetUrl2}
-            placeholder="https://example.com"
-            placeholderTextColor="#9CA3AF"
-            autoCapitalize="none"
-            keyboardType="url"
-            editable={!loading}
-          />
-        </View>
-
-        <View style={styles.field}>
-          <Text style={styles.label}>% of Gross Income from Internet</Text>
-          <View style={styles.percentInput}>
-            <TextInput
-              style={styles.percentField}
-              value={internetIncome}
-              onChangeText={setInternetIncome}
-              placeholder="0"
-              placeholderTextColor="#9CA3AF"
-              keyboardType="decimal-pad"
-              editable={!loading}
-            />
-            <Text style={styles.percentSign}>%</Text>
-          </View>
         </View>
       </View>
 
