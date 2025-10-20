@@ -425,122 +425,184 @@ export function generateT2125PDF(data: T2125Data): string {
   </div>
 
   <div class="section" style="page-break-before: always;">
-    <div class="section-title">PART 4 — EXPENSES</div>
-    <div class="line-item header">
-      <div>Line</div>
-      <div>Description</div>
-      <div>Amount</div>
-    </div>
-    ${pdfData.part4_expenses.line8521_advertising > 0 ? `
-    <div class="line-item">
-      <div class="line-number">8521</div>
-      <div>Advertising</div>
-      <div class="amount">$${formatCurrency(pdfData.part4_expenses.line8521_advertising)}</div>
-    </div>` : ''}
-    ${pdfData.part4_expenses.line8523_meals_entertainment > 0 ? `
-    <div class="line-item">
-      <div class="line-number">8523</div>
-      <div>Meals and entertainment (50% limit applied)</div>
-      <div class="amount">$${formatCurrency(pdfData.part4_expenses.line8523_meals_entertainment)}</div>
-    </div>` : ''}
-    ${pdfData.part4_expenses.line8690_insurance > 0 ? `
-    <div class="line-item">
-      <div class="line-number">8690</div>
-      <div>Insurance</div>
-      <div class="amount">$${formatCurrency(pdfData.part4_expenses.line8690_insurance)}</div>
-    </div>` : ''}
-    ${pdfData.part4_expenses.line8710_interest_bank_charges > 0 ? `
-    <div class="line-item">
-      <div class="line-number">8710</div>
-      <div>Interest and bank charges</div>
-      <div class="amount">$${formatCurrency(pdfData.part4_expenses.line8710_interest_bank_charges)}</div>
-    </div>` : ''}
-    ${pdfData.part4_expenses.line8760_business_taxes_licences > 0 ? `
-    <div class="line-item">
-      <div class="line-number">8760</div>
-      <div>Business taxes, fees, licences, and memberships</div>
-      <div class="amount">$${formatCurrency(pdfData.part4_expenses.line8760_business_taxes_licences)}</div>
-    </div>` : ''}
-    ${pdfData.part4_expenses.line8810_office_expenses > 0 ? `
-    <div class="line-item">
-      <div class="line-number">8810</div>
-      <div>Office expenses</div>
-      <div class="amount">$${formatCurrency(pdfData.part4_expenses.line8810_office_expenses)}</div>
-    </div>` : ''}
-    ${pdfData.part4_expenses.line8811_office_supplies > 0 ? `
-    <div class="line-item">
-      <div class="line-number">8811</div>
-      <div>Supplies</div>
-      <div class="amount">$${formatCurrency(pdfData.part4_expenses.line8811_office_supplies)}</div>
-    </div>` : ''}
-    ${pdfData.part4_expenses.line8860_professional_fees > 0 ? `
-    <div class="line-item">
-      <div class="line-number">8860</div>
-      <div>Professional fees</div>
-      <div class="amount">$${formatCurrency(pdfData.part4_expenses.line8860_professional_fees)}</div>
-    </div>` : ''}
-    ${pdfData.part4_expenses.line8871_management_fees > 0 ? `
-    <div class="line-item">
-      <div class="line-number">8871</div>
-      <div>Management and administration fees</div>
-      <div class="amount">$${formatCurrency(pdfData.part4_expenses.line8871_management_fees)}</div>
-    </div>` : ''}
-    ${pdfData.part4_expenses.line8910_rent > 0 ? `
-    <div class="line-item">
-      <div class="line-number">8910</div>
-      <div>Rent</div>
-      <div class="amount">$${formatCurrency(pdfData.part4_expenses.line8910_rent)}</div>
-    </div>` : ''}
-    ${pdfData.part4_expenses.line8960_repairs_maintenance > 0 ? `
-    <div class="line-item">
-      <div class="line-number">8960</div>
-      <div>Repairs and maintenance</div>
-      <div class="amount">$${formatCurrency(pdfData.part4_expenses.line8960_repairs_maintenance)}</div>
-    </div>` : ''}
-    ${pdfData.part4_expenses.line9200_travel > 0 ? `
-    <div class="line-item">
-      <div class="line-number">9200</div>
-      <div>Travel</div>
-      <div class="amount">$${formatCurrency(pdfData.part4_expenses.line9200_travel)}</div>
-    </div>` : ''}
-    ${pdfData.part4_expenses.line9225_telephone_utilities > 0 ? `
-    <div class="line-item">
-      <div class="line-number">9225</div>
-      <div>Telephone and utilities</div>
-      <div class="amount">$${formatCurrency(pdfData.part4_expenses.line9225_telephone_utilities)}</div>
-    </div>` : ''}
-    ${pdfData.part4_expenses.line9270_other_expenses > 0 ? `
-    <div class="line-item">
-      <div class="line-number">9270</div>
-      <div>Other expenses</div>
-      <div class="amount">$${formatCurrency(pdfData.part4_expenses.line9270_other_expenses)}</div>
-    </div>` : ''}
-    <div class="line-item">
-      <div class="line-number">9281</div>
-      <div>Motor vehicle expenses (not including CCA)</div>
-      <div class="amount">$${formatCurrency(pdfData.part4_expenses.line9281_motor_vehicle)}</div>
-    </div>
-    ${pdfData.part4_expenses.line9936_cca > 0 ? `
-    <div class="line-item">
-      <div class="line-number">9936</div>
-      <div>Capital cost allowance (CCA)</div>
-      <div class="amount">$${formatCurrency(pdfData.part4_expenses.line9936_cca)}</div>
-    </div>` : ''}
-    ${pdfData.part4_expenses.line9945_home_office > 0 ? `
-    <div class="line-item">
-      <div class="line-number">9945</div>
-      <div>Business-use-of-home expenses</div>
-      <div class="amount">$${formatCurrency(pdfData.part4_expenses.line9945_home_office)}</div>
-    </div>` : ''}
-    <div class="line-item total">
-      <div class="line-number">9368</div>
-      <div>TOTAL EXPENSES</div>
-      <div class="amount">$${formatCurrency(pdfData.part4_expenses.line9368_total_expenses)}</div>
-    </div>
-    <div class="line-item total">
-      <div class="line-number">9369</div>
-      <div>NET INCOME (LOSS) BEFORE ADJUSTMENTS</div>
-      <div class="amount">$${formatCurrency(pdfData.part4_expenses.line9369_net_income)}</div>
+    <div class="section-title">Part 4 – Net income (loss) before adjustments</div>
+
+    <div style="margin: 20px 0;">
+      <div style="display: grid; grid-template-columns: 60px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 2px solid #000; background: #f0f9ff; font-weight: bold;">
+        <div></div>
+        <div style="font-weight: bold;">4A</div>
+        <div></div>
+      </div>
+      <div style="display: grid; grid-template-columns: 60px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div></div>
+        <div>Gross business or professional income (line 8299 of Part 3C) or Gross profit (line 8519 of Part 3D). . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace; font-weight: bold;">$${formatCurrency(pdfData.part3_income.line8299_total_gross_income)}</div>
+      </div>
+
+      <div style="margin: 15px 0; padding: 10px; background: #f5f5f5; font-weight: bold;">
+        Expenses (enter only the business part)
+      </div>
+
+      <div style="display: grid; grid-template-columns: 60px 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">8521</div>
+        <div style="font-weight: bold;">4B</div>
+        <div>Advertising . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.part4_expenses.line8521_advertising)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 60px 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">8523</div>
+        <div style="font-weight: bold;">4C</div>
+        <div>Meals and entertainment. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.part4_expenses.line8523_meals_entertainment)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 60px 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">8590</div>
+        <div style="font-weight: bold;">4D</div>
+        <div>Bad debts . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.part4_expenses.line8590_bad_debts)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 60px 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">8690</div>
+        <div style="font-weight: bold;">4E</div>
+        <div>Insurance . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.part4_expenses.line8690_insurance)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 60px 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">8710</div>
+        <div style="font-weight: bold;">4F</div>
+        <div>Interest and bank charges. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.part4_expenses.line8710_interest_bank_charges)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 60px 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">8760</div>
+        <div style="font-weight: bold;">4G</div>
+        <div>Business taxes, licences and memberships . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.part4_expenses.line8760_business_taxes_licences)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 60px 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">8810</div>
+        <div style="font-weight: bold;">4H</div>
+        <div>Office expenses . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.part4_expenses.line8810_office_expenses)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 60px 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">8811</div>
+        <div style="font-weight: bold;">4I</div>
+        <div>Office stationery and supplies . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.part4_expenses.line8811_office_supplies)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 60px 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">8860</div>
+        <div style="font-weight: bold;">4J</div>
+        <div>Professional fees (includes legal and accounting fees). . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.part4_expenses.line8860_professional_fees)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 60px 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">8871</div>
+        <div style="font-weight: bold;">4K</div>
+        <div>Management and administration fees . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.part4_expenses.line8871_management_fees)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 60px 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">8910</div>
+        <div style="font-weight: bold;">4L</div>
+        <div>Rent . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.part4_expenses.line8910_rent)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 60px 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">8960</div>
+        <div style="font-weight: bold;">4M</div>
+        <div>Repairs and maintenance . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.part4_expenses.line8960_repairs_maintenance)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 60px 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">9060</div>
+        <div style="font-weight: bold;">4N</div>
+        <div>Salaries, wages and benefits (including employer's contributions) . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.part4_expenses.line9060_salaries_wages)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 60px 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">9180</div>
+        <div style="font-weight: bold;">4O</div>
+        <div>Property taxes. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.part4_expenses.line9180_property_taxes)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 60px 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">9200</div>
+        <div style="font-weight: bold;">4P</div>
+        <div>Travel expenses . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.part4_expenses.line9200_travel)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 60px 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">9220</div>
+        <div style="font-weight: bold;">4Q</div>
+        <div>Utilities . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.part4_expenses.line9220_utilities)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 60px 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">9224</div>
+        <div style="font-weight: bold;">4R</div>
+        <div>Fuel costs (except for motor vehicles). . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.part4_expenses.line9224_fuel_costs)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 60px 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">9275</div>
+        <div style="font-weight: bold;">4S</div>
+        <div>Delivery, freight and express. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.part4_expenses.line9275_delivery_freight)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 60px 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">9281</div>
+        <div style="font-weight: bold;">4T</div>
+        <div>Motor vehicle expenses (not including CCA) (amount 16 of Chart A) . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.part4_expenses.line9281_motor_vehicle)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 60px 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">9936</div>
+        <div style="font-weight: bold;">4U</div>
+        <div>Capital cost allowance (CCA). Enter amount ii of Area A minus any personal part and any<br>CCA for business-use-of-home expenses . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.part4_expenses.line9936_cca)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 60px 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #ddd;">
+        <div style="font-weight: bold;">9270</div>
+        <div style="font-weight: bold;">4V</div>
+        <div>Other expenses (specify):</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.part4_expenses.line9270_other_expenses)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 60px 30px 1fr 150px; gap: 10px; padding: 8px 5px; border-bottom: 2px solid #000; background: #f5f5f5; font-weight: bold;">
+        <div>9368</div>
+        <div></div>
+        <div>Total expenses: Total of amounts 4B to 4V ►</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.part4_expenses.line9368_total_expenses)}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 60px 30px 1fr 150px; gap: 10px; padding: 12px 5px; border-bottom: 2px solid #000; background: #e8f4f8; font-weight: bold;">
+        <div>9369</div>
+        <div></div>
+        <div>Net income (loss) before adjustments: Amount 4A minus line 9368 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</div>
+        <div style="text-align: right; font-family: 'Courier New', monospace;">$${formatCurrency(pdfData.part4_expenses.line9369_net_income)}</div>
+      </div>
     </div>
   </div>
 
