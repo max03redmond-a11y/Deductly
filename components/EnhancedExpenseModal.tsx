@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -42,15 +42,6 @@ export function EnhancedExpenseModal({
   const [businessPercentage, setBusinessPercentage] = useState('100');
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
-  const [mileageBusinessUse, setMileageBusinessUse] = useState<number>(0);
-  const isMountedRef = useRef(true);
-
-  useEffect(() => {
-    isMountedRef.current = true;
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
 
   useEffect(() => {
     if (visible) {
@@ -61,49 +52,14 @@ export function EnhancedExpenseModal({
       setSelectedCategory(null);
       setBusinessPercentage('100');
       setNotes('');
-      loadMileageBusinessUse();
     }
   }, [visible]);
 
-  const loadMileageBusinessUse = async () => {
-    const currentYear = new Date().getFullYear();
-    const { data } = await supabase
-      .from('mileage_settings')
-      .select('jan1_odometer_km, current_odometer_km')
-      .eq('user_id', DEFAULT_USER_ID)
-      .eq('year', currentYear)
-      .maybeSingle();
-
-    if (data && isMountedRef.current) {
-      const totalKm = data.current_odometer_km - data.jan1_odometer_km;
-      if (totalKm > 0) {
-        const { data: logs } = await supabase
-          .from('mileage_logs')
-          .select('distance_km, is_business')
-          .eq('user_id', DEFAULT_USER_ID)
-          .gte('date', `${currentYear}-01-01`)
-          .lte('date', `${currentYear}-12-31`);
-
-        if (logs && isMountedRef.current) {
-          const businessKm = logs
-            .filter(log => log.is_business)
-            .reduce((sum, log) => sum + log.distance_km, 0);
-          const percentage = Math.min(100, Math.max(0, (businessKm / totalKm) * 100));
-          setMileageBusinessUse(percentage);
-        }
-      }
-    }
-  };
-
   useEffect(() => {
     if (selectedCategory) {
-      if (selectedCategory.apply_business_use && mileageBusinessUse > 0) {
-        setBusinessPercentage(mileageBusinessUse.toFixed(1));
-      } else {
-        setBusinessPercentage(selectedCategory.default_business_use_target.toString());
-      }
+      setBusinessPercentage(selectedCategory.default_business_use_target.toString());
     }
-  }, [selectedCategory, mileageBusinessUse]);
+  }, [selectedCategory]);
 
   const calculateTotalAmount = (): number => {
     const beforeTax = parseFloat(amountBeforeTax) || 0;
@@ -326,64 +282,43 @@ export function EnhancedExpenseModal({
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>BUSINESS USE</Text>
 
-                {selectedCategory.apply_business_use ? (
-                  <View style={styles.autoCalculatedCard}>
-                    <Text style={styles.autoCalculatedLabel}>
-                      Vehicle Expense - Auto-Calculated
-                    </Text>
-                    <View style={styles.autoPercentageDisplay}>
-                      <Text style={styles.autoPercentageValue}>
-                        {businessPercentage}%
-                      </Text>
-                      <Text style={styles.autoPercentageSubtext}>
-                        Based on your mileage business-use %
-                      </Text>
-                    </View>
-                    {mileageBusinessUse === 0 && (
-                      <Text style={styles.warningText}>
-                        ⚠️ Set your odometer readings in Mileage tab to calculate business-use %
-                      </Text>
-                    )}
-                  </View>
-                ) : (
-                  <>
-                    <Text style={styles.sectionHint}>
-                      What percentage of this expense was for business?
-                    </Text>
+                <Text style={styles.sectionHint}>
+                  What percentage of this expense was for business?
+                </Text>
 
-                    <View style={styles.percentageGrid}>
-                      {['100', '75', '50', '25'].map((pct) => (
-                        <TouchableOpacity
-                          key={pct}
-                          style={[
-                            styles.percentageChip,
-                            businessPercentage === pct && styles.percentageChipActive,
-                          ]}
-                          onPress={() => setBusinessPercentage(pct)}
-                          disabled={loading}
-                        >
-                          {businessPercentage === pct && (
-                            <Check size={14} color="#059669" style={styles.checkIcon} />
-                          )}
-                          <Text
-                            style={[
-                              styles.percentageText,
-                              businessPercentage === pct && styles.percentageTextActive,
-                            ]}
-                          >
-                            {pct}%
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
+                <View style={styles.percentageGrid}>
+                  {['100', '75', '50', '25'].map((pct) => (
+                    <TouchableOpacity
+                      key={pct}
+                      style={[
+                        styles.percentageChip,
+                        businessPercentage === pct && styles.percentageChipActive,
+                      ]}
+                      onPress={() => setBusinessPercentage(pct)}
+                      disabled={loading}
+                    >
+                      {businessPercentage === pct && (
+                        <Check size={14} color="#059669" style={styles.checkIcon} />
+                      )}
+                      <Text
+                        style={[
+                          styles.percentageText,
+                          businessPercentage === pct && styles.percentageTextActive,
+                        ]}
+                      >
+                        {pct}%
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
 
-                    <View style={styles.customPercentageRow}>
-                      <Text style={styles.customLabel}>Or enter custom %:</Text>
-                      <View style={styles.percentageInput}>
-                        <TextInput
-                          style={styles.percentageField}
-                          value={businessPercentage}
-                          onChangeText={setBusinessPercentage}
+                <View style={styles.customPercentageRow}>
+                  <Text style={styles.customLabel}>Or enter custom %:</Text>
+                  <View style={styles.percentageInput}>
+                    <TextInput
+                      style={styles.percentageField}
+                      value={businessPercentage}
+                      onChangeText={setBusinessPercentage}
                       placeholder="0"
                       placeholderTextColor="#9CA3AF"
                       keyboardType="decimal-pad"
@@ -392,8 +327,6 @@ export function EnhancedExpenseModal({
                     <Text style={styles.percentSign}>%</Text>
                   </View>
                 </View>
-                  </>
-                )}
 
                 {deductibleAmount > 0 && (
                   <View style={styles.deductibleBanner}>
