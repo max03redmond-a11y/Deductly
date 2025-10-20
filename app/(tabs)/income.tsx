@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   RefreshControl,
 } from 'react-native';
-import { Plus, DollarSign, Calendar, TrendingUp } from 'lucide-react-native';
+import { Plus, DollarSign, Calendar, TrendingUp, Trash2 } from 'lucide-react-native';
 import { useAppStore } from '@/store/useAppStore';
 import { IncomeEntry } from '@/types/database';
 import { PageHeader } from '@/components/PageHeader';
@@ -57,23 +57,25 @@ export default function IncomeScreen() {
     });
 
     return (
-      <TouchableOpacity
-        onPress={() => handleEditIncome(item)}
-        onLongPress={() => handleDeleteIncome(item.id)}
-        style={styles.incomeCard}
-      >
+      <View style={styles.incomeCard}>
         <View style={styles.incomeHeader}>
           <View style={styles.incomeIcon}>
             <DollarSign color={theme.colors.success} size={20} />
           </View>
-          <View style={styles.incomeDetails}>
-            <Text style={styles.incomeText}>
-              {dateStr} – ${Number(item.net_payout).toFixed(2)}
-              {item.trips_completed && ` – ${item.trips_completed} trips`}
-            </Text>
-          </View>
+          <TouchableOpacity
+            onPress={() => handleDeleteIncome(item.id)}
+            style={styles.deleteButton}
+          >
+            <Trash2 size={16} color={theme.colors.error} strokeWidth={2} />
+          </TouchableOpacity>
         </View>
-      </TouchableOpacity>
+        <TouchableOpacity onPress={() => handleEditIncome(item)}>
+          <Text style={styles.incomeText}>
+            {dateStr} – ${Number(item.net_payout).toFixed(2)}
+            {item.trips_completed && ` – ${item.trips_completed} trips`}
+          </Text>
+        </TouchableOpacity>
+      </View>
     );
   };
 
@@ -205,5 +207,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     color: theme.colors.text,
+    marginTop: 8,
+  },
+  deleteButton: {
+    padding: 4,
   },
 });
