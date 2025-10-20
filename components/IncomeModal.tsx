@@ -73,7 +73,6 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
         bonuses: 0,
         other_income: 0,
         platform_fees: 0,
-        trips_completed: tripsCompleted ? parseInt(tripsCompleted) : null,
         notes: null,
       };
 
@@ -154,17 +153,6 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
             />
           </View>
 
-          <View style={styles.section}>
-            <Text style={styles.label}>Number of Trips</Text>
-            <TextInput
-              style={styles.input}
-              value={tripsCompleted}
-              onChangeText={setTripsCompleted}
-              placeholder="Optional"
-              keyboardType="number-pad"
-              placeholderTextColor={theme.colors.textSecondary}
-            />
-          </View>
 
           {payout > 0 && (
             <View style={styles.summaryBox}>
