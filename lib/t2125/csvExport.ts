@@ -372,8 +372,54 @@ export function generateT2125CSV(data: T2125Data): string {
 
   rows.push({
     section: 'Part 5',
+    lineNumber: '',
+    description: 'NET INCOME (LOSS)',
+    amount: '',
+  });
+
+  rows.push({
+    section: 'Part 5',
+    lineNumber: '9369',
+    description: 'Net income (loss) before adjustments',
+    amount: formatCurrency(data.part5_netIncome.line9369_netIncomeBeforeAdjustments),
+  });
+
+  if (data.part5_netIncome.line5B_canadianJournalismCredit > 0) {
+    rows.push({
+      section: 'Part 5',
+      lineNumber: '—',
+      description: 'Canadian journalism labour tax credit',
+      amount: formatCurrency(data.part5_netIncome.line5B_canadianJournalismCredit),
+    });
+  }
+
+  if (data.part5_netIncome.line9974_gstHstRebate > 0) {
+    rows.push({
+      section: 'Part 5',
+      lineNumber: '9974',
+      description: 'GST/HST rebate',
+      amount: formatCurrency(data.part5_netIncome.line9974_gstHstRebate),
+    });
+  }
+
+  rows.push({
+    section: 'Part 5',
+    lineNumber: '9943',
+    description: 'Net income (loss) after adjustments',
+    amount: formatCurrency(data.part5_netIncome.line5D_netIncomeAfterAdjustments),
+  });
+
+  rows.push({
+    section: 'Part 5',
+    lineNumber: '9945',
+    description: 'Business-use-of-home expenses',
+    amount: formatCurrency(data.part5_netIncome.line9945_businessUseOfHome),
+  });
+
+  rows.push({
+    section: 'Part 5',
     lineNumber: '9946',
-    description: 'Your net income (loss)',
+    description: 'Net income (loss) - Enter on line 13500 of your return',
     amount: formatCurrency(data.part5_netIncome.line9946_yourNetIncome),
   });
 

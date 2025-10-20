@@ -390,10 +390,51 @@ export function generateT2125HTML(data: T2125Data): string {
   </div>
 
   <div class="section">
-    <h2>Part 5 - Your Net Income</h2>
+    <h2>Part 5 - Your Net Income (Loss)</h2>
+    <p style="margin-bottom: 15px; color: #6B7280; font-size: 13px;">
+      Final calculation of net income for tax purposes
+    </p>
+    <div class="row header">
+      <div class="line-number">Line</div>
+      <div class="description">Description</div>
+      <div class="amount">Amount</div>
+    </div>
+
+    <div class="row">
+      <div class="line-number">9369</div>
+      <div class="description">Net income (loss) before adjustments</div>
+      <div class="amount">$${formatCurrency(data.part5_netIncome.line9369_netIncomeBeforeAdjustments)}</div>
+    </div>
+
+    ${data.part5_netIncome.line5B_canadianJournalismCredit > 0 ? `
+    <div class="row">
+      <div class="line-number">—</div>
+      <div class="description">Canadian journalism labour tax credit</div>
+      <div class="amount">$${formatCurrency(data.part5_netIncome.line5B_canadianJournalismCredit)}</div>
+    </div>` : ''}
+
+    ${data.part5_netIncome.line9974_gstHstRebate > 0 ? `
+    <div class="row">
+      <div class="line-number">9974</div>
+      <div class="description">GST/HST rebate</div>
+      <div class="amount">$${formatCurrency(data.part5_netIncome.line9974_gstHstRebate)}</div>
+    </div>` : ''}
+
+    <div class="row">
+      <div class="line-number">9943</div>
+      <div class="description">Net income (loss) after adjustments</div>
+      <div class="amount">$${formatCurrency(data.part5_netIncome.line5D_netIncomeAfterAdjustments)}</div>
+    </div>
+
+    <div class="row">
+      <div class="line-number">9945</div>
+      <div class="description">Business-use-of-home expenses</div>
+      <div class="amount">$${formatCurrency(data.part5_netIncome.line9945_businessUseOfHome)}</div>
+    </div>
+
     <div class="row total">
       <div class="line-number">9946</div>
-      <div class="description">Your net income (loss)</div>
+      <div class="description">Net income (loss) - Enter this amount on line 13500 of your return</div>
       <div class="amount">$${formatCurrency(data.part5_netIncome.line9946_yourNetIncome)}</div>
     </div>
   </div>
