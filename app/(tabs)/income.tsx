@@ -92,12 +92,10 @@ export default function IncomeScreen() {
         </Card>
 
         <Button
+          title="Add Payout"
           onPress={handleAddIncome}
-          icon={Plus}
           style={styles.addButton}
-        >
-          Add Payout
-        </Button>
+        />
       </View>
 
       {incomeEntries.length === 0 ? (
