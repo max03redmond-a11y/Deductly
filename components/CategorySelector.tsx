@@ -27,9 +27,22 @@ export function CategorySelector({
     setShowDetailsModal(true);
   };
 
-  const vehicleCategories = categories.filter(cat => cat.apply_business_use);
+  const vehicleExpenseCodes = [
+    'GAS_FUEL',
+    'LOAN_INTEREST',
+    'INSURANCE_AUTO',
+    'LIC_REG',
+    'REPAIRS_MAINT',
+    'LEASE_PAYMENTS',
+    'VEHICLE_ELECTRICITY'
+  ];
+
+  const vehicleCategories = categories.filter(cat =>
+    vehicleExpenseCodes.includes(cat.code)
+  );
+
   const operatingCategories = categories.filter(
-    cat => !cat.apply_business_use && cat.t2125_line !== null
+    cat => !vehicleExpenseCodes.includes(cat.code) && cat.t2125_line !== null
   );
 
   return (
