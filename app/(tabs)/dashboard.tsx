@@ -104,14 +104,17 @@ export default function DashboardScreen() {
     return VEHICLE_EXPENSE_CODES.includes(categoryCode);
   };
 
+  const totalKm = mileage.reduce((sum, log) => sum + log.distance_km, 0);
+  const businessKm = mileage.reduce((sum, log) => sum + log.business_km, 0);
+  const mileageBusinessUsePercentage = totalKm > 0 ? (businessKm / totalKm) * 100 : 0;
+
   const vehicleExpensesByCategory = expenses.reduce((acc, expense) => {
     if (isVehicleExpense(expense.category)) {
       const category = expense.category;
-      const deductibleAmount = expense.amount * (expense.business_percentage / 100);
       if (!acc[category]) {
         acc[category] = 0;
       }
-      acc[category] += deductibleAmount;
+      acc[category] += expense.amount;
     }
     return acc;
   }, {} as Record<string, number>);
@@ -128,16 +131,14 @@ export default function DashboardScreen() {
     return acc;
   }, {} as Record<string, number>);
 
-  const expensesByCategory = { ...vehicleExpensesByCategory, ...operatingExpensesByCategory };
-
-  const totalVehicleExpenses = Object.values(vehicleExpensesByCategory).reduce((sum, val) => sum + val, 0);
+  const totalVehicleExpensesBeforeBusinessUse = Object.values(vehicleExpensesByCategory).reduce((sum, val) => sum + val, 0);
+  const totalVehicleExpenses = totalVehicleExpensesBeforeBusinessUse * (mileageBusinessUsePercentage / 100);
   const totalOperatingExpenses = Object.values(operatingExpensesByCategory).reduce((sum, val) => sum + val, 0);
   const totalExpenses = totalVehicleExpenses + totalOperatingExpenses;
   const netProfit = totalIncome - totalExpenses;
   const profitMargin = totalIncome > 0 ? (netProfit / totalIncome) * 100 : 0;
 
-  const totalKm = mileage.reduce((sum, log) => sum + log.distance_km, 0);
-  const businessKm = mileage.reduce((sum, log) => sum + log.business_km, 0);
+  const expensesByCategory = { ...vehicleExpensesByCategory, ...operatingExpensesByCategory };
 
   const TAX_RATE = 0.25;
   const totalDeductible = totalExpenses;
@@ -332,8 +333,24 @@ export default function DashboardScreen() {
             )}
 
             <View style={[styles.lineItem, styles.subtotalLine]}>
-              <Text style={styles.subtotalLabel}>Vehicle Expenses Subtotal</Text>
+              <Text style={styles.subtotalLabel}>Vehicle Expenses Total</Text>
               <Text style={styles.subtotalAmount}>
+                ${totalVehicleExpensesBeforeBusinessUse.toFixed(2)}
+              </Text>
+            </View>
+
+            <View style={styles.lineItem}>
+              <Text style={[styles.lineItemLabel, { color: '#6B7280', fontSize: 13 }]}>
+                Business Use % (from mileage)
+              </Text>
+              <Text style={[styles.lineItemAmount, { color: '#6B7280', fontSize: 13 }]}>
+                {mileageBusinessUsePercentage.toFixed(1)}%
+              </Text>
+            </View>
+
+            <View style={[styles.lineItem, styles.deductibleLine]}>
+              <Text style={styles.deductibleLineLabel}>Deductible Vehicle Expenses</Text>
+              <Text style={styles.deductibleLineAmount}>
                 ${totalVehicleExpenses.toFixed(2)}
               </Text>
             </View>
@@ -639,6 +656,26 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: 'Montserrat-SemiBold',
     color: '#6B7280',
+  },
+  deductibleLine: {
+    borderTopWidth: 2,
+    borderTopColor: '#3B82F6',
+    marginTop: 12,
+    paddingTop: 12,
+    backgroundColor: '#EFF6FF',
+    marginHorizontal: -12,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  deductibleLineLabel: {
+    fontSize: 14,
+    fontFamily: 'Montserrat-SemiBold',
+    color: '#1E40AF',
+  },
+  deductibleLineAmount: {
+    fontSize: 16,
+    fontFamily: 'Montserrat-SemiBold',
+    color: '#1E40AF',
   },
   totalLine: {
     borderTopWidth: 2,
