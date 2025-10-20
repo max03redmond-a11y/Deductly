@@ -153,9 +153,19 @@ export default function DashboardScreen() {
 
       <ScrollView style={styles.content}>
         <View style={styles.analyticsSection}>
-          <Text style={styles.sectionMainTitle}>Tax Analytics</Text>
+          <Text style={styles.sectionMainTitle}>Overview</Text>
 
           <View style={styles.taxSummaryCards}>
+            <View style={styles.taxCard}>
+              <View style={styles.taxCardIcon}>
+                <TrendingUp size={24} color="#10B981" />
+              </View>
+              <Text style={styles.taxCardLabel}>Total Income</Text>
+              <Text style={[styles.taxCardValue, { color: '#10B981' }]}>
+                ${totalIncome.toFixed(2)}
+              </Text>
+            </View>
+
             <View style={styles.taxCard}>
               <View style={styles.taxCardIcon}>
                 <DollarSign size={24} color="#3B82F6" />
@@ -165,7 +175,9 @@ export default function DashboardScreen() {
                 ${totalDeductible.toFixed(2)}
               </Text>
             </View>
+          </View>
 
+          <View style={styles.taxSummaryCards}>
             <View style={styles.taxCard}>
               <View style={styles.taxCardIcon}>
                 <Percent size={24} color="#10B981" />
@@ -175,6 +187,16 @@ export default function DashboardScreen() {
                 ${estimatedTaxSavings.toFixed(2)}
               </Text>
               <Text style={styles.taxCardSubtext}>at 25% rate</Text>
+            </View>
+
+            <View style={styles.taxCard}>
+              <View style={styles.taxCardIcon}>
+                <TrendingDown size={24} color="#DC2626" />
+              </View>
+              <Text style={styles.taxCardLabel}>Net Profit</Text>
+              <Text style={[styles.taxCardValue, { color: netProfit >= 0 ? '#10B981' : '#DC2626' }]}>
+                ${netProfit.toFixed(2)}
+              </Text>
             </View>
           </View>
 
