@@ -163,6 +163,9 @@ export function generateT2125HTML(data: T2125Data): string {
 
   <div class="section">
     <h2>Part 4 - Expenses</h2>
+    <p style="margin-bottom: 15px; color: #6B7280; font-size: 13px;">
+      All business expenses organized by T2125 line numbers. Empty categories are hidden for clarity.
+    </p>
     <div class="row header">
       <div class="line-number">Line</div>
       <div class="description">Description</div>
@@ -302,11 +305,19 @@ export function generateT2125HTML(data: T2125Data): string {
       <div class="amount">$${formatCurrency(data.part4_expenses.line9275_deliveryFreight)}</div>
     </div>` : ''}
 
+    ${data.part4_expenses.line9270_otherExpenses > 0 ? `
+    <div class="row">
+      <div class="line-number">9270</div>
+      <div class="description">Other expenses</div>
+      <div class="amount">$${formatCurrency(data.part4_expenses.line9270_otherExpenses)}</div>
+    </div>` : ''}
+
+    ${data.part4_expenses.line9281_motorVehicleExpenses > 0 ? `
     <div class="row">
       <div class="line-number">9281</div>
       <div class="description">Motor vehicle expenses (not including CCA)</div>
       <div class="amount">$${formatCurrency(data.part4_expenses.line9281_motorVehicleExpenses)}</div>
-    </div>
+    </div>` : ''}
 
     ${data.part4_expenses.line9936_cca > 0 ? `
     <div class="row">
@@ -388,9 +399,48 @@ export function generateT2125HTML(data: T2125Data): string {
   </div>
 
   <div class="section" style="page-break-before: always;">
+    <h2>Expense Summary by T2125 Line</h2>
+    <p style="margin-bottom: 20px; color: #6B7280; font-size: 13px;">
+      This summary shows how your ${data.expenseDetails.length} expenses are categorized across T2125 lines
+    </p>
+
+    <div class="row header">
+      <div class="line-number">Line</div>
+      <div class="description">Category</div>
+      <div class="amount">Total</div>
+    </div>
+
+    ${Object.entries({
+      '8521': { label: 'Advertising', value: data.part4_expenses.line8521_advertising },
+      '8523': { label: 'Meals & Entertainment (50%)', value: data.part4_expenses.line8523_mealsEntertainment },
+      '8690': { label: 'Insurance', value: data.part4_expenses.line8690_insurance },
+      '8710': { label: 'Interest & Bank Charges', value: data.part4_expenses.line8710_interestBankCharges },
+      '8760': { label: 'Business Taxes & Licences', value: data.part4_expenses.line8760_businessTaxesLicences },
+      '8811': { label: 'Office Supplies', value: data.part4_expenses.line8811_officeStationery },
+      '8860': { label: 'Professional Fees', value: data.part4_expenses.line8860_professionalFees },
+      '8871': { label: 'Platform Fees', value: data.part4_expenses.line8871_managementFees },
+      '9225': { label: 'Phone & Internet', value: data.part4_expenses.line9225_telephone },
+      '9270': { label: 'Other Expenses', value: data.part4_expenses.line9270_otherExpenses },
+      '9281': { label: 'Motor Vehicle Expenses', value: data.part4_expenses.line9281_motorVehicleExpenses },
+      '9936': { label: 'Capital Cost Allowance', value: data.part4_expenses.line9936_cca },
+    }).filter(([_, data]) => data.value > 0).map(([line, data]) => `
+    <div class="row">
+      <div class="line-number">${line}</div>
+      <div class="description">${data.label}</div>
+      <div class="amount">$${formatCurrency(data.value)}</div>
+    </div>`).join('')}
+
+    <div class="row total">
+      <div class="line-number">9368</div>
+      <div class="description">Total Expenses</div>
+      <div class="amount">$${formatCurrency(data.part4_expenses.line9368_totalExpenses)}</div>
+    </div>
+  </div>
+
+  <div class="section" style="page-break-before: always;">
     <h2>Detailed Expense Breakdown</h2>
     <p style="margin-bottom: 20px; color: #6B7280; font-size: 13px;">
-      Complete list of all ${data.expenseDetails.length} business expenses for the tax year
+      Complete chronological list of all ${data.expenseDetails.length} business expenses
     </p>
 
     <div class="row header">

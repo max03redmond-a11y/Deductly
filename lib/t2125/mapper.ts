@@ -196,7 +196,7 @@ export function generateT2125Data(
 
   expenses.forEach((expense) => {
     const lineKey = mapExpenseToT2125Line(expense.category_code || expense.category);
-    if (lineKey && lineKey !== 'line9936_cca') {
+    if (lineKey && lineKey !== 'line9936_cca' && lineKey !== 'line9281_motorVehicleExpenses') {
       const deductible = expense.deductible_amount || (expense.amount * (expense.business_percentage / 100));
       expensesByLine[lineKey] = (expensesByLine[lineKey] || 0) + deductible;
     }
