@@ -182,7 +182,8 @@ export function generateT2125Data(
   expenses: Expense[],
   income: IncomeRecord[],
   mileage: MileageLog[],
-  assets: Asset[]
+  assets: Asset[],
+  mileageSettings?: any
 ): T2125Data {
   const filter = getYTDFilter();
   const currentYear = new Date().getFullYear();
@@ -211,9 +212,16 @@ export function generateT2125Data(
   const mealsTotal = expensesByLine.line8523_mealsEntertainment || 0;
   expensesByLine.line8523_mealsEntertainment = mealsTotal * 0.5;
 
-  const mileageTotals = calculateMileageTotals(filteredMileage, filter);
-  const businessUsePercent = mileageTotals.total > 0
-    ? (mileageTotals.business / mileageTotals.total) * 100
+  const businessKm = filteredMileage
+    .filter((log) => log.is_business)
+    .reduce((sum, log) => sum + log.distance_km, 0);
+
+  const totalKm = mileageSettings && mileageSettings.jan1_odometer_km && mileageSettings.current_odometer_km
+    ? parseFloat(mileageSettings.current_odometer_km) - parseFloat(mileageSettings.jan1_odometer_km)
+    : 0;
+
+  const businessUsePercent = totalKm > 0
+    ? Math.min(100, Math.max(0, (businessKm / totalKm) * 100))
     : 0;
 
   const vehicleFuel = filteredExpenses
@@ -372,8 +380,8 @@ export function generateT2125Data(
       line9368_totalExpenses: totalExpenses,
     },
     chartA_motorVehicle: {
-      line1_businessKm: mileageTotals.business,
-      line2_totalKm: mileageTotals.total,
+      line1_businessKm: businessKm,
+      line2_totalKm: totalKm,
       line3_fuelOil: vehicleFuel,
       line4_interest: 0,
       line5_insurance: vehicleInsurance,

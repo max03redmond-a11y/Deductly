@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Dimensions, Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { supabase } from '@/lib/supabase';
 import { TrendingUp, TrendingDown, Download, FileText, PieChart, DollarSign, Percent } from 'lucide-react-native';
-import { Expense, IncomeEntry, MileageLog, Asset, EXPENSE_CATEGORIES, CRACategory } from '@/types/database';
+import { Expense, IncomeEntry, IncomeRecord, MileageLog, Asset, EXPENSE_CATEGORIES, CRACategory } from '@/types/database';
 import { PieChart as RNPieChart } from 'react-native-chart-kit';
 import { generateT2125Data } from '@/lib/t2125/mapper';
 import { generateT2125CSV, downloadCSV } from '@/lib/t2125/csvExport';
@@ -174,7 +174,19 @@ export default function DashboardScreen() {
 
   const handleExportT2125CSV = async () => {
     try {
-      const t2125Data = generateT2125Data(profile, expenses, income, mileage, assets);
+      const incomeRecords: IncomeRecord[] = income.map((entry) => ({
+        id: entry.id,
+        user_id: entry.user_id,
+        date: entry.date,
+        source: entry.platform,
+        amount: entry.net_payout,
+        trips_completed: entry.trips_completed,
+        description: entry.notes,
+        imported_from: null,
+        created_at: entry.created_at,
+        updated_at: entry.updated_at,
+      }));
+      const t2125Data = generateT2125Data(profile, expenses, incomeRecords, mileage, assets, mileageSettings);
       const csvContent = generateT2125CSV(t2125Data);
       await downloadCSV(csvContent, `t2125_export_${new Date().getFullYear()}.csv`);
       showToast('T2125 CSV exported successfully');
@@ -186,7 +198,19 @@ export default function DashboardScreen() {
 
   const handleExportT2125HTML = async () => {
     try {
-      const t2125Data = generateT2125Data(profile, expenses, income, mileage, assets);
+      const incomeRecords: IncomeRecord[] = income.map((entry) => ({
+        id: entry.id,
+        user_id: entry.user_id,
+        date: entry.date,
+        source: entry.platform,
+        amount: entry.net_payout,
+        trips_completed: entry.trips_completed,
+        description: entry.notes,
+        imported_from: null,
+        created_at: entry.created_at,
+        updated_at: entry.updated_at,
+      }));
+      const t2125Data = generateT2125Data(profile, expenses, incomeRecords, mileage, assets, mileageSettings);
       const htmlContent = generateT2125HTML(t2125Data);
       await downloadHTML(htmlContent, `t2125_report_${new Date().getFullYear()}.html`);
       showToast('T2125 report exported successfully');

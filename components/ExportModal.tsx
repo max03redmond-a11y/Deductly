@@ -44,12 +44,13 @@ export default function ExportModal({ visible, onClose }: ExportModalProps) {
 
     try {
       // Fetch all data from Supabase
-      const [expensesRes, incomeEntriesRes, mileageRes, assetsRes, profileRes] = await Promise.all([
+      const [expensesRes, incomeEntriesRes, mileageRes, assetsRes, profileRes, settingsRes] = await Promise.all([
         supabase.from('expenses').select('*').eq('user_id', DEFAULT_USER_ID),
         supabase.from('income_entries').select('*').eq('user_id', DEFAULT_USER_ID),
         supabase.from('mileage_logs').select('*').eq('user_id', DEFAULT_USER_ID),
         supabase.from('assets').select('*').eq('user_id', DEFAULT_USER_ID),
         supabase.from('profiles').select('*').eq('id', DEFAULT_USER_ID).maybeSingle(),
+        supabase.from('mileage_settings').select('*').eq('user_id', DEFAULT_USER_ID).eq('year', currentYear).maybeSingle(),
       ]);
 
       if (expensesRes.error) {
@@ -75,6 +76,7 @@ export default function ExportModal({ visible, onClose }: ExportModalProps) {
       const incomeEntries = (incomeEntriesRes.data || []) as IncomeEntry[];
       const mileage = (mileageRes.data || []) as MileageLog[];
       const userProfile = profileRes.data || profile;
+      const mileageSettings = settingsRes.data || null;
 
       // Convert IncomeEntry to IncomeRecord format for T2125 mapper
       const income: IncomeRecord[] = incomeEntries.map((entry) => ({
@@ -97,7 +99,7 @@ export default function ExportModal({ visible, onClose }: ExportModalProps) {
         assets: assets.length,
       });
 
-      const t2125Data = generateT2125Data(userProfile, expenses, income, mileage, assets);
+      const t2125Data = generateT2125Data(userProfile, expenses, income, mileage, assets, mileageSettings);
 
       console.log('T2125 generated:', {
         name: t2125Data.identification.yourName,
