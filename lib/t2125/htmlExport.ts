@@ -236,13 +236,6 @@ export function generateT2125HTML(data: T2125Data): string {
       <div class="amount">$${formatCurrency(data.part4_expenses.line8523_mealsEntertainment)}</div>
     </div>` : ''}
 
-    ${data.part4_expenses.line8590_badDebts > 0 ? `
-    <div class="row">
-      <div class="line-number">8590</div>
-      <div class="description">Bad debts</div>
-      <div class="amount">$${formatCurrency(data.part4_expenses.line8590_badDebts)}</div>
-    </div>` : ''}
-
     ${data.part4_expenses.line8690_insurance > 0 ? `
     <div class="row">
       <div class="line-number">8690</div>
@@ -306,13 +299,6 @@ export function generateT2125HTML(data: T2125Data): string {
       <div class="amount">$${formatCurrency(data.part4_expenses.line8960_repairsMaintenance)}</div>
     </div>` : ''}
 
-    ${data.part4_expenses.line9060_salariesWages > 0 ? `
-    <div class="row">
-      <div class="line-number">9060</div>
-      <div class="description">Salaries, wages and benefits</div>
-      <div class="amount">$${formatCurrency(data.part4_expenses.line9060_salariesWages)}</div>
-    </div>` : ''}
-
     ${data.part4_expenses.line9180_propertyTaxes > 0 ? `
     <div class="row">
       <div class="line-number">9180</div>
@@ -320,32 +306,11 @@ export function generateT2125HTML(data: T2125Data): string {
       <div class="amount">$${formatCurrency(data.part4_expenses.line9180_propertyTaxes)}</div>
     </div>` : ''}
 
-    ${data.part4_expenses.line9200_travelExpenses > 0 ? `
-    <div class="row">
-      <div class="line-number">9200</div>
-      <div class="description">Travel expenses</div>
-      <div class="amount">$${formatCurrency(data.part4_expenses.line9200_travelExpenses)}</div>
-    </div>` : ''}
-
-    ${data.part4_expenses.line9220_utilities > 0 ? `
-    <div class="row">
-      <div class="line-number">9220</div>
-      <div class="description">Utilities</div>
-      <div class="amount">$${formatCurrency(data.part4_expenses.line9220_utilities)}</div>
-    </div>` : ''}
-
     ${data.part4_expenses.line9225_telephone > 0 ? `
     <div class="row">
-      <div class="line-number">9225</div>
-      <div class="description">Telephone and utilities</div>
+      <div class="line-number">9220</div>
+      <div class="description">Utilities (phone and internet)</div>
       <div class="amount">$${formatCurrency(data.part4_expenses.line9225_telephone)}</div>
-    </div>` : ''}
-
-    ${data.part4_expenses.line9224_fuelCosts > 0 ? `
-    <div class="row">
-      <div class="line-number">9224</div>
-      <div class="description">Fuel costs (except for motor vehicles)</div>
-      <div class="amount">$${formatCurrency(data.part4_expenses.line9224_fuelCosts)}</div>
     </div>` : ''}
 
     ${data.part4_expenses.line9275_deliveryFreight > 0 ? `
@@ -507,11 +472,16 @@ export function generateT2125HTML(data: T2125Data): string {
       '8690': { label: 'Insurance', value: data.part4_expenses.line8690_insurance },
       '8710': { label: 'Interest & Bank Charges', value: data.part4_expenses.line8710_interestBankCharges },
       '8760': { label: 'Business Taxes & Licences', value: data.part4_expenses.line8760_businessTaxesLicences },
-      '8811': { label: 'Office Supplies', value: data.part4_expenses.line8811_officeStationery },
+      '8810': { label: 'Office Expenses', value: data.part4_expenses.line8810_officeExpenses },
+      '8811': { label: 'Office Stationery & Supplies', value: data.part4_expenses.line8811_officeStationery },
       '8860': { label: 'Professional Fees', value: data.part4_expenses.line8860_professionalFees },
-      '8871': { label: 'Platform Fees', value: data.part4_expenses.line8871_managementFees },
-      '9225': { label: 'Phone & Internet', value: data.part4_expenses.line9225_telephone },
+      '8871': { label: 'Management & Admin Fees', value: data.part4_expenses.line8871_managementFees },
+      '8910': { label: 'Rent', value: data.part4_expenses.line8910_rent },
+      '8960': { label: 'Repairs & Maintenance', value: data.part4_expenses.line8960_repairsMaintenance },
+      '9180': { label: 'Property Taxes', value: data.part4_expenses.line9180_propertyTaxes },
+      '9220': { label: 'Utilities (Phone & Internet)', value: data.part4_expenses.line9225_telephone },
       '9270': { label: 'Other Expenses', value: data.part4_expenses.line9270_otherExpenses },
+      '9275': { label: 'Delivery, Freight & Express', value: data.part4_expenses.line9275_deliveryFreight },
       '9281': { label: 'Motor Vehicle Expenses', value: data.part4_expenses.line9281_motorVehicleExpenses },
       '9936': { label: 'Capital Cost Allowance', value: data.part4_expenses.line9936_cca },
     }).filter(([_, data]) => data.value > 0).map(([line, data]) => `
