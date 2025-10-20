@@ -47,16 +47,13 @@ export default function IncomeScreen() {
     await removeIncomeEntry(id);
   };
 
-  const totalIncome = incomeEntries.reduce((sum, entry) => sum + Number(entry.net_payout), 0);
-  const totalGrossIncome = incomeEntries.reduce((sum, entry) => sum + Number(entry.gross_income), 0);
-  const totalFees = incomeEntries.reduce((sum, entry) => sum + Number(entry.platform_fees), 0);
+  const totalNetPayout = incomeEntries.reduce((sum, entry) => sum + Number(entry.net_payout), 0);
 
   const renderIncomeEntry = ({ item }: { item: IncomeEntry }) => {
     const date = new Date(item.date);
     const dateStr = date.toLocaleDateString('en-CA', {
       month: 'short',
       day: 'numeric',
-      year: 'numeric',
     });
 
     return (
@@ -67,26 +64,15 @@ export default function IncomeScreen() {
       >
         <View style={styles.incomeHeader}>
           <View style={styles.incomeIcon}>
-            <DollarSign color={theme.colors.primary} size={20} />
+            <DollarSign color={theme.colors.success} size={20} />
           </View>
           <View style={styles.incomeDetails}>
-            <Text style={styles.platform}>{item.platform}</Text>
-            <Text style={styles.date}>{dateStr}</Text>
-            {item.trips_completed && (
-              <Text style={styles.trips}>{item.trips_completed} trips</Text>
-            )}
-          </View>
-          <View style={styles.incomeAmount}>
-            <Text style={styles.amount}>${Number(item.net_payout).toFixed(2)}</Text>
-            <Text style={styles.grossAmount}>Gross: ${Number(item.gross_income).toFixed(2)}</Text>
+            <Text style={styles.incomeText}>
+              {dateStr} – ${Number(item.net_payout).toFixed(2)}
+              {item.trips_completed && ` – ${item.trips_completed} trips`}
+            </Text>
           </View>
         </View>
-        {item.platform_fees > 0 && (
-          <View style={styles.incomeBreakdown}>
-            <Text style={styles.feeText}>Fees: -${Number(item.platform_fees).toFixed(2)}</Text>
-          </View>
-        )}
-        {item.notes && <Text style={styles.notes}>{item.notes}</Text>}
       </TouchableOpacity>
     );
   };
@@ -99,18 +85,8 @@ export default function IncomeScreen() {
         <Card style={styles.summaryCard}>
           <View style={styles.summaryRow}>
             <View style={styles.summaryItem}>
-              <Text style={styles.summaryLabel}>Income after Fees</Text>
-              <Text style={styles.summaryValue}>${totalIncome.toFixed(2)}</Text>
-            </View>
-            <View style={styles.summaryDivider} />
-            <View style={styles.summaryItem}>
-              <Text style={styles.summaryLabel}>Gross Income</Text>
-              <Text style={styles.summaryValue}>${totalGrossIncome.toFixed(2)}</Text>
-            </View>
-            <View style={styles.summaryDivider} />
-            <View style={styles.summaryItem}>
-              <Text style={styles.summaryLabel}>Total Fees</Text>
-              <Text style={styles.feeValue}>${totalFees.toFixed(2)}</Text>
+              <Text style={styles.summaryLabel}>Net Payout</Text>
+              <Text style={styles.summaryValue}>${totalNetPayout.toFixed(2)}</Text>
             </View>
           </View>
         </Card>
@@ -120,15 +96,15 @@ export default function IncomeScreen() {
           icon={Plus}
           style={styles.addButton}
         >
-          Add Income
+          Add Payout
         </Button>
       </View>
 
       {incomeEntries.length === 0 ? (
         <EmptyState
           icon={TrendingUp}
-          title="No income entries yet"
-          description="Start tracking your income by adding your first entry"
+          title="No payouts yet"
+          description="Start tracking your income by adding your first payout"
         />
       ) : (
         <FlatList
@@ -183,13 +159,16 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.border,
   },
   summaryLabel: {
-    fontSize: 12,
+    fontSize: 14,
     color: theme.colors.textSecondary,
-    marginBottom: 4,
+    marginBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    fontWeight: '500',
   },
   summaryValue: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 32,
+    fontWeight: '700',
     color: theme.colors.success,
   },
   feeValue: {
@@ -224,56 +203,9 @@ const styles = StyleSheet.create({
   incomeDetails: {
     flex: 1,
   },
-  platform: {
+  incomeText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: theme.colors.text,
-    marginBottom: 4,
-  },
-  date: {
-    fontSize: 14,
-    color: theme.colors.textSecondary,
-  },
-  trips: {
-    fontSize: 13,
-    color: theme.colors.primary,
-    marginTop: 2,
     fontWeight: '500',
-  },
-  incomeAmount: {
-    alignItems: 'flex-end',
-  },
-  amount: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: theme.colors.success,
-    marginBottom: 2,
-  },
-  grossAmount: {
-    fontSize: 12,
-    color: theme.colors.textSecondary,
-  },
-  incomeBreakdown: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-    marginTop: 12,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.border,
-  },
-  breakdownText: {
-    fontSize: 13,
-    color: theme.colors.textSecondary,
-  },
-  feeText: {
-    fontSize: 13,
-    color: theme.colors.error,
-  },
-  notes: {
-    marginTop: 8,
-    fontSize: 14,
-    color: theme.colors.textSecondary,
-    fontStyle: 'italic',
+    color: theme.colors.text,
   },
 });

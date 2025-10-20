@@ -29,20 +29,14 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
   const [loading, setLoading] = useState(false);
 
   const [date, setDate] = useState('');
-  const [platform, setPlatform] = useState('');
-  const [grossIncome, setGrossIncome] = useState('');
-  const [platformFees, setPlatformFees] = useState('');
+  const [payoutAmount, setPayoutAmount] = useState('');
   const [tripsCompleted, setTripsCompleted] = useState('');
-  const [notes, setNotes] = useState('');
 
   useEffect(() => {
     if (entry) {
       setDate(entry.date);
-      setPlatform(entry.platform);
-      setGrossIncome(entry.gross_income.toString());
-      setPlatformFees(entry.platform_fees.toString());
+      setPayoutAmount(entry.net_payout.toString());
       setTripsCompleted(entry.trips_completed?.toString() || '');
-      setNotes(entry.notes || '');
     } else {
       resetForm();
     }
@@ -51,16 +45,19 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
   const resetForm = () => {
     const today = new Date().toISOString().split('T')[0];
     setDate(today);
-    setPlatform('');
-    setGrossIncome('');
-    setPlatformFees('0');
+    setPayoutAmount('');
     setTripsCompleted('');
-    setNotes('');
   };
 
   const handleSave = async () => {
-    if (!date || !platform || !grossIncome) {
-      showToast('Please fill in all required fields', 'error');
+    if (!date || !payoutAmount) {
+      showToast('Please fill in date and payout amount', 'error');
+      return;
+    }
+
+    const payout = parseFloat(payoutAmount) || 0;
+    if (payout <= 0) {
+      showToast('Payout amount must be greater than zero', 'error');
       return;
     }
 
@@ -70,14 +67,14 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
       const incomeData = {
         user_id: DEFAULT_USER_ID,
         date,
-        platform,
-        gross_income: parseFloat(grossIncome) || 0,
+        platform: 'Payout',
+        gross_income: payout,
         tips: 0,
         bonuses: 0,
         other_income: 0,
-        platform_fees: parseFloat(platformFees) || 0,
+        platform_fees: 0,
         trips_completed: tripsCompleted ? parseInt(tripsCompleted) : null,
-        notes: notes || null,
+        notes: null,
       };
 
       if (entry) {
@@ -112,9 +109,7 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
     }
   };
 
-  const netPayout =
-    (parseFloat(grossIncome) || 0) -
-    (parseFloat(platformFees) || 0);
+  const payout = parseFloat(payoutAmount) || 0;
 
   return (
     <Modal
@@ -125,7 +120,7 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
     >
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.title}>{entry ? 'Edit Income' : 'Add Income'}</Text>
+          <Text style={styles.title}>{entry ? 'Edit Payout' : 'Add Payout'}</Text>
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
             <X color={theme.colors.text} size={24} />
           </TouchableOpacity>
@@ -147,37 +142,12 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
 
           <View style={styles.section}>
             <Text style={styles.label}>
-              Platform <Text style={styles.required}>*</Text>
+              Payout Amount ($) <Text style={styles.required}>*</Text>
             </Text>
             <TextInput
               style={styles.input}
-              value={platform}
-              onChangeText={setPlatform}
-              placeholder="e.g., Uber, DoorDash, Lyft"
-              placeholderTextColor={theme.colors.textSecondary}
-            />
-          </View>
-
-          <View style={styles.section}>
-            <Text style={styles.label}>
-              Gross Income <Text style={styles.required}>*</Text>
-            </Text>
-            <TextInput
-              style={styles.input}
-              value={grossIncome}
-              onChangeText={setGrossIncome}
-              placeholder="0.00"
-              keyboardType="decimal-pad"
-              placeholderTextColor={theme.colors.textSecondary}
-            />
-          </View>
-
-          <View style={styles.section}>
-            <Text style={styles.label}>Platform Fees</Text>
-            <TextInput
-              style={styles.input}
-              value={platformFees}
-              onChangeText={setPlatformFees}
+              value={payoutAmount}
+              onChangeText={setPayoutAmount}
               placeholder="0.00"
               keyboardType="decimal-pad"
               placeholderTextColor={theme.colors.textSecondary}
@@ -196,23 +166,12 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
             />
           </View>
 
-          <View style={styles.section}>
-            <Text style={styles.label}>Notes</Text>
-            <TextInput
-              style={[styles.input, styles.textArea]}
-              value={notes}
-              onChangeText={setNotes}
-              placeholder="Optional notes"
-              multiline
-              numberOfLines={3}
-              placeholderTextColor={theme.colors.textSecondary}
-            />
-          </View>
-
-          <View style={styles.summaryBox}>
-            <Text style={styles.summaryLabel}>Net Payout</Text>
-            <Text style={styles.summaryValue}>${netPayout.toFixed(2)}</Text>
-          </View>
+          {payout > 0 && (
+            <View style={styles.summaryBox}>
+              <Text style={styles.summaryLabel}>Total Payout</Text>
+              <Text style={styles.summaryValue}>${payout.toFixed(2)}</Text>
+            </View>
+          )}
         </ScrollView>
 
         <View style={styles.footer}>
