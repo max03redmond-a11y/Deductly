@@ -111,6 +111,14 @@ export default function IncomeScreen() {
             </View>
           </View>
         </Card>
+
+        <Button
+          onPress={handleAddIncome}
+          icon={Plus}
+          style={styles.addButton}
+        >
+          Add Income
+        </Button>
       </View>
 
       {incomeEntries.length === 0 ? (
@@ -118,11 +126,6 @@ export default function IncomeScreen() {
           icon={TrendingUp}
           title="No income entries yet"
           description="Start tracking your income by adding your first entry"
-          action={
-            <Button onPress={handleAddIncome} icon={Plus}>
-              Add Income
-            </Button>
-          }
         />
       ) : (
         <FlatList
@@ -132,15 +135,6 @@ export default function IncomeScreen() {
           contentContainerStyle={styles.list}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         />
-      )}
-
-      {incomeEntries.length > 0 && (
-        <TouchableOpacity style={styles.fab} onPress={handleAddIncome}>
-          <View style={styles.fabContent}>
-            <Plus color="#fff" size={20} />
-            <Text style={styles.fabText}>Add Income</Text>
-          </View>
-        </TouchableOpacity>
       )}
 
       <IncomeModal
@@ -167,6 +161,9 @@ const styles = StyleSheet.create({
   summaryCard: {
     padding: 16,
     marginBottom: 12,
+  },
+  addButton: {
+    width: '100%',
   },
   summaryRow: {
     flexDirection: 'row',
@@ -269,30 +266,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: theme.colors.textSecondary,
     fontStyle: 'italic',
-  },
-  fab: {
-    position: 'absolute',
-    bottom: 24,
-    right: 24,
-    backgroundColor: '#000',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderRadius: 28,
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-  },
-  fabContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  fabText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
-    marginLeft: 8,
   },
 });
