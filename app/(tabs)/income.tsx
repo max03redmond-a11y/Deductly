@@ -111,14 +111,6 @@ export default function IncomeScreen() {
             </View>
           </View>
         </Card>
-
-        <Button
-          onPress={handleAddIncome}
-          icon={Plus}
-          style={styles.addButton}
-        >
-          Add Income Entry
-        </Button>
       </View>
 
       {incomeEntries.length === 0 ? (
@@ -175,9 +167,6 @@ const styles = StyleSheet.create({
   summaryCard: {
     padding: 16,
     marginBottom: 12,
-  },
-  addButton: {
-    width: '100%',
   },
   summaryRow: {
     flexDirection: 'row',
