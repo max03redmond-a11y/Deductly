@@ -18,7 +18,7 @@ import { downloadHTML } from '@/lib/t2125/htmlExport';
 import { useAppStore } from '@/store/useAppStore';
 import { supabase } from '@/lib/supabase';
 import { showToast } from '@/lib/toast';
-import { Expense, IncomeRecord, MileageLog, Asset } from '@/types/database';
+import { Expense, IncomeRecord, IncomeEntry, MileageLog, Asset } from '@/types/database';
 
 interface ExportModalProps {
   visible: boolean;
@@ -44,9 +44,9 @@ export default function ExportModal({ visible, onClose }: ExportModalProps) {
 
     try {
       // Fetch all data from Supabase
-      const [expensesRes, incomeRes, mileageRes, assetsRes, profileRes] = await Promise.all([
+      const [expensesRes, incomeEntriesRes, mileageRes, assetsRes, profileRes] = await Promise.all([
         supabase.from('expenses').select('*').eq('user_id', DEFAULT_USER_ID),
-        supabase.from('income_records').select('*').eq('user_id', DEFAULT_USER_ID),
+        supabase.from('income_entries').select('*').eq('user_id', DEFAULT_USER_ID),
         supabase.from('mileage_logs').select('*').eq('user_id', DEFAULT_USER_ID),
         supabase.from('assets').select('*').eq('user_id', DEFAULT_USER_ID),
         supabase.from('profiles').select('*').eq('id', DEFAULT_USER_ID).maybeSingle(),
@@ -56,9 +56,9 @@ export default function ExportModal({ visible, onClose }: ExportModalProps) {
         console.error('Expenses fetch error:', expensesRes.error);
         throw new Error(`Failed to fetch expenses: ${expensesRes.error.message}`);
       }
-      if (incomeRes.error) {
-        console.error('Income fetch error:', incomeRes.error);
-        throw new Error(`Failed to fetch income: ${incomeRes.error.message}`);
+      if (incomeEntriesRes.error) {
+        console.error('Income fetch error:', incomeEntriesRes.error);
+        throw new Error(`Failed to fetch income: ${incomeEntriesRes.error.message}`);
       }
       if (mileageRes.error) {
         console.error('Mileage fetch error:', mileageRes.error);
@@ -72,9 +72,23 @@ export default function ExportModal({ visible, onClose }: ExportModalProps) {
       }
 
       const expenses = (expensesRes.data || []) as Expense[];
-      const income = (incomeRes.data || []) as IncomeRecord[];
+      const incomeEntries = (incomeEntriesRes.data || []) as IncomeEntry[];
       const mileage = (mileageRes.data || []) as MileageLog[];
       const userProfile = profileRes.data || profile;
+
+      // Convert IncomeEntry to IncomeRecord format for T2125 mapper
+      const income: IncomeRecord[] = incomeEntries.map((entry) => ({
+        id: entry.id,
+        user_id: entry.user_id,
+        date: entry.date,
+        source: entry.platform,
+        amount: entry.net_payout,
+        trips_completed: entry.trips_completed,
+        description: entry.notes,
+        imported_from: null,
+        created_at: entry.created_at,
+        updated_at: entry.updated_at,
+      }));
 
       console.log('Export data counts:', {
         expenses: expenses.length,

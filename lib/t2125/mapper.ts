@@ -1,5 +1,5 @@
 import { Expense, IncomeRecord, MileageLog, Asset, Profile } from '@/types/database';
-import { calculateDeductibleTotal, calculateMileageTotals, getYTDFilter } from '@/lib/calcs/summary';
+import { calculateDeductibleTotal, calculateMileageTotals, getYTDFilter, filterByPeriod } from '@/lib/calcs/summary';
 import { calculateCCADeduction } from '@/lib/calcs/tax';
 
 export interface ExpenseDetail {
@@ -187,14 +187,19 @@ export function generateT2125Data(
   const filter = getYTDFilter();
   const currentYear = new Date().getFullYear();
 
+  // Filter data to current year only
+  const filteredIncome = filterByPeriod(income, filter);
+  const filteredExpenses = filterByPeriod(expenses, filter);
+  const filteredMileage = filterByPeriod(mileage, filter);
+
   // Calculate income totals
-  const totalIncome = income.reduce((sum, i) => sum + i.amount, 0);
+  const totalIncome = filteredIncome.reduce((sum, i) => sum + i.amount, 0);
   const gstHstCollected = 0; // GST/HST not tracked in current income_records schema
   const tipsAndBonuses = 0; // Tips/bonuses not tracked in current income_records schema
 
   const expensesByLine: Partial<Record<keyof T2125Data['part4_expenses'], number>> = {};
 
-  expenses.forEach((expense) => {
+  filteredExpenses.forEach((expense) => {
     const lineKey = mapExpenseToT2125Line(expense.category_code || expense.category);
     if (lineKey && lineKey !== 'line9936_cca' && lineKey !== 'line9281_motorVehicleExpenses') {
       const deductible = expense.deductible_amount || (expense.amount * (expense.business_percentage / 100));
@@ -206,32 +211,32 @@ export function generateT2125Data(
   const mealsTotal = expensesByLine.line8523_mealsEntertainment || 0;
   expensesByLine.line8523_mealsEntertainment = mealsTotal * 0.5;
 
-  const mileageTotals = calculateMileageTotals(mileage, filter);
+  const mileageTotals = calculateMileageTotals(filteredMileage, filter);
   const businessUsePercent = mileageTotals.total > 0
     ? (mileageTotals.business / mileageTotals.total) * 100
     : 0;
 
-  const vehicleFuel = expenses
+  const vehicleFuel = filteredExpenses
     .filter((e) => e.category_code === 'GAS_FUEL')
     .reduce((sum, e) => sum + (e.deductible_amount || (e.amount * (e.business_percentage / 100))), 0);
 
-  const vehicleInsurance = expenses
+  const vehicleInsurance = filteredExpenses
     .filter((e) => e.category_code === 'INSURANCE_AUTO')
     .reduce((sum, e) => sum + (e.deductible_amount || (e.amount * (e.business_percentage / 100))), 0);
 
-  const vehicleMaintenance = expenses
+  const vehicleMaintenance = filteredExpenses
     .filter((e) => ['REPAIRS_MAINT', 'CAR_WASH'].includes(e.category_code || ''))
     .reduce((sum, e) => sum + (e.deductible_amount || (e.amount * (e.business_percentage / 100))), 0);
 
-  const vehicleLicence = expenses
+  const vehicleLicence = filteredExpenses
     .filter((e) => e.category_code === 'LIC_REG')
     .reduce((sum, e) => sum + (e.deductible_amount || (e.amount * (e.business_percentage / 100))), 0);
 
-  const vehicleParking = expenses
+  const vehicleParking = filteredExpenses
     .filter((e) => e.category_code === 'PARKING_TOLLS')
     .reduce((sum, e) => sum + (e.deductible_amount || (e.amount * (e.business_percentage / 100))), 0);
 
-  const vehicleLease = expenses
+  const vehicleLease = filteredExpenses
     .filter((e) => e.category_code === 'LEASE_PAYMENTS')
     .reduce((sum, e) => sum + (e.deductible_amount || (e.amount * (e.business_percentage / 100))), 0);
 
@@ -241,7 +246,7 @@ export function generateT2125Data(
   expensesByLine.line9936_cca = ccaDeduction;
 
   // Calculate Chart A motor vehicle totals
-  const vehicleOtherExpenses = expenses
+  const vehicleOtherExpenses = filteredExpenses
     .filter((e) => e.category === 'Other' && e.notes?.toLowerCase().includes('vehicle'))
     .reduce((sum, e) => sum + (e.deductible_amount || (e.amount * (e.business_percentage / 100))), 0);
 
@@ -255,7 +260,7 @@ export function generateT2125Data(
 
   const netIncomeBeforeAdjustments = totalIncome - totalExpenses;
 
-  const expenseDetails: ExpenseDetail[] = expenses
+  const expenseDetails: ExpenseDetail[] = filteredExpenses
     .filter((e) => e.category_code !== 'VEHICLE_DEPRECIATION_CCA')
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     .map((expense) => {
