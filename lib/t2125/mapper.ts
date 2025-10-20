@@ -134,6 +134,24 @@ export interface T2125Data {
 
 export function mapExpenseToT2125Line(categoryCode: string): keyof T2125Data['part4_expenses'] | null {
   const mapping: Record<string, keyof T2125Data['part4_expenses']> = {
+    // New category codes
+    '8521_ADVERTISING': 'line8521_advertising',
+    '8523_MEALS': 'line8523_mealsEntertainment',
+    '8690_INSURANCE': 'line8690_insurance',
+    '8710_INTEREST': 'line8710_interestBankCharges',
+    '8760_LICENCES': 'line8760_businessTaxesLicences',
+    '8810_OFFICE': 'line8810_officeExpenses',
+    '8811_STATIONERY': 'line8811_officeStationery',
+    '8860_PROFESSIONAL': 'line8860_professionalFees',
+    '8871_MANAGEMENT': 'line8871_managementFees',
+    '8910_RENT': 'line8910_rent',
+    '8960_REPAIRS': 'line8960_repairsMaintenance',
+    '9180_PROPERTY_TAX': 'line9180_propertyTaxes',
+    '9220_UTILITIES': 'line9225_telephone',
+    '9275_DELIVERY': 'line9275_deliveryFreight',
+    '9281_OTHER': 'line9270_otherExpenses',
+
+    // Legacy category codes (backwards compatibility)
     'ADVERTISING_PROMOS': 'line8521_advertising',
     '8521': 'line8521_advertising',
     'MEALS_CLIENT': 'line8523_mealsEntertainment',
@@ -166,6 +184,8 @@ export function mapExpenseToT2125Line(categoryCode: string): keyof T2125Data['pa
     'TRAINING_EDU': 'line9270_otherExpenses',
     '9270': 'line9270_otherExpenses',
     '9275': 'line9275_deliveryFreight',
+
+    // Vehicle expenses (remain unchanged)
     'GAS_FUEL': 'line9281_motorVehicleExpenses',
     'REPAIRS_MAINT': 'line9281_motorVehicleExpenses',
     'INSURANCE_AUTO': 'line9281_motorVehicleExpenses',
