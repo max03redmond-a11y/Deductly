@@ -233,7 +233,7 @@ export function generateT2125Data(
     .reduce((sum, e) => sum + (e.deductible_amount || (e.amount * (e.business_percentage / 100))), 0);
 
   const vehicleMaintenance = filteredExpenses
-    .filter((e) => ['REPAIRS_MAINT', 'CAR_WASH'].includes(e.category_code || ''))
+    .filter((e) => e.category_code === 'REPAIRS_MAINT')
     .reduce((sum, e) => sum + (e.deductible_amount || (e.amount * (e.business_percentage / 100))), 0);
 
   const vehicleLicence = filteredExpenses
