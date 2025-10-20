@@ -140,7 +140,6 @@ export function mapExpenseToT2125Line(categoryCode: string): keyof T2125Data['pa
     'BANK_FEES_INTEREST': 'line8710_interestBankCharges',
     'LOAN_INTEREST': 'line8710_interestBankCharges',
     '8710': 'line8710_interestBankCharges',
-    'LIC_REG': 'line8760_businessTaxesLicences',
     '8760': 'line8760_businessTaxesLicences',
     '8810': 'line8810_officeExpenses',
     'SUPPLIES': 'line8811_officeStationery',
@@ -166,6 +165,7 @@ export function mapExpenseToT2125Line(categoryCode: string): keyof T2125Data['pa
     'GAS_FUEL': 'line9281_motorVehicleExpenses',
     'REPAIRS_MAINT': 'line9281_motorVehicleExpenses',
     'INSURANCE_AUTO': 'line9281_motorVehicleExpenses',
+    'LIC_REG': 'line9281_motorVehicleExpenses',
     'CAR_WASH': 'line9281_motorVehicleExpenses',
     'PARKING_TOLLS': 'line9281_motorVehicleExpenses',
     'LEASE_PAYMENTS': 'line9281_motorVehicleExpenses',
@@ -240,7 +240,18 @@ export function generateT2125Data(
   const ccaDeduction = calculateCCADeduction(assets, filter);
   expensesByLine.line9936_cca = ccaDeduction;
 
-  const totalExpenses = Object.values(expensesByLine).reduce((sum, val) => sum + (val || 0), 0);
+  // Calculate Chart A motor vehicle totals
+  const vehicleOtherExpenses = expenses
+    .filter((e) => e.category === 'Other' && e.notes?.toLowerCase().includes('vehicle'))
+    .reduce((sum, e) => sum + (e.deductible_amount || (e.amount * (e.business_percentage / 100))), 0);
+
+  const chartA_line12 = vehicleFuel + vehicleInsurance + vehicleLicence + vehicleMaintenance + vehicleLease + vehicleOtherExpenses;
+  const chartA_line13 = chartA_line12 * (businessUsePercent / 100);
+  const chartA_line16 = chartA_line13 + vehicleParking;
+
+  // Calculate total expenses INCLUDING motor vehicle expenses
+  const nonVehicleExpenses = Object.values(expensesByLine).reduce((sum, val) => sum + (val || 0), 0);
+  const totalExpenses = nonVehicleExpenses + chartA_line16;
 
   const netIncomeBeforeAdjustments = totalIncome - totalExpenses;
 
@@ -284,15 +295,6 @@ export function generateT2125Data(
     if (profile.mailing_address_line2) parts.push(profile.mailing_address_line2);
     return parts.join(', ');
   };
-
-  // Calculate Chart A motor vehicle totals
-  const vehicleOtherExpenses = expenses
-    .filter((e) => e.category === 'Other' && e.notes?.toLowerCase().includes('vehicle'))
-    .reduce((sum, e) => sum + (e.deductible_amount || (e.amount * (e.business_percentage / 100))), 0);
-
-  const chartA_line12 = vehicleFuel + vehicleInsurance + vehicleLicence + vehicleMaintenance + vehicleLease + vehicleOtherExpenses;
-  const chartA_line13 = chartA_line12 * (businessUsePercent / 100);
-  const chartA_line16 = chartA_line13 + vehicleParking;
 
   // Part 7 - Home Office (if applicable)
   // Home office expenses should be calculated separately
