@@ -33,14 +33,17 @@ export default function DashboardScreen() {
   const [craCategories, setCraCategories] = useState<CRACategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [showExportModal, setShowExportModal] = useState(false);
+  const [mileageSettings, setMileageSettings] = useState<any>(null);
 
   const loadData = useCallback(async () => {
-    const [expensesRes, incomeRes, mileageRes, assetsRes, categoriesRes] = await Promise.all([
+    const currentYear = new Date().getFullYear();
+    const [expensesRes, incomeRes, mileageRes, assetsRes, categoriesRes, settingsRes] = await Promise.all([
       supabase.from('expenses').select('*').eq('user_id', profile.id),
       supabase.from('income_entries').select('*').eq('user_id', profile.id),
       supabase.from('mileage_logs').select('*').eq('user_id', profile.id),
       supabase.from('assets').select('*').eq('user_id', profile.id),
       supabase.from('cra_categories').select('*'),
+      supabase.from('mileage_settings').select('*').eq('user_id', profile.id).eq('year', currentYear).maybeSingle(),
     ]);
 
     if (expensesRes.data) setExpenses(expensesRes.data);
@@ -48,6 +51,7 @@ export default function DashboardScreen() {
     if (mileageRes.data) setMileage(mileageRes.data);
     if (assetsRes.data) setAssets(assetsRes.data);
     if (categoriesRes.data) setCraCategories(categoriesRes.data);
+    if (settingsRes.data) setMileageSettings(settingsRes.data);
     setLoading(false);
   }, []);
 
@@ -104,9 +108,17 @@ export default function DashboardScreen() {
     return VEHICLE_EXPENSE_CODES.includes(categoryCode);
   };
 
-  const totalKm = mileage.reduce((sum, log) => sum + log.distance_km, 0);
-  const businessKm = mileage.reduce((sum, log) => sum + log.business_km, 0);
-  const mileageBusinessUsePercentage = totalKm > 0 ? (businessKm / totalKm) * 100 : 0;
+  const businessKm = mileage
+    .filter((log) => log.is_business)
+    .reduce((sum, log) => sum + log.distance_km, 0);
+
+  const totalKm = mileageSettings && mileageSettings.jan1_odometer_km && mileageSettings.current_odometer_km
+    ? parseFloat(mileageSettings.current_odometer_km) - parseFloat(mileageSettings.jan1_odometer_km)
+    : 0;
+
+  const mileageBusinessUsePercentage = totalKm > 0
+    ? Math.min(100, Math.max(0, (businessKm / totalKm) * 100))
+    : 0;
 
   const vehicleExpensesByCategory = expenses.reduce((acc, expense) => {
     if (isVehicleExpense(expense.category)) {
