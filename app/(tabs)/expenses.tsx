@@ -3,7 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, Platform }
 import { useFocusEffect } from '@react-navigation/native';
 import { supabase } from '@/lib/supabase';
 import { Plus, Receipt, Trash2, Car } from 'lucide-react-native';
-import { Expense, EXPENSE_CATEGORIES, MileageLog } from '@/types/database';
+import { Expense, EXPENSE_CATEGORIES, MileageLog, CRACategory } from '@/types/database';
 import { EnhancedExpenseModal } from '@/components/EnhancedExpenseModal';
 import { PageHeader } from '@/components/PageHeader';
 import { EmptyState } from '@/components/EmptyState';
@@ -16,11 +16,12 @@ export default function ExpensesScreen() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [mileageLogs, setMileageLogs] = useState<MileageLog[]>([]);
   const [businessUsePercent, setBusinessUsePercent] = useState(0);
+  const [craCategories, setCraCategories] = useState<CRACategory[]>([]);
 
   const loadExpenses = useCallback(async () => {
     const currentYear = new Date().getFullYear();
 
-    const [expensesRes, mileageRes, mileageSettingsRes] = await Promise.all([
+    const [expensesRes, mileageRes, mileageSettingsRes, categoriesRes] = await Promise.all([
       supabase
         .from('expenses')
         .select('*')
@@ -38,12 +39,19 @@ export default function ExpensesScreen() {
         .eq('user_id', DEFAULT_USER_ID)
         .eq('year', currentYear)
         .maybeSingle(),
+      supabase
+        .from('cra_categories')
+        .select('*'),
     ]);
 
     if (expensesRes.error) {
       console.error('Error loading expenses:', expensesRes.error);
     } else {
       setExpenses(expensesRes.data || []);
+    }
+
+    if (categoriesRes.data) {
+      setCraCategories(categoriesRes.data);
     }
 
     if (mileageRes.data) {
@@ -86,8 +94,17 @@ export default function ExpensesScreen() {
     }, [loadExpenses])
   );
 
+  const getEffectiveBusinessPercentage = (expense: Expense): number => {
+    const category = craCategories.find(c => c.code === expense.category_code);
+    if (category?.apply_business_use && businessUsePercent > 0) {
+      return businessUsePercent;
+    }
+    return expense.business_percentage;
+  };
+
   const totalDeductible = expenses.reduce((sum, expense) => {
-    return sum + (expense.amount * (expense.business_percentage / 100));
+    const effectivePercent = getEffectiveBusinessPercentage(expense);
+    return sum + (expense.amount * (effectivePercent / 100));
   }, 0);
 
   const expensesByCategory = expenses.reduce((acc, expense) => {
@@ -95,7 +112,8 @@ export default function ExpensesScreen() {
     if (!acc[category]) {
       acc[category] = 0;
     }
-    acc[category] += expense.amount * (expense.business_percentage / 100);
+    const effectivePercent = getEffectiveBusinessPercentage(expense);
+    acc[category] += expense.amount * (effectivePercent / 100);
     return acc;
   }, {} as Record<string, number>);
 
@@ -164,7 +182,12 @@ export default function ExpensesScreen() {
               <Text style={styles.sectionTitle}>RECENT</Text>
               <View style={styles.expenseGrid}>
                 {expenses.slice(0, 20).map((expense) => (
-                  <ExpenseItem key={expense.id} expense={expense} onDelete={loadExpenses} />
+                  <ExpenseItem
+                    key={expense.id}
+                    expense={expense}
+                    onDelete={loadExpenses}
+                    effectiveBusinessPercentage={getEffectiveBusinessPercentage(expense)}
+                  />
                 ))}
               </View>
             </View>
@@ -184,9 +207,17 @@ export default function ExpensesScreen() {
   );
 }
 
-function ExpenseItem({ expense, onDelete }: { expense: Expense; onDelete: () => void }) {
+function ExpenseItem({
+  expense,
+  onDelete,
+  effectiveBusinessPercentage,
+}: {
+  expense: Expense;
+  onDelete: () => void;
+  effectiveBusinessPercentage: number;
+}) {
   const categoryInfo = EXPENSE_CATEGORIES.find(c => c.value === expense.category);
-  const deductibleAmount = expense.amount * (expense.business_percentage / 100);
+  const deductibleAmount = expense.amount * (effectiveBusinessPercentage / 100);
   const [deleting, setDeleting] = useState(false);
 
   const handleDelete = async () => {
@@ -278,10 +309,10 @@ function ExpenseItem({ expense, onDelete }: { expense: Expense; onDelete: () => 
         </Text>
       </View>
 
-      {expense.business_percentage < 100 && (
+      {effectiveBusinessPercentage < 100 && (
         <View style={styles.deductibleBadge}>
           <Text style={styles.deductibleText}>
-            ${deductibleAmount.toFixed(2)}
+            ${deductibleAmount.toFixed(2)} ({effectiveBusinessPercentage.toFixed(0)}%)
           </Text>
         </View>
       )}
