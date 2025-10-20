@@ -31,9 +31,6 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
   const [date, setDate] = useState('');
   const [platform, setPlatform] = useState('');
   const [grossIncome, setGrossIncome] = useState('');
-  const [tips, setTips] = useState('');
-  const [bonuses, setBonuses] = useState('');
-  const [otherIncome, setOtherIncome] = useState('');
   const [platformFees, setPlatformFees] = useState('');
   const [notes, setNotes] = useState('');
 
@@ -42,9 +39,6 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
       setDate(entry.date);
       setPlatform(entry.platform);
       setGrossIncome(entry.gross_income.toString());
-      setTips(entry.tips.toString());
-      setBonuses(entry.bonuses.toString());
-      setOtherIncome(entry.other_income.toString());
       setPlatformFees(entry.platform_fees.toString());
       setNotes(entry.notes || '');
     } else {
@@ -57,9 +51,6 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
     setDate(today);
     setPlatform('');
     setGrossIncome('');
-    setTips('0');
-    setBonuses('0');
-    setOtherIncome('0');
     setPlatformFees('0');
     setNotes('');
   };
@@ -78,9 +69,9 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
         date,
         platform,
         gross_income: parseFloat(grossIncome) || 0,
-        tips: parseFloat(tips) || 0,
-        bonuses: parseFloat(bonuses) || 0,
-        other_income: parseFloat(otherIncome) || 0,
+        tips: 0,
+        bonuses: 0,
+        other_income: 0,
         platform_fees: parseFloat(platformFees) || 0,
         notes: notes || null,
       };
@@ -118,10 +109,7 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
   };
 
   const netPayout =
-    (parseFloat(grossIncome) || 0) +
-    (parseFloat(tips) || 0) +
-    (parseFloat(bonuses) || 0) +
-    (parseFloat(otherIncome) || 0) -
+    (parseFloat(grossIncome) || 0) -
     (parseFloat(platformFees) || 0);
 
   return (
@@ -174,42 +162,6 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
               style={styles.input}
               value={grossIncome}
               onChangeText={setGrossIncome}
-              placeholder="0.00"
-              keyboardType="decimal-pad"
-              placeholderTextColor={theme.colors.textSecondary}
-            />
-          </View>
-
-          <View style={styles.section}>
-            <Text style={styles.label}>Tips</Text>
-            <TextInput
-              style={styles.input}
-              value={tips}
-              onChangeText={setTips}
-              placeholder="0.00"
-              keyboardType="decimal-pad"
-              placeholderTextColor={theme.colors.textSecondary}
-            />
-          </View>
-
-          <View style={styles.section}>
-            <Text style={styles.label}>Bonuses</Text>
-            <TextInput
-              style={styles.input}
-              value={bonuses}
-              onChangeText={setBonuses}
-              placeholder="0.00"
-              keyboardType="decimal-pad"
-              placeholderTextColor={theme.colors.textSecondary}
-            />
-          </View>
-
-          <View style={styles.section}>
-            <Text style={styles.label}>Other Income</Text>
-            <TextInput
-              style={styles.input}
-              value={otherIncome}
-              onChangeText={setOtherIncome}
               placeholder="0.00"
               keyboardType="decimal-pad"
               placeholderTextColor={theme.colors.textSecondary}

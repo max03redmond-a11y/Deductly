@@ -78,17 +78,9 @@ export default function IncomeScreen() {
             <Text style={styles.grossAmount}>Gross: ${Number(item.gross_income).toFixed(2)}</Text>
           </View>
         </View>
-        {(item.tips > 0 || item.bonuses > 0 || item.platform_fees > 0) && (
+        {item.platform_fees > 0 && (
           <View style={styles.incomeBreakdown}>
-            {item.tips > 0 && (
-              <Text style={styles.breakdownText}>Tips: ${Number(item.tips).toFixed(2)}</Text>
-            )}
-            {item.bonuses > 0 && (
-              <Text style={styles.breakdownText}>Bonuses: ${Number(item.bonuses).toFixed(2)}</Text>
-            )}
-            {item.platform_fees > 0 && (
-              <Text style={styles.feeText}>Fees: -${Number(item.platform_fees).toFixed(2)}</Text>
-            )}
+            <Text style={styles.feeText}>Fees: -${Number(item.platform_fees).toFixed(2)}</Text>
           </View>
         )}
         {item.notes && <Text style={styles.notes}>{item.notes}</Text>}
@@ -125,7 +117,7 @@ export default function IncomeScreen() {
           icon={Plus}
           style={styles.addButton}
         >
-          Add Income
+          Add Income Entry
         </Button>
       </View>
 
