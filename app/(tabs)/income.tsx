@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 24,
     right: 24,
-    backgroundColor: theme.colors.primary,
+    backgroundColor: '#000',
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderRadius: 28,
