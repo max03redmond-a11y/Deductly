@@ -1,11 +1,9 @@
 import { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Switch, ActivityIndicator } from 'react-native';
-import { User, Shield, Building2, Sparkles, ChevronRight, Edit3, FileText } from 'lucide-react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { User, Shield, Building2, ChevronRight, Edit3, FileText } from 'lucide-react-native';
 import { CANADIAN_PROVINCES, BUSINESS_TYPES } from '@/types/database';
-import { generateDemoData, clearDemoData } from '@/lib/demoData';
 import { theme } from '@/constants/theme';
 import { Card } from '@/components/Card';
-import { Button } from '@/components/Button';
 import { ProfileEditForm } from '@/components/ProfileEditForm';
 
 const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000001';
@@ -21,37 +19,10 @@ const DEFAULT_PROFILE: any = {
 
 export default function ProfileScreen() {
   const profile = DEFAULT_PROFILE;
-  const [demoMode, setDemoMode] = useState(false);
-  const [demoLoading, setDemoLoading] = useState(false);
   const [editMode, setEditMode] = useState(false);
 
   const provinceName = CANADIAN_PROVINCES.find(p => p.value === profile?.province)?.label;
   const businessTypeName = BUSINESS_TYPES.find(b => b.value === profile?.business_type)?.label;
-
-  const handleDemoModeToggle = async (value: boolean) => {
-    if (value) {
-      setDemoLoading(true);
-      try {
-        await generateDemoData(profile.id);
-        setDemoMode(true);
-      } catch (error: any) {
-        console.error('Demo data generation error:', error);
-        setDemoMode(false);
-      } finally {
-        setDemoLoading(false);
-      }
-    } else {
-      setDemoLoading(true);
-      try {
-        await clearDemoData(profile.id);
-        setDemoMode(false);
-      } catch (error: any) {
-        console.error('Demo data clear error:', error);
-      } finally {
-        setDemoLoading(false);
-      }
-    }
-  };
 
   const handleEditSuccess = async () => {
     setEditMode(false);
@@ -171,39 +142,6 @@ export default function ProfileScreen() {
           </Card>
         </View>
 
-        {/* Demo Mode */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Developer</Text>
-
-          <Card>
-            <View style={styles.demoModeContainer}>
-              <View style={styles.demoModeIconContainer}>
-                <Sparkles size={20} color={theme.colors.primary} />
-              </View>
-              <View style={styles.demoModeContent}>
-                <Text style={styles.demoModeTitle}>Demo Mode</Text>
-                <Text style={styles.demoModeSubtitle}>
-                  {demoMode ? 'Sample data active' : 'Add sample data for testing'}
-                </Text>
-              </View>
-              {demoLoading ? (
-                <ActivityIndicator size="small" color={theme.colors.primary} />
-              ) : (
-                <Switch
-                  value={demoMode}
-                  onValueChange={handleDemoModeToggle}
-                  trackColor={{
-                    false: theme.colors.border,
-                    true: theme.colors.primary,
-                  }}
-                  thumbColor={theme.colors.surface}
-                  testID="toggle-demo"
-                />
-              )}
-            </View>
-          </Card>
-        </View>
-
         <View style={styles.footer}>
           <Text style={styles.footerText}>Deductly • Version 1.0.0</Text>
         </View>
@@ -311,33 +249,6 @@ const styles = StyleSheet.create({
   detailDivider: {
     height: 1,
     backgroundColor: theme.colors.divider,
-  },
-  demoModeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: theme.spacing.xs,
-  },
-  demoModeIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: theme.colors.primaryLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: theme.spacing.md,
-  },
-  demoModeContent: {
-    flex: 1,
-  },
-  demoModeTitle: {
-    fontSize: theme.typography.fontSize.base,
-    fontWeight: theme.typography.fontWeight.semibold,
-    color: theme.colors.text,
-    marginBottom: theme.spacing.xs,
-  },
-  demoModeSubtitle: {
-    fontSize: theme.typography.fontSize.sm,
-    color: theme.colors.textSecondary,
   },
   footer: {
     alignItems: 'center',

@@ -1,8 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const STORAGE_KEYS = {
-  DEMO_MODE: '@deductly/demoMode',
-  EXPENSES_BACKUP: '@deductly/expensesBackup',
   UI_STATE: '@deductly/ui',
 } as const;
 

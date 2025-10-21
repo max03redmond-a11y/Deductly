@@ -19,7 +19,6 @@ export interface ExpensesState {
   addExpense: (expense: Expense) => void;
   removeExpense: (id: string) => Promise<boolean>;
   clearExpenses: () => Promise<void>;
-  seedDemoData: () => Promise<void>;
   loadExpenses: () => Promise<void>;
 }
 
@@ -32,8 +31,6 @@ export interface IncomeState {
 }
 
 export interface UIState {
-  demoModeEnabled: boolean;
-  setDemoMode: (enabled: boolean) => Promise<void>;
   showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
 }
 
