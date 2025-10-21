@@ -1,4 +1,4 @@
-import { Expense, IncomeRecord, MileageLog, Asset, Profile } from '@/types/database';
+import { Expense, IncomeRecord, IncomeEntry, MileageLog, Asset, Profile } from '@/types/database';
 import { calculateDeductibleTotal, calculateMileageTotals, getYTDFilter, filterByPeriod } from '@/lib/calcs/summary';
 import { calculateCCADeduction } from '@/lib/calcs/tax';
 
@@ -203,7 +203,7 @@ export function mapExpenseToT2125Line(categoryCode: string): keyof T2125Data['pa
 export function generateT2125Data(
   profile: Profile | null,
   expenses: Expense[],
-  income: IncomeRecord[],
+  income: IncomeRecord[] | IncomeEntry[],
   mileage: MileageLog[],
   assets: Asset[],
   mileageSettings?: any
@@ -216,10 +216,29 @@ export function generateT2125Data(
   const filteredExpenses = filterByPeriod(expenses, filter);
   const filteredMileage = filterByPeriod(mileage, filter);
 
+  // Check if income entries have new GST/HST tracking
+  const isIncomeEntry = (item: IncomeRecord | IncomeEntry): item is IncomeEntry => {
+    return 'gross_income' in item && 'gst_collected' in item;
+  };
+
   // Calculate income totals
-  const totalIncome = filteredIncome.reduce((sum, i) => sum + i.amount, 0);
-  const gstHstCollected = 0; // GST/HST not tracked in current income_records schema
-  const tipsAndBonuses = 0; // Tips/bonuses not tracked in current income_records schema
+  let totalGrossSales = 0;
+  let gstHstCollected = 0;
+  let tipsAndBonuses = 0;
+
+  filteredIncome.forEach(entry => {
+    if (isIncomeEntry(entry)) {
+      // New income_entries table with GST/HST tracking
+      totalGrossSales += Number(entry.gross_income);
+      gstHstCollected += Number(entry.gst_collected || 0);
+      tipsAndBonuses += Number(entry.tips || 0) + Number(entry.bonuses || 0);
+    } else {
+      // Legacy income_records table
+      totalGrossSales += Number(entry.amount);
+    }
+  });
+
+  const totalIncome = totalGrossSales - gstHstCollected;
 
   const expensesByLine: Partial<Record<keyof T2125Data['part4_expenses'], number>> = {};
 
@@ -369,7 +388,7 @@ export function generateT2125Data(
       incomeFromWebPercent: 0,
     },
     part3a_businessIncome: {
-      line3A_grossSales: totalIncome + gstHstCollected,
+      line3A_grossSales: totalGrossSales,
       line3B_gstHstCollected: gstHstCollected,
       line3C_subtotal: totalIncome,
       line3G_adjustedGrossSales: totalIncome,

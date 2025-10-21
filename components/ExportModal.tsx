@@ -78,28 +78,14 @@ export default function ExportModal({ visible, onClose }: ExportModalProps) {
       const userProfile = profileRes.data || profile;
       const mileageSettings = settingsRes.data || null;
 
-      // Convert IncomeEntry to IncomeRecord format for T2125 mapper
-      const income: IncomeRecord[] = incomeEntries.map((entry) => ({
-        id: entry.id,
-        user_id: entry.user_id,
-        date: entry.date,
-        source: entry.platform,
-        amount: entry.net_payout,
-        trips_completed: entry.trips_completed,
-        description: entry.notes,
-        imported_from: null,
-        created_at: entry.created_at,
-        updated_at: entry.updated_at,
-      }));
-
       console.log('Export data counts:', {
         expenses: expenses.length,
-        income: income.length,
+        income: incomeEntries.length,
         mileage: mileage.length,
         assets: assets.length,
       });
 
-      const t2125Data = generateT2125Data(userProfile, expenses, income, mileage, assets, mileageSettings);
+      const t2125Data = generateT2125Data(userProfile, expenses, incomeEntries, mileage, assets, mileageSettings);
 
       console.log('T2125 generated:', {
         name: t2125Data.identification.yourName,

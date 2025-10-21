@@ -176,19 +176,7 @@ export default function DashboardScreen() {
 
   const handleExportT2125CSV = async () => {
     try {
-      const incomeRecords: IncomeRecord[] = income.map((entry) => ({
-        id: entry.id,
-        user_id: entry.user_id,
-        date: entry.date,
-        source: entry.platform,
-        amount: entry.net_payout,
-        trips_completed: entry.trips_completed,
-        description: entry.notes,
-        imported_from: null,
-        created_at: entry.created_at,
-        updated_at: entry.updated_at,
-      }));
-      const t2125Data = generateT2125Data(profile, expenses, incomeRecords, mileage, assets, mileageSettings);
+      const t2125Data = generateT2125Data(profile, expenses, income, mileage, assets, mileageSettings);
       const csvContent = generateT2125CSV(t2125Data);
       await downloadCSV(csvContent, `t2125_export_${new Date().getFullYear()}.csv`);
       showToast('T2125 CSV exported successfully');
@@ -200,19 +188,7 @@ export default function DashboardScreen() {
 
   const handleExportT2125HTML = async () => {
     try {
-      const incomeRecords: IncomeRecord[] = income.map((entry) => ({
-        id: entry.id,
-        user_id: entry.user_id,
-        date: entry.date,
-        source: entry.platform,
-        amount: entry.net_payout,
-        trips_completed: entry.trips_completed,
-        description: entry.notes,
-        imported_from: null,
-        created_at: entry.created_at,
-        updated_at: entry.updated_at,
-      }));
-      const t2125Data = generateT2125Data(profile, expenses, incomeRecords, mileage, assets, mileageSettings);
+      const t2125Data = generateT2125Data(profile, expenses, income, mileage, assets, mileageSettings);
       const htmlContent = generateT2125HTML(t2125Data);
       await downloadHTML(htmlContent, `t2125_report_${new Date().getFullYear()}.html`);
       showToast('T2125 report exported successfully');
