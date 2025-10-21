@@ -59,14 +59,8 @@ export default function IncomeScreen() {
     });
 
     const grossIncome = Number(item.gross_income);
-    const gst = Number(item.gst_amount || 0);
-    const hst = Number(item.hst_amount || 0);
-    const totalTax = gst + hst;
-    const netIncome = grossIncome - totalTax;
-
-    const taxBreakdown = [];
-    if (gst > 0) taxBreakdown.push(`GST $${gst.toFixed(2)}`);
-    if (hst > 0) taxBreakdown.push(`HST $${hst.toFixed(2)}`);
+    const gstCollected = Number(item.gst_collected || 0);
+    const netIncome = grossIncome - gstCollected;
 
     return (
       <View style={styles.incomeCard}>
@@ -85,9 +79,9 @@ export default function IncomeScreen() {
           <Text style={styles.incomeText}>
             {dateStr} – ${grossIncome.toFixed(2)}
           </Text>
-          {item.includes_tax && totalTax > 0 && (
+          {item.includes_tax && gstCollected > 0 && (
             <Text style={styles.incomeSubtext}>
-              Includes {taxBreakdown.join(' + ')} (Net: ${netIncome.toFixed(2)})
+              Includes ${gstCollected.toFixed(2)} GST/HST (Net: ${netIncome.toFixed(2)})
             </Text>
           )}
         </TouchableOpacity>

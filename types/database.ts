@@ -136,8 +136,6 @@ export type IncomeEntry = {
   source_ref: string | null;
   notes: string | null;
   gst_collected: number;
-  gst_amount: number;
-  hst_amount: number;
   includes_tax: boolean;
   created_at: string;
   updated_at: string;
