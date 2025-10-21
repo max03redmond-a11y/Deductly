@@ -31,12 +31,16 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
   const [date, setDate] = useState('');
   const [payoutAmount, setPayoutAmount] = useState('');
   const [tripsCompleted, setTripsCompleted] = useState('');
+  const [includesTax, setIncludesTax] = useState(false);
+  const [gstAmount, setGstAmount] = useState('');
 
   useEffect(() => {
     if (entry) {
       setDate(entry.date);
-      setPayoutAmount(entry.net_payout.toString());
+      setPayoutAmount(entry.gross_income.toString());
       setTripsCompleted(entry.trips_completed?.toString() || '');
+      setIncludesTax(entry.includes_tax || false);
+      setGstAmount(entry.gst_collected > 0 ? entry.gst_collected.toString() : '');
     } else {
       resetForm();
     }
@@ -47,17 +51,25 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
     setDate(today);
     setPayoutAmount('');
     setTripsCompleted('');
+    setIncludesTax(false);
+    setGstAmount('');
   };
 
   const handleSave = async () => {
     if (!date || !payoutAmount) {
-      showToast('Please fill in date and payout amount', 'error');
+      showToast('Please fill in date and gross sales amount', 'error');
       return;
     }
 
-    const payout = parseFloat(payoutAmount) || 0;
-    if (payout <= 0) {
-      showToast('Payout amount must be greater than zero', 'error');
+    const grossSales = parseFloat(payoutAmount) || 0;
+    if (grossSales <= 0) {
+      showToast('Gross sales amount must be greater than zero', 'error');
+      return;
+    }
+
+    const gstCollected = parseFloat(gstAmount) || 0;
+    if (includesTax && gstCollected <= 0) {
+      showToast('Please enter the GST/HST amount included in gross sales', 'error');
       return;
     }
 
@@ -67,13 +79,15 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
       const incomeData = {
         user_id: DEFAULT_USER_ID,
         date,
-        platform: 'Payout',
-        gross_income: payout,
+        platform: 'Income',
+        gross_income: grossSales,
         tips: 0,
         bonuses: 0,
         other_income: 0,
         platform_fees: 0,
         notes: null,
+        gst_collected: gstCollected,
+        includes_tax: includesTax,
       };
 
       if (entry) {
@@ -108,7 +122,9 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
     }
   };
 
-  const payout = parseFloat(payoutAmount) || 0;
+  const grossSales = parseFloat(payoutAmount) || 0;
+  const gstCollected = parseFloat(gstAmount) || 0;
+  const netSales = includesTax ? grossSales - gstCollected : grossSales;
 
   return (
     <Modal
@@ -119,7 +135,7 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
     >
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.title}>{entry ? 'Edit Payout' : 'Add Payout'}</Text>
+          <Text style={styles.title}>{entry ? 'Edit Income' : 'Add Income'}</Text>
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
             <X color={theme.colors.text} size={24} />
           </TouchableOpacity>
@@ -141,7 +157,10 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
 
           <View style={styles.section}>
             <Text style={styles.label}>
-              Payout Amount ($) <Text style={styles.required}>*</Text>
+              Gross Sales ($) <Text style={styles.required}>*</Text>
+            </Text>
+            <Text style={styles.helperText}>
+              {includesTax ? 'Total amount including GST/HST' : 'Total amount (no tax)'}
             </Text>
             <TextInput
               style={styles.input}
@@ -153,11 +172,66 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
             />
           </View>
 
+          <View style={styles.section}>
+            <View style={styles.switchRow}>
+              <View style={styles.switchLabelContainer}>
+                <Text style={styles.label}>Includes GST/HST</Text>
+                <Text style={styles.helperText}>
+                  Check this if gross sales includes GST/HST
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={[styles.switch, includesTax && styles.switchActive]}
+                onPress={() => {
+                  setIncludesTax(!includesTax);
+                  if (!includesTax) {
+                    setGstAmount('');
+                  }
+                }}
+              >
+                <View style={[styles.switchThumb, includesTax && styles.switchThumbActive]} />
+              </TouchableOpacity>
+            </View>
+          </View>
 
-          {payout > 0 && (
+          {includesTax && (
+            <View style={styles.section}>
+              <Text style={styles.label}>
+                GST/HST Amount ($) <Text style={styles.required}>*</Text>
+              </Text>
+              <Text style={styles.helperText}>
+                Enter the GST/HST portion included in gross sales
+              </Text>
+              <TextInput
+                style={styles.input}
+                value={gstAmount}
+                onChangeText={setGstAmount}
+                placeholder="0.00"
+                keyboardType="decimal-pad"
+                placeholderTextColor={theme.colors.textSecondary}
+              />
+            </View>
+          )}
+
+          {grossSales > 0 && (
             <View style={styles.summaryBox}>
-              <Text style={styles.summaryLabel}>Total Payout</Text>
-              <Text style={styles.summaryValue}>${payout.toFixed(2)}</Text>
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>Gross Sales</Text>
+                <Text style={styles.summaryValue}>${grossSales.toFixed(2)}</Text>
+              </View>
+              {includesTax && gstCollected > 0 && (
+                <>
+                  <View style={styles.summaryRow}>
+                    <Text style={styles.summaryLabel}>GST/HST Collected</Text>
+                    <Text style={styles.summaryValueSecondary}>-${gstCollected.toFixed(2)}</Text>
+                  </View>
+                  <View style={styles.summaryDivider} />
+                  <View style={styles.summaryRow}>
+                    <Text style={styles.summaryLabelBold}>Net Sales (before tax)</Text>
+                    <Text style={styles.summaryValueBold}>${netSales.toFixed(2)}</Text>
+                  </View>
+                </>
+              )}
             </View>
           )}
         </ScrollView>
@@ -227,23 +301,81 @@ const styles = StyleSheet.create({
     minHeight: 80,
     textAlignVertical: 'top',
   },
+  helperText: {
+    fontSize: 13,
+    color: theme.colors.textSecondary,
+    marginBottom: 8,
+  },
+  switchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  switchLabelContainer: {
+    flex: 1,
+  },
+  switch: {
+    width: 52,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: theme.colors.border,
+    padding: 2,
+    justifyContent: 'center',
+  },
+  switchActive: {
+    backgroundColor: theme.colors.primary,
+  },
+  switchThumb: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#fff',
+    alignSelf: 'flex-start',
+  },
+  switchThumbActive: {
+    alignSelf: 'flex-end',
+  },
   summaryBox: {
     backgroundColor: theme.colors.primaryLight,
     borderRadius: 12,
     padding: 20,
-    alignItems: 'center',
     marginTop: 8,
     marginBottom: 20,
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  summaryDivider: {
+    height: 1,
+    backgroundColor: theme.colors.border,
+    marginVertical: 8,
   },
   summaryLabel: {
     fontSize: 14,
     color: theme.colors.textSecondary,
-    marginBottom: 4,
+  },
+  summaryLabelBold: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.text,
   },
   summaryValue: {
-    fontSize: 28,
+    fontSize: 20,
     fontWeight: '700',
     color: theme.colors.success,
+  },
+  summaryValueSecondary: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.colors.error,
+  },
+  summaryValueBold: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: theme.colors.text,
   },
   footer: {
     flexDirection: 'row',

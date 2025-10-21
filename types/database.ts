@@ -135,6 +135,8 @@ export type IncomeEntry = {
   trips_completed: number | null;
   source_ref: string | null;
   notes: string | null;
+  gst_collected: number;
+  includes_tax: boolean;
   created_at: string;
   updated_at: string;
 };

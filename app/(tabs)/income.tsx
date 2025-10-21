@@ -47,7 +47,9 @@ export default function IncomeScreen() {
     await removeIncomeEntry(id);
   };
 
-  const totalNetPayout = incomeEntries.reduce((sum, entry) => sum + Number(entry.net_payout), 0);
+  const totalGrossSales = incomeEntries.reduce((sum, entry) => sum + Number(entry.gross_income), 0);
+  const totalGstCollected = incomeEntries.reduce((sum, entry) => sum + Number(entry.gst_collected || 0), 0);
+  const totalNetSales = totalGrossSales - totalGstCollected;
 
   const renderIncomeEntry = ({ item }: { item: IncomeEntry }) => {
     const date = new Date(item.date);
@@ -55,6 +57,10 @@ export default function IncomeScreen() {
       month: 'short',
       day: 'numeric',
     });
+
+    const grossIncome = Number(item.gross_income);
+    const gstCollected = Number(item.gst_collected || 0);
+    const netIncome = grossIncome - gstCollected;
 
     return (
       <View style={styles.incomeCard}>
@@ -71,9 +77,13 @@ export default function IncomeScreen() {
         </View>
         <TouchableOpacity onPress={() => handleEditIncome(item)}>
           <Text style={styles.incomeText}>
-            {dateStr} – ${Number(item.net_payout).toFixed(2)}
-            {item.trips_completed && ` – ${item.trips_completed} trips`}
+            {dateStr} – ${grossIncome.toFixed(2)}
           </Text>
+          {item.includes_tax && gstCollected > 0 && (
+            <Text style={styles.incomeSubtext}>
+              Includes ${gstCollected.toFixed(2)} GST/HST (Net: ${netIncome.toFixed(2)})
+            </Text>
+          )}
         </TouchableOpacity>
       </View>
     );
@@ -87,14 +97,29 @@ export default function IncomeScreen() {
         <Card style={styles.summaryCard}>
           <View style={styles.summaryRow}>
             <View style={styles.summaryItem}>
-              <Text style={styles.summaryLabel}>Net Payout</Text>
-              <Text style={styles.summaryValue}>${totalNetPayout.toFixed(2)}</Text>
+              <Text style={styles.summaryLabel}>Gross Sales</Text>
+              <Text style={styles.summaryValue}>${totalGrossSales.toFixed(2)}</Text>
             </View>
+            {totalGstCollected > 0 && (
+              <>
+                <View style={styles.summaryDivider} />
+                <View style={styles.summaryItem}>
+                  <Text style={styles.summaryLabel}>GST/HST</Text>
+                  <Text style={styles.feeValue}>${totalGstCollected.toFixed(2)}</Text>
+                </View>
+              </>
+            )}
           </View>
+          {totalGstCollected > 0 && (
+            <View style={styles.netSalesRow}>
+              <Text style={styles.netSalesLabel}>Net Sales (before tax)</Text>
+              <Text style={styles.netSalesValue}>${totalNetSales.toFixed(2)}</Text>
+            </View>
+          )}
         </Card>
 
         <Button
-          title="Add Payout"
+          title="Add Income"
           onPress={handleAddIncome}
           style={styles.addButton}
         />
@@ -103,8 +128,8 @@ export default function IncomeScreen() {
       {incomeEntries.length === 0 ? (
         <EmptyState
           icon={TrendingUp}
-          title="No payouts yet"
-          description="Start tracking your income by adding your first payout"
+          title="No income yet"
+          description="Start tracking your income by adding your first sale"
         />
       ) : (
         <FlatList
@@ -209,7 +234,33 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
     marginTop: 8,
   },
+  incomeSubtext: {
+    fontSize: 13,
+    color: theme.colors.textSecondary,
+    marginTop: 4,
+  },
   deleteButton: {
     padding: 4,
+  },
+  netSalesRow: {
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  netSalesLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.colors.text,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  netSalesValue: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: theme.colors.text,
   },
 });
