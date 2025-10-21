@@ -33,6 +33,7 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
   const [tripsCompleted, setTripsCompleted] = useState('');
   const [includesTax, setIncludesTax] = useState(false);
   const [gstAmount, setGstAmount] = useState('');
+  const [hstAmount, setHstAmount] = useState('');
 
   useEffect(() => {
     if (entry) {
@@ -40,7 +41,8 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
       setPayoutAmount(entry.gross_income.toString());
       setTripsCompleted(entry.trips_completed?.toString() || '');
       setIncludesTax(entry.includes_tax || false);
-      setGstAmount(entry.gst_collected > 0 ? entry.gst_collected.toString() : '');
+      setGstAmount(entry.gst_amount > 0 ? entry.gst_amount.toString() : '');
+      setHstAmount(entry.hst_amount > 0 ? entry.hst_amount.toString() : '');
     } else {
       resetForm();
     }
@@ -53,6 +55,7 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
     setTripsCompleted('');
     setIncludesTax(false);
     setGstAmount('');
+    setHstAmount('');
   };
 
   const handleSave = async () => {
@@ -67,9 +70,12 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
       return;
     }
 
-    const gstCollected = parseFloat(gstAmount) || 0;
-    if (includesTax && gstCollected <= 0) {
-      showToast('Please enter the GST/HST amount included in gross sales', 'error');
+    const gst = parseFloat(gstAmount) || 0;
+    const hst = parseFloat(hstAmount) || 0;
+    const totalTax = gst + hst;
+
+    if (includesTax && totalTax <= 0) {
+      showToast('Please enter at least one tax amount (GST or HST)', 'error');
       return;
     }
 
@@ -86,7 +92,9 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
         other_income: 0,
         platform_fees: 0,
         notes: null,
-        gst_collected: gstCollected,
+        gst_amount: gst,
+        hst_amount: hst,
+        gst_collected: totalTax,
         includes_tax: includesTax,
       };
 
@@ -123,8 +131,10 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
   };
 
   const grossSales = parseFloat(payoutAmount) || 0;
-  const gstCollected = parseFloat(gstAmount) || 0;
-  const netSales = includesTax ? grossSales - gstCollected : grossSales;
+  const gst = parseFloat(gstAmount) || 0;
+  const hst = parseFloat(hstAmount) || 0;
+  const totalTax = gst + hst;
+  const netSales = includesTax ? grossSales - totalTax : grossSales;
 
   return (
     <Modal
@@ -195,22 +205,41 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
           </View>
 
           {includesTax && (
-            <View style={styles.section}>
-              <Text style={styles.label}>
-                GST/HST Amount ($) <Text style={styles.required}>*</Text>
-              </Text>
-              <Text style={styles.helperText}>
-                Enter the GST/HST portion included in gross sales
-              </Text>
-              <TextInput
-                style={styles.input}
-                value={gstAmount}
-                onChangeText={setGstAmount}
-                placeholder="0.00"
-                keyboardType="decimal-pad"
-                placeholderTextColor={theme.colors.textSecondary}
-              />
-            </View>
+            <>
+              <View style={styles.section}>
+                <Text style={styles.label}>
+                  GST Amount ($)
+                </Text>
+                <Text style={styles.helperText}>
+                  GST portion (5% federal tax)
+                </Text>
+                <TextInput
+                  style={styles.input}
+                  value={gstAmount}
+                  onChangeText={setGstAmount}
+                  placeholder="0.00"
+                  keyboardType="decimal-pad"
+                  placeholderTextColor={theme.colors.textSecondary}
+                />
+              </View>
+
+              <View style={styles.section}>
+                <Text style={styles.label}>
+                  HST Amount ($)
+                </Text>
+                <Text style={styles.helperText}>
+                  HST portion (13% or 15% depending on province)
+                </Text>
+                <TextInput
+                  style={styles.input}
+                  value={hstAmount}
+                  onChangeText={setHstAmount}
+                  placeholder="0.00"
+                  keyboardType="decimal-pad"
+                  placeholderTextColor={theme.colors.textSecondary}
+                />
+              </View>
+            </>
           )}
 
           {grossSales > 0 && (
@@ -219,12 +248,20 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
                 <Text style={styles.summaryLabel}>Gross Sales</Text>
                 <Text style={styles.summaryValue}>${grossSales.toFixed(2)}</Text>
               </View>
-              {includesTax && gstCollected > 0 && (
+              {includesTax && totalTax > 0 && (
                 <>
-                  <View style={styles.summaryRow}>
-                    <Text style={styles.summaryLabel}>GST/HST Collected</Text>
-                    <Text style={styles.summaryValueSecondary}>-${gstCollected.toFixed(2)}</Text>
-                  </View>
+                  {gst > 0 && (
+                    <View style={styles.summaryRow}>
+                      <Text style={styles.summaryLabel}>GST (5%)</Text>
+                      <Text style={styles.summaryValueSecondary}>-${gst.toFixed(2)}</Text>
+                    </View>
+                  )}
+                  {hst > 0 && (
+                    <View style={styles.summaryRow}>
+                      <Text style={styles.summaryLabel}>HST</Text>
+                      <Text style={styles.summaryValueSecondary}>-${hst.toFixed(2)}</Text>
+                    </View>
+                  )}
                   <View style={styles.summaryDivider} />
                   <View style={styles.summaryRow}>
                     <Text style={styles.summaryLabelBold}>Net Sales (before tax)</Text>
