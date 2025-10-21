@@ -29,18 +29,18 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
   const [loading, setLoading] = useState(false);
 
   const [date, setDate] = useState('');
-  const [payoutAmount, setPayoutAmount] = useState('');
-  const [tripsCompleted, setTripsCompleted] = useState('');
-  const [includesTax, setIncludesTax] = useState(false);
+  const [salesAmount, setSalesAmount] = useState('');
   const [gstAmount, setGstAmount] = useState('');
 
   useEffect(() => {
     if (entry) {
       setDate(entry.date);
-      setPayoutAmount(entry.gross_income.toString());
-      setTripsCompleted(entry.trips_completed?.toString() || '');
-      setIncludesTax(entry.includes_tax || false);
-      setGstAmount(entry.gst_collected > 0 ? entry.gst_collected.toString() : '');
+      const gstCollected = Number(entry.gst_collected || 0);
+      const grossIncome = Number(entry.gross_income);
+      // Calculate sales amount (gross - gst)
+      const sales = grossIncome - gstCollected;
+      setSalesAmount(sales > 0 ? sales.toString() : grossIncome.toString());
+      setGstAmount(gstCollected > 0 ? gstCollected.toString() : '');
     } else {
       resetForm();
     }
@@ -49,29 +49,25 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
   const resetForm = () => {
     const today = new Date().toISOString().split('T')[0];
     setDate(today);
-    setPayoutAmount('');
-    setTripsCompleted('');
-    setIncludesTax(false);
+    setSalesAmount('');
     setGstAmount('');
   };
 
   const handleSave = async () => {
-    if (!date || !payoutAmount) {
-      showToast('Please fill in date and gross sales amount', 'error');
+    if (!date || !salesAmount) {
+      showToast('Please fill in date and sales amount', 'error');
       return;
     }
 
-    const grossSales = parseFloat(payoutAmount) || 0;
-    if (grossSales <= 0) {
-      showToast('Gross sales amount must be greater than zero', 'error');
+    const sales = parseFloat(salesAmount) || 0;
+    if (sales <= 0) {
+      showToast('Sales amount must be greater than zero', 'error');
       return;
     }
 
     const gstCollected = parseFloat(gstAmount) || 0;
-    if (includesTax && gstCollected <= 0) {
-      showToast('Please enter the GST/HST amount included in gross sales', 'error');
-      return;
-    }
+    // Gross sales = Sales + GST/HST
+    const grossSales = sales + gstCollected;
 
     setLoading(true);
 
@@ -87,7 +83,7 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
         platform_fees: 0,
         notes: null,
         gst_collected: gstCollected,
-        includes_tax: includesTax,
+        includes_tax: gstCollected > 0,
       };
 
       if (entry) {
@@ -122,9 +118,9 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
     }
   };
 
-  const grossSales = parseFloat(payoutAmount) || 0;
+  const sales = parseFloat(salesAmount) || 0;
   const gstCollected = parseFloat(gstAmount) || 0;
-  const netSales = includesTax ? grossSales - gstCollected : grossSales;
+  const grossSales = sales + gstCollected;
 
   return (
     <Modal
@@ -157,15 +153,15 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
 
           <View style={styles.section}>
             <Text style={styles.label}>
-              Gross Sales ($) <Text style={styles.required}>*</Text>
+              Sales Amount ($) <Text style={styles.required}>*</Text>
             </Text>
             <Text style={styles.helperText}>
-              {includesTax ? 'Total amount including GST/HST' : 'Total amount (no tax)'}
+              Line 3C - Sales before tax
             </Text>
             <TextInput
               style={styles.input}
-              value={payoutAmount}
-              onChangeText={setPayoutAmount}
+              value={salesAmount}
+              onChangeText={setSalesAmount}
               placeholder="0.00"
               keyboardType="decimal-pad"
               placeholderTextColor={theme.colors.textSecondary}
@@ -173,62 +169,38 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
           </View>
 
           <View style={styles.section}>
-            <View style={styles.switchRow}>
-              <View style={styles.switchLabelContainer}>
-                <Text style={styles.label}>Includes GST/HST</Text>
-                <Text style={styles.helperText}>
-                  Check this if gross sales includes GST/HST
-                </Text>
-              </View>
-              <TouchableOpacity
-                style={[styles.switch, includesTax && styles.switchActive]}
-                onPress={() => {
-                  setIncludesTax(!includesTax);
-                  if (!includesTax) {
-                    setGstAmount('');
-                  }
-                }}
-              >
-                <View style={[styles.switchThumb, includesTax && styles.switchThumbActive]} />
-              </TouchableOpacity>
-            </View>
+            <Text style={styles.label}>
+              GST/HST Collected ($)
+            </Text>
+            <Text style={styles.helperText}>
+              Line 3B - GST/HST collected (if applicable)
+            </Text>
+            <TextInput
+              style={styles.input}
+              value={gstAmount}
+              onChangeText={setGstAmount}
+              placeholder="0.00"
+              keyboardType="decimal-pad"
+              placeholderTextColor={theme.colors.textSecondary}
+            />
           </View>
 
-          {includesTax && (
-            <View style={styles.section}>
-              <Text style={styles.label}>
-                GST/HST Amount ($) <Text style={styles.required}>*</Text>
-              </Text>
-              <Text style={styles.helperText}>
-                Enter the GST/HST portion included in gross sales
-              </Text>
-              <TextInput
-                style={styles.input}
-                value={gstAmount}
-                onChangeText={setGstAmount}
-                placeholder="0.00"
-                keyboardType="decimal-pad"
-                placeholderTextColor={theme.colors.textSecondary}
-              />
-            </View>
-          )}
-
-          {grossSales > 0 && (
+          {sales > 0 && (
             <View style={styles.summaryBox}>
               <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>Gross Sales</Text>
-                <Text style={styles.summaryValue}>${grossSales.toFixed(2)}</Text>
+                <Text style={styles.summaryLabel}>Line 3C - Sales (before tax)</Text>
+                <Text style={styles.summaryValue}>${sales.toFixed(2)}</Text>
               </View>
-              {includesTax && gstCollected > 0 && (
+              {gstCollected > 0 && (
                 <>
                   <View style={styles.summaryRow}>
-                    <Text style={styles.summaryLabel}>GST/HST Collected</Text>
-                    <Text style={styles.summaryValueSecondary}>-${gstCollected.toFixed(2)}</Text>
+                    <Text style={styles.summaryLabel}>Line 3B - GST/HST Collected</Text>
+                    <Text style={styles.summaryValueSecondary}>+${gstCollected.toFixed(2)}</Text>
                   </View>
                   <View style={styles.summaryDivider} />
                   <View style={styles.summaryRow}>
-                    <Text style={styles.summaryLabelBold}>Net Sales (before tax)</Text>
-                    <Text style={styles.summaryValueBold}>${netSales.toFixed(2)}</Text>
+                    <Text style={styles.summaryLabelBold}>Line 3A - Gross Sales</Text>
+                    <Text style={styles.summaryValueBold}>${grossSales.toFixed(2)}</Text>
                   </View>
                 </>
               )}
@@ -306,35 +278,6 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
     marginBottom: 8,
   },
-  switchRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  switchLabelContainer: {
-    flex: 1,
-  },
-  switch: {
-    width: 52,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: theme.colors.border,
-    padding: 2,
-    justifyContent: 'center',
-  },
-  switchActive: {
-    backgroundColor: theme.colors.primary,
-  },
-  switchThumb: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: '#fff',
-    alignSelf: 'flex-start',
-  },
-  switchThumbActive: {
-    alignSelf: 'flex-end',
-  },
   summaryBox: {
     backgroundColor: theme.colors.primaryLight,
     borderRadius: 12,
@@ -365,17 +308,17 @@ const styles = StyleSheet.create({
   summaryValue: {
     fontSize: 20,
     fontWeight: '700',
-    color: theme.colors.success,
+    color: theme.colors.text,
   },
   summaryValueSecondary: {
     fontSize: 16,
     fontWeight: '600',
-    color: theme.colors.error,
+    color: theme.colors.success,
   },
   summaryValueBold: {
     fontSize: 20,
     fontWeight: '700',
-    color: theme.colors.text,
+    color: theme.colors.success,
   },
   footer: {
     flexDirection: 'row',
