@@ -33,6 +33,9 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
   const [tripsCompleted, setTripsCompleted] = useState('');
   const [includesTax, setIncludesTax] = useState(false);
   const [gstAmount, setGstAmount] = useState('');
+  const [tips, setTips] = useState('');
+  const [bonuses, setBonuses] = useState('');
+  const [otherIncome, setOtherIncome] = useState('');
 
   useEffect(() => {
     if (entry) {
@@ -41,6 +44,9 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
       setTripsCompleted(entry.trips_completed?.toString() || '');
       setIncludesTax(entry.includes_tax || false);
       setGstAmount(entry.gst_collected > 0 ? entry.gst_collected.toString() : '');
+      setTips(entry.tips > 0 ? entry.tips.toString() : '');
+      setBonuses(entry.bonuses > 0 ? entry.bonuses.toString() : '');
+      setOtherIncome(entry.other_income > 0 ? entry.other_income.toString() : '');
     } else {
       resetForm();
     }
@@ -53,6 +59,9 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
     setTripsCompleted('');
     setIncludesTax(false);
     setGstAmount('');
+    setTips('');
+    setBonuses('');
+    setOtherIncome('');
   };
 
   const handleSave = async () => {
@@ -71,15 +80,19 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
 
     setLoading(true);
 
+    const tipsAmount = parseFloat(tips) || 0;
+    const bonusesAmount = parseFloat(bonuses) || 0;
+    const otherIncomeAmount = parseFloat(otherIncome) || 0;
+
     try {
       const incomeData = {
         user_id: DEFAULT_USER_ID,
         date,
         platform: 'Income',
         gross_income: grossSales,
-        tips: 0,
-        bonuses: 0,
-        other_income: 0,
+        tips: tipsAmount,
+        bonuses: bonusesAmount,
+        other_income: otherIncomeAmount,
         platform_fees: 0,
         notes: null,
         gst_collected: gstCollected,
@@ -121,6 +134,10 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
   const grossSales = parseFloat(payoutAmount) || 0;
   const gstCollected = parseFloat(gstAmount) || 0;
   const netSales = includesTax ? grossSales - gstCollected : grossSales;
+  const tipsAmount = parseFloat(tips) || 0;
+  const bonusesAmount = parseFloat(bonuses) || 0;
+  const otherIncomeAmount = parseFloat(otherIncome) || 0;
+  const totalIncome = grossSales + tipsAmount + bonusesAmount + otherIncomeAmount;
 
   return (
     <Modal
@@ -209,24 +226,92 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
             </View>
           )}
 
-          {grossSales > 0 && (
+          <View style={styles.divider} />
+
+          <Text style={styles.sectionTitle}>Other Income (Optional)</Text>
+          <Text style={styles.sectionDescription}>
+            Add tips, bonuses, or referral income separate from gross sales
+          </Text>
+
+          <View style={styles.section}>
+            <Text style={styles.label}>Tips ($)</Text>
+            <TextInput
+              style={styles.input}
+              value={tips}
+              onChangeText={setTips}
+              placeholder="0.00"
+              keyboardType="decimal-pad"
+              placeholderTextColor={theme.colors.textSecondary}
+            />
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.label}>Bonuses ($)</Text>
+            <TextInput
+              style={styles.input}
+              value={bonuses}
+              onChangeText={setBonuses}
+              placeholder="0.00"
+              keyboardType="decimal-pad"
+              placeholderTextColor={theme.colors.textSecondary}
+            />
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.label}>Other Income ($)</Text>
+            <Text style={styles.helperText}>
+              Referrals, incentives, or other income
+            </Text>
+            <TextInput
+              style={styles.input}
+              value={otherIncome}
+              onChangeText={setOtherIncome}
+              placeholder="0.00"
+              keyboardType="decimal-pad"
+              placeholderTextColor={theme.colors.textSecondary}
+            />
+          </View>
+
+          {totalIncome > 0 && (
             <View style={styles.summaryBox}>
               <View style={styles.summaryRow}>
                 <Text style={styles.summaryLabel}>Gross Sales</Text>
                 <Text style={styles.summaryValue}>${grossSales.toFixed(2)}</Text>
               </View>
               {includesTax && gstCollected > 0 && (
-                <>
-                  <View style={styles.summaryRow}>
-                    <Text style={styles.summaryLabel}>GST/HST Collected</Text>
-                    <Text style={styles.summaryValueSecondary}>-${gstCollected.toFixed(2)}</Text>
-                  </View>
-                  <View style={styles.summaryDivider} />
-                  <View style={styles.summaryRow}>
-                    <Text style={styles.summaryLabelBold}>Net Sales (before tax)</Text>
-                    <Text style={styles.summaryValueBold}>${netSales.toFixed(2)}</Text>
-                  </View>
-                </>
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryLabel}>GST/HST Collected</Text>
+                  <Text style={styles.summaryValueSecondary}>-${gstCollected.toFixed(2)}</Text>
+                </View>
+              )}
+              {tipsAmount > 0 && (
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryLabel}>Tips</Text>
+                  <Text style={styles.summaryValue}>${tipsAmount.toFixed(2)}</Text>
+                </View>
+              )}
+              {bonusesAmount > 0 && (
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryLabel}>Bonuses</Text>
+                  <Text style={styles.summaryValue}>${bonusesAmount.toFixed(2)}</Text>
+                </View>
+              )}
+              {otherIncomeAmount > 0 && (
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryLabel}>Other Income</Text>
+                  <Text style={styles.summaryValue}>${otherIncomeAmount.toFixed(2)}</Text>
+                </View>
+              )}
+              <View style={styles.summaryDivider} />
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabelBold}>Total Income</Text>
+                <Text style={styles.summaryValueBold}>${totalIncome.toFixed(2)}</Text>
+              </View>
+              {includesTax && gstCollected > 0 && (
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryLabel}>Net Sales (before tax)</Text>
+                  <Text style={styles.summaryValueSecondary}>${netSales.toFixed(2)}</Text>
+                </View>
               )}
             </View>
           )}
@@ -273,6 +358,22 @@ const styles = StyleSheet.create({
   },
   section: {
     marginBottom: 20,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: theme.colors.border,
+    marginVertical: 24,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: theme.colors.text,
+    marginBottom: 8,
+  },
+  sectionDescription: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    marginBottom: 16,
   },
   label: {
     fontSize: 16,
