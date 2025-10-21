@@ -77,11 +77,11 @@ export default function IncomeScreen() {
         </View>
         <TouchableOpacity onPress={() => handleEditIncome(item)}>
           <Text style={styles.incomeText}>
-            {dateStr} – ${grossIncome.toFixed(2)}
+            {dateStr} – Gross Sales: ${grossIncome.toFixed(2)}
           </Text>
-          {item.includes_tax && gstCollected > 0 && (
+          {gstCollected > 0 && (
             <Text style={styles.incomeSubtext}>
-              Includes ${gstCollected.toFixed(2)} GST/HST (Net: ${netIncome.toFixed(2)})
+              GST/HST: ${gstCollected.toFixed(2)} • Net: ${netIncome.toFixed(2)}
             </Text>
           )}
         </TouchableOpacity>
@@ -97,14 +97,14 @@ export default function IncomeScreen() {
         <Card style={styles.summaryCard}>
           <View style={styles.summaryRow}>
             <View style={styles.summaryItem}>
-              <Text style={styles.summaryLabel}>Gross Sales</Text>
+              <Text style={styles.summaryLabel}>Line 3A - Gross Sales</Text>
               <Text style={styles.summaryValue}>${totalGrossSales.toFixed(2)}</Text>
             </View>
             {totalGstCollected > 0 && (
               <>
                 <View style={styles.summaryDivider} />
                 <View style={styles.summaryItem}>
-                  <Text style={styles.summaryLabel}>GST/HST</Text>
+                  <Text style={styles.summaryLabel}>Line 3B - GST/HST</Text>
                   <Text style={styles.feeValue}>${totalGstCollected.toFixed(2)}</Text>
                 </View>
               </>
@@ -112,7 +112,7 @@ export default function IncomeScreen() {
           </View>
           {totalGstCollected > 0 && (
             <View style={styles.netSalesRow}>
-              <Text style={styles.netSalesLabel}>Net Sales (before tax)</Text>
+              <Text style={styles.netSalesLabel}>Line 3C - Net Sales</Text>
               <Text style={styles.netSalesValue}>${totalNetSales.toFixed(2)}</Text>
             </View>
           )}
