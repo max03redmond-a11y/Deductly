@@ -15,7 +15,6 @@ export type Profile = {
   mailing_address_line2: string | null;
   mailing_city: string | null;
   mailing_postal_code: string | null;
-  business_name: string | null;
   business_number: string | null;
   business_address_line1: string | null;
   business_address_line2: string | null;

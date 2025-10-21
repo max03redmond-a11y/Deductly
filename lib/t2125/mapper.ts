@@ -212,7 +212,7 @@ export function generateT2125Data(
   const currentYear = new Date().getFullYear();
 
   // Filter data to current year only
-  const filteredIncome = filterByPeriod(income, filter);
+  const filteredIncome = filterByPeriod(income as any[], filter);
   const filteredExpenses = filterByPeriod(expenses, filter);
   const filteredMileage = filterByPeriod(mileage, filter);
 
@@ -221,24 +221,27 @@ export function generateT2125Data(
     return 'gross_income' in item && 'gst_collected' in item;
   };
 
-  // Calculate income totals
+  // Calculate income totals (all amounts in dollars, converted to cents for storage)
   let totalGrossSales = 0;
   let gstHstCollected = 0;
-  let tipsAndBonuses = 0;
+  let totalOtherIncome = 0;
 
   filteredIncome.forEach(entry => {
     if (isIncomeEntry(entry)) {
       // New income_entries table with GST/HST tracking
       totalGrossSales += Number(entry.gross_income);
       gstHstCollected += Number(entry.gst_collected || 0);
-      tipsAndBonuses += Number(entry.tips || 0) + Number(entry.bonuses || 0);
+      totalOtherIncome += Number(entry.tips || 0) + Number(entry.bonuses || 0) + Number(entry.other_income || 0);
     } else {
       // Legacy income_records table
       totalGrossSales += Number(entry.amount);
     }
   });
 
-  const totalIncome = totalGrossSales - gstHstCollected;
+  // Line 3C: Net sales (Gross sales - GST/HST)
+  const totalNetSales = totalGrossSales - gstHstCollected;
+  // Line 8299: Gross business income (Net sales + Other income)
+  const totalGrossBusinessIncome = totalNetSales + totalOtherIncome;
 
   const expensesByLine: Partial<Record<keyof T2125Data['part4_expenses'], number>> = {};
 
@@ -308,7 +311,7 @@ export function generateT2125Data(
   const nonVehicleExpenses = Object.values(expensesByLine).reduce((sum, val) => sum + (val || 0), 0);
   const totalExpenses = nonVehicleExpenses + chartA_line16;
 
-  const netIncomeBeforeAdjustments = totalIncome - totalExpenses;
+  const netIncomeBeforeAdjustments = totalGrossBusinessIncome - totalExpenses;
 
   const expenseDetails: ExpenseDetail[] = filteredExpenses
     .filter((e) => e.category_code !== 'VEHICLE_DEPRECIATION_CCA')
@@ -390,14 +393,14 @@ export function generateT2125Data(
     part3a_businessIncome: {
       line3A_grossSales: totalGrossSales,
       line3B_gstHstCollected: gstHstCollected,
-      line3C_subtotal: totalIncome,
-      line3G_adjustedGrossSales: totalIncome,
+      line3C_subtotal: totalNetSales,
+      line3G_adjustedGrossSales: totalNetSales,
     },
     part3c_income: {
-      line8000_adjustedGrossSales: totalIncome,
+      line8000_adjustedGrossSales: totalNetSales,
       line8290_reservesDeductedLastYear: 0,
-      line8230_otherIncome: tipsAndBonuses,
-      line8299_grossBusinessIncome: totalIncome + tipsAndBonuses,
+      line8230_otherIncome: totalOtherIncome,
+      line8299_grossBusinessIncome: totalGrossBusinessIncome,
     },
     part4_expenses: {
       line8521_advertising: expensesByLine.line8521_advertising || 0,
@@ -477,7 +480,11 @@ export function generateT2125Data(
 }
 
 export function formatCurrency(amount: number): string {
-  return amount.toFixed(2);
+  return Math.round(amount).toFixed(2);
+}
+
+export function formatCurrencyToDollars(amount: number): string {
+  return Math.round(amount).toFixed(0);
 }
 
 export function formatPercent(percent: number): string {

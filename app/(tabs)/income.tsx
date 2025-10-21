@@ -50,6 +50,8 @@ export default function IncomeScreen() {
   const totalGrossSales = incomeEntries.reduce((sum, entry) => sum + Number(entry.gross_income), 0);
   const totalGstCollected = incomeEntries.reduce((sum, entry) => sum + Number(entry.gst_collected || 0), 0);
   const totalNetSales = totalGrossSales - totalGstCollected;
+  const totalOtherIncome = incomeEntries.reduce((sum, entry) => sum + Number(entry.tips || 0) + Number(entry.bonuses || 0) + Number(entry.other_income || 0), 0);
+  const totalGrossBusinessIncome = totalNetSales + totalOtherIncome;
 
   const renderIncomeEntry = ({ item }: { item: IncomeEntry }) => {
     const date = new Date(item.date);
@@ -95,27 +97,36 @@ export default function IncomeScreen() {
 
       <View style={styles.summaryContainer}>
         <Card style={styles.summaryCard}>
-          <View style={styles.summaryRow}>
-            <View style={styles.summaryItem}>
-              <Text style={styles.summaryLabel}>Gross Sales</Text>
-              <Text style={styles.summaryValue}>${totalGrossSales.toFixed(2)}</Text>
-            </View>
-            {totalGstCollected > 0 && (
-              <>
-                <View style={styles.summaryDivider} />
-                <View style={styles.summaryItem}>
-                  <Text style={styles.summaryLabel}>GST/HST</Text>
-                  <Text style={styles.feeValue}>${totalGstCollected.toFixed(2)}</Text>
-                </View>
-              </>
-            )}
+          <Text style={styles.cardTitle}>T2125 Part 3 - Income</Text>
+
+          <View style={styles.incomeLineItem}>
+            <Text style={styles.lineLabel}>3A - Gross Sales</Text>
+            <Text style={styles.lineAmount}>${totalGrossSales.toFixed(2)}</Text>
           </View>
+
           {totalGstCollected > 0 && (
-            <View style={styles.netSalesRow}>
-              <Text style={styles.netSalesLabel}>Net Sales (before tax)</Text>
-              <Text style={styles.netSalesValue}>${totalNetSales.toFixed(2)}</Text>
+            <View style={styles.incomeLineItem}>
+              <Text style={styles.lineLabel}>3B - GST/HST Collected</Text>
+              <Text style={[styles.lineAmount, { color: theme.colors.error }]}>-${totalGstCollected.toFixed(2)}</Text>
             </View>
           )}
+
+          <View style={[styles.incomeLineItem, styles.subtotalLine]}>
+            <Text style={styles.subtotalLabel}>3C - Subtotal</Text>
+            <Text style={styles.subtotalAmount}>${totalNetSales.toFixed(2)}</Text>
+          </View>
+
+          {totalOtherIncome > 0 && (
+            <View style={styles.incomeLineItem}>
+              <Text style={styles.lineLabel}>8230 - Other Income</Text>
+              <Text style={styles.lineAmount}>${totalOtherIncome.toFixed(2)}</Text>
+            </View>
+          )}
+
+          <View style={[styles.incomeLineItem, styles.totalLine]}>
+            <Text style={styles.totalLabel}>8299 - Gross Business Income</Text>
+            <Text style={styles.totalAmount}>${totalGrossBusinessIncome.toFixed(2)}</Text>
+          </View>
         </Card>
 
         <Button
@@ -129,7 +140,7 @@ export default function IncomeScreen() {
         <EmptyState
           icon={TrendingUp}
           title="No income yet"
-          description="Start tracking your income by adding your first sale"
+          message="Start tracking your income by adding your first sale"
         />
       ) : (
         <FlatList
@@ -163,8 +174,71 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   summaryCard: {
-    padding: 16,
+    padding: 20,
     marginBottom: 12,
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.text,
+    marginBottom: 16,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  incomeLineItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+  lineLabel: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    fontWeight: '500',
+  },
+  lineAmount: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.colors.text,
+  },
+  subtotalLine: {
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+    marginTop: 4,
+    paddingTop: 12,
+  },
+  subtotalLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.colors.text,
+  },
+  subtotalAmount: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: theme.colors.primary,
+  },
+  totalLine: {
+    borderTopWidth: 2,
+    borderTopColor: theme.colors.primary,
+    marginTop: 8,
+    paddingTop: 12,
+    backgroundColor: theme.colors.primaryLight,
+    marginHorizontal: -20,
+    paddingHorizontal: 20,
+    marginBottom: -20,
+    paddingBottom: 20,
+  },
+  totalLabel: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: theme.colors.text,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  totalAmount: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: theme.colors.success,
   },
   addButton: {
     width: '100%',

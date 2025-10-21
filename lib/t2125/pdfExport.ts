@@ -387,6 +387,10 @@ export function generateT2125PDF(data: T2125Data): string {
 
   <div class="section">
     <div class="section-title">PART 3 — INCOME</div>
+    <p style="margin: 10px 0; padding: 10px; background: #f9fafb; border-left: 3px solid #3b82f6; font-size: 9pt;">
+      <strong>Formula:</strong> Gross Business Income (8299) = (Gross Sales - GST/HST) + Other Income<br>
+      All amounts calculated automatically from your income entries and stored with precision.
+    </p>
     <div class="line-item header">
       <div>Line</div>
       <div>Description</div>
@@ -412,14 +416,16 @@ export function generateT2125PDF(data: T2125Data): string {
       <div>Adjusted gross sales</div>
       <div class="amount">$${formatCurrency(pdfData.part3_income.line8000_adjusted_gross_sales)}</div>
     </div>
+    ${pdfData.part3_income.line8230_other_income > 0 ? `
     <div class="line-item">
       <div class="line-number">8230</div>
       <div>Other income (tips, bonuses, referrals)</div>
       <div class="amount">$${formatCurrency(pdfData.part3_income.line8230_other_income)}</div>
     </div>
+    ` : ''}
     <div class="line-item total">
       <div class="line-number">8299</div>
-      <div>TOTAL GROSS INCOME</div>
+      <div>GROSS BUSINESS INCOME (3C + 8230)</div>
       <div class="amount">$${formatCurrency(pdfData.part3_income.line8299_total_gross_income)}</div>
     </div>
   </div>

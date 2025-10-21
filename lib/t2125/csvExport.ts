@@ -183,10 +183,19 @@ export function generateT2125CSV(data: T2125Data): string {
     amount: formatCurrency(data.part3c_income.line8000_adjustedGrossSales),
   });
 
+  if (data.part3c_income.line8230_otherIncome > 0) {
+    rows.push({
+      section: 'Part 3C',
+      lineNumber: '8230',
+      description: 'Other income (tips, bonuses, referrals)',
+      amount: formatCurrency(data.part3c_income.line8230_otherIncome),
+    });
+  }
+
   rows.push({
     section: 'Part 3C',
     lineNumber: '8299',
-    description: 'Gross business or professional income',
+    description: 'Gross business income (3C + 8230)',
     amount: formatCurrency(data.part3c_income.line8299_grossBusinessIncome),
   });
 

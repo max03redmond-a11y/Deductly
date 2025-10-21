@@ -218,14 +218,24 @@ export function generateT2125HTML(data: T2125Data): string {
 
   <div class="section">
     <h2>Part 3C - Gross Business Income</h2>
+    <p style="margin-bottom: 10px; padding: 8px; background: #f0f9ff; border-left: 3px solid #3b82f6; font-size: 11px;">
+      <strong>Formula:</strong> Gross Business Income (8299) = (Gross Sales - GST/HST) + Other Income
+    </p>
     <div class="row">
       <div class="line-number">8000</div>
       <div class="description">Adjusted gross sales</div>
       <div class="amount">$${formatCurrency(data.part3c_income.line8000_adjustedGrossSales)}</div>
     </div>
+    ${data.part3c_income.line8230_otherIncome > 0 ? `
+    <div class="row">
+      <div class="line-number">8230</div>
+      <div class="description">Other income (tips, bonuses, referrals)</div>
+      <div class="amount">$${formatCurrency(data.part3c_income.line8230_otherIncome)}</div>
+    </div>
+    ` : ''}
     <div class="row total">
       <div class="line-number">8299</div>
-      <div class="description">Gross business or professional income</div>
+      <div class="description">Gross business income (8000 + 8230)</div>
       <div class="amount">$${formatCurrency(data.part3c_income.line8299_grossBusinessIncome)}</div>
     </div>
   </div>

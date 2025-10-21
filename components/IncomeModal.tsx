@@ -318,12 +318,8 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
         </ScrollView>
 
         <View style={styles.footer}>
-          <Button variant="outline" onPress={onClose} style={styles.button}>
-            Cancel
-          </Button>
-          <Button onPress={handleSave} loading={loading} style={styles.button}>
-            {entry ? 'Update' : 'Add Income'}
-          </Button>
+          <Button title="Cancel" onPress={onClose} style={styles.button} />
+          <Button title={entry ? 'Update' : 'Add Income'} onPress={handleSave} loading={loading} style={styles.button} />
         </View>
       </View>
     </Modal>
