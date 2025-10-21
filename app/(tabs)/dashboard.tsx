@@ -233,10 +233,10 @@ export default function DashboardScreen() {
 
             <View style={styles.taxCard}>
               <View style={styles.taxCardIcon}>
-                <DollarSign size={24} color="#3B82F6" />
+                <DollarSign size={24} color="#111827" />
               </View>
               <Text style={styles.taxCardLabel}>Gross Business Income</Text>
-              <Text style={[styles.taxCardValue, { color: '#3B82F6' }]}>
+              <Text style={[styles.taxCardValue, { color: '#111827' }]}>
                 ${totalIncome.toFixed(2)}
               </Text>
               <Text style={styles.taxCardSubtext}>Line 8299</Text>
