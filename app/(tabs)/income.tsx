@@ -16,44 +16,20 @@ import { EmptyState } from '@/components/EmptyState';
 import { Button } from '@/components/Button';
 import { theme } from '@/constants/theme';
 import { IncomeModal } from '@/components/IncomeModal';
-import { IncomePart3CCard } from '@/components/IncomePart3CCard';
-import {
-  getIncomeTotalsPart3C,
-  calculateIncomeTotalsDisplay,
-  IncomeTotalsPart3C,
-  IncomeTotalsDisplay,
-} from '@/lib/calcs/income';
 
 export default function IncomeScreen() {
   const { incomeEntries, loadIncomeEntries, removeIncomeEntry, loading } = useAppStore();
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState<IncomeEntry | undefined>();
   const [refreshing, setRefreshing] = useState(false);
-  const [incomeTotals, setIncomeTotals] = useState<IncomeTotalsDisplay>({
-    line3A: 0,
-    line3B: 0,
-    line3C: 0,
-    line8230: 0,
-    line8299: 0,
-    hasWarning: false,
-    warningMessage: null,
-  });
 
   useEffect(() => {
     loadIncomeEntries();
-    loadIncomeTotals();
   }, []);
-
-  const loadIncomeTotals = async () => {
-    const totals = await getIncomeTotalsPart3C();
-    const display = calculateIncomeTotalsDisplay(totals);
-    setIncomeTotals(display);
-  };
 
   const onRefresh = async () => {
     setRefreshing(true);
     await loadIncomeEntries();
-    await loadIncomeTotals();
     setRefreshing(false);
   };
 
@@ -69,8 +45,11 @@ export default function IncomeScreen() {
 
   const handleDeleteIncome = async (id: string) => {
     await removeIncomeEntry(id);
-    await loadIncomeTotals();
   };
+
+  const totalGrossSales = incomeEntries.reduce((sum, entry) => sum + Number(entry.gross_income), 0);
+  const totalGstCollected = incomeEntries.reduce((sum, entry) => sum + Number(entry.gst_collected || 0), 0);
+  const totalNetSales = totalGrossSales - totalGstCollected;
 
   const renderIncomeEntry = ({ item }: { item: IncomeEntry }) => {
     const date = new Date(item.date);
@@ -81,11 +60,7 @@ export default function IncomeScreen() {
 
     const grossIncome = Number(item.gross_income);
     const gstCollected = Number(item.gst_collected || 0);
-    const tips = Number(item.tips || 0);
-    const bonuses = Number(item.bonuses || 0);
-    const otherIncome = Number(item.other_income || 0);
     const netIncome = grossIncome - gstCollected;
-    const totalOtherIncome = tips + bonuses + otherIncome;
 
     return (
       <View style={styles.incomeCard}>
@@ -109,11 +84,6 @@ export default function IncomeScreen() {
               Includes ${gstCollected.toFixed(2)} GST/HST (Net: ${netIncome.toFixed(2)})
             </Text>
           )}
-          {totalOtherIncome > 0 && (
-            <Text style={styles.incomeSubtext}>
-              Other income: ${totalOtherIncome.toFixed(2)}
-            </Text>
-          )}
         </TouchableOpacity>
       </View>
     );
@@ -124,15 +94,29 @@ export default function IncomeScreen() {
       <PageHeader title="Income" />
 
       <View style={styles.summaryContainer}>
-        <IncomePart3CCard
-          line3A={incomeTotals.line3A}
-          line3B={incomeTotals.line3B}
-          line3C={incomeTotals.line3C}
-          line8230={incomeTotals.line8230}
-          line8299={incomeTotals.line8299}
-          hasWarning={incomeTotals.hasWarning}
-          warningMessage={incomeTotals.warningMessage}
-        />
+        <Card style={styles.summaryCard}>
+          <View style={styles.summaryRow}>
+            <View style={styles.summaryItem}>
+              <Text style={styles.summaryLabel}>Gross Sales</Text>
+              <Text style={styles.summaryValue}>${totalGrossSales.toFixed(2)}</Text>
+            </View>
+            {totalGstCollected > 0 && (
+              <>
+                <View style={styles.summaryDivider} />
+                <View style={styles.summaryItem}>
+                  <Text style={styles.summaryLabel}>GST/HST</Text>
+                  <Text style={styles.feeValue}>${totalGstCollected.toFixed(2)}</Text>
+                </View>
+              </>
+            )}
+          </View>
+          {totalGstCollected > 0 && (
+            <View style={styles.netSalesRow}>
+              <Text style={styles.netSalesLabel}>Net Sales (before tax)</Text>
+              <Text style={styles.netSalesValue}>${totalNetSales.toFixed(2)}</Text>
+            </View>
+          )}
+        </Card>
 
         <Button
           title="Add Income"
@@ -163,7 +147,6 @@ export default function IncomeScreen() {
         onClose={() => {
           setModalVisible(false);
           setSelectedEntry(undefined);
-          loadIncomeTotals();
         }}
       />
     </View>
@@ -179,9 +162,44 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
   },
+  summaryCard: {
+    padding: 16,
+    marginBottom: 12,
+  },
   addButton: {
     width: '100%',
-    marginTop: 12,
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+  },
+  summaryItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  summaryDivider: {
+    width: 1,
+    height: 40,
+    backgroundColor: theme.colors.border,
+  },
+  summaryLabel: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    marginBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    fontWeight: '500',
+  },
+  summaryValue: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: theme.colors.success,
+  },
+  feeValue: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: theme.colors.error,
   },
   list: {
     padding: 20,
@@ -223,5 +241,26 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     padding: 4,
+  },
+  netSalesRow: {
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  netSalesLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.colors.text,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  netSalesValue: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: theme.colors.text,
   },
 });

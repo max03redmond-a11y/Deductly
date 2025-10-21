@@ -221,25 +221,24 @@ export function generateT2125Data(
     return 'gross_income' in item && 'gst_collected' in item;
   };
 
-  // Calculate income totals (Part 3C)
+  // Calculate income totals
   let totalGrossSales = 0;
   let gstHstCollected = 0;
-  let otherIncome = 0;
+  let tipsAndBonuses = 0;
 
   filteredIncome.forEach(entry => {
     if (isIncomeEntry(entry)) {
       // New income_entries table with GST/HST tracking
       totalGrossSales += Number(entry.gross_income);
       gstHstCollected += Number(entry.gst_collected || 0);
-      otherIncome += Number(entry.tips || 0) + Number(entry.bonuses || 0) + Number(entry.other_income || 0);
+      tipsAndBonuses += Number(entry.tips || 0) + Number(entry.bonuses || 0);
     } else {
       // Legacy income_records table
       totalGrossSales += Number(entry.amount);
     }
   });
 
-  const netSales = totalGrossSales - gstHstCollected;
-  const grossBusinessIncome = netSales + otherIncome;
+  const totalIncome = totalGrossSales - gstHstCollected;
 
   const expensesByLine: Partial<Record<keyof T2125Data['part4_expenses'], number>> = {};
 
@@ -309,7 +308,7 @@ export function generateT2125Data(
   const nonVehicleExpenses = Object.values(expensesByLine).reduce((sum, val) => sum + (val || 0), 0);
   const totalExpenses = nonVehicleExpenses + chartA_line16;
 
-  const netIncomeBeforeAdjustments = grossBusinessIncome - totalExpenses;
+  const netIncomeBeforeAdjustments = totalIncome - totalExpenses;
 
   const expenseDetails: ExpenseDetail[] = filteredExpenses
     .filter((e) => e.category_code !== 'VEHICLE_DEPRECIATION_CCA')
@@ -389,16 +388,16 @@ export function generateT2125Data(
       incomeFromWebPercent: 0,
     },
     part3a_businessIncome: {
-      line3A_grossSales: Math.round(totalGrossSales),
-      line3B_gstHstCollected: Math.round(gstHstCollected),
-      line3C_subtotal: Math.round(netSales),
-      line3G_adjustedGrossSales: Math.round(netSales),
+      line3A_grossSales: totalGrossSales,
+      line3B_gstHstCollected: gstHstCollected,
+      line3C_subtotal: totalIncome,
+      line3G_adjustedGrossSales: totalIncome,
     },
     part3c_income: {
-      line8000_adjustedGrossSales: Math.round(netSales),
+      line8000_adjustedGrossSales: totalIncome,
       line8290_reservesDeductedLastYear: 0,
-      line8230_otherIncome: Math.round(otherIncome),
-      line8299_grossBusinessIncome: Math.round(grossBusinessIncome),
+      line8230_otherIncome: tipsAndBonuses,
+      line8299_grossBusinessIncome: totalIncome + tipsAndBonuses,
     },
     part4_expenses: {
       line8521_advertising: expensesByLine.line8521_advertising || 0,
