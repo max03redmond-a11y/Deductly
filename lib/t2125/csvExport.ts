@@ -156,6 +156,27 @@ export function generateT2125CSV(data: T2125Data): string {
   }
 
   rows.push({
+    section: 'Part 3A',
+    lineNumber: '3A',
+    description: 'Gross sales (including GST/HST)',
+    amount: formatCurrency(data.part3a_businessIncome.line3A_grossSales),
+  });
+
+  rows.push({
+    section: 'Part 3A',
+    lineNumber: '3B',
+    description: 'GST/HST collected',
+    amount: formatCurrency(data.part3a_businessIncome.line3B_gstHstCollected),
+  });
+
+  rows.push({
+    section: 'Part 3A',
+    lineNumber: '3C',
+    description: 'Net sales (3A - 3B)',
+    amount: formatCurrency(data.part3a_businessIncome.line3C_subtotal),
+  });
+
+  rows.push({
     section: 'Part 3C',
     lineNumber: '8000',
     description: 'Adjusted gross sales or adjusted professional fees',

@@ -198,6 +198,25 @@ export function generateT2125HTML(data: T2125Data): string {
   </div>` : ''}
 
   <div class="section">
+    <h2>Part 3A - Sales of Goods and Services</h2>
+    <div class="row">
+      <div class="line-number">3A</div>
+      <div class="description">Gross sales (including GST/HST)</div>
+      <div class="amount">$${formatCurrency(data.part3a_businessIncome.line3A_grossSales)}</div>
+    </div>
+    <div class="row">
+      <div class="line-number">3B</div>
+      <div class="description">GST/HST collected</div>
+      <div class="amount">$${formatCurrency(data.part3a_businessIncome.line3B_gstHstCollected)}</div>
+    </div>
+    <div class="row">
+      <div class="line-number">3C</div>
+      <div class="description">Net sales (3A minus 3B)</div>
+      <div class="amount">$${formatCurrency(data.part3a_businessIncome.line3C_subtotal)}</div>
+    </div>
+  </div>
+
+  <div class="section">
     <h2>Part 3C - Gross Business Income</h2>
     <div class="row">
       <div class="line-number">8000</div>
