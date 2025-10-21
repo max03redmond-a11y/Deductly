@@ -62,10 +62,6 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
     }
 
     const grossSales = parseFloat(payoutAmount) || 0;
-    if (grossSales <= 0) {
-      showToast('Gross sales amount must be greater than zero', 'error');
-      return;
-    }
 
     const gstCollected = parseFloat(gstAmount) || 0;
     if (includesTax && gstCollected <= 0) {
