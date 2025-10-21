@@ -94,7 +94,9 @@ export default function DashboardScreen() {
     }, [loadData])
   );
 
-  const totalIncome = income.reduce((sum, entry) => sum + Number(entry.net_payout), 0);
+  const totalGrossSales = income.reduce((sum, entry) => sum + Number(entry.gross_income), 0);
+  const totalGstCollected = income.reduce((sum, entry) => sum + Number(entry.gst_collected || 0), 0);
+  const totalIncome = totalGrossSales - totalGstCollected;
 
   const getCategoryLabel = (categoryCode: string): string => {
     const craCategory = craCategories.find(c => c.code === categoryCode);
@@ -240,20 +242,28 @@ export default function DashboardScreen() {
               <View style={styles.taxCardIcon}>
                 <TrendingUp size={24} color="#10B981" />
               </View>
-              <Text style={styles.taxCardLabel}>Total Income</Text>
+              <Text style={styles.taxCardLabel}>Gross Sales</Text>
               <Text style={[styles.taxCardValue, { color: '#10B981' }]}>
-                ${totalIncome.toFixed(2)}
+                ${totalGrossSales.toFixed(2)}
               </Text>
+              {totalGstCollected > 0 && (
+                <Text style={styles.taxCardSubtext}>
+                  includes ${totalGstCollected.toFixed(2)} GST/HST
+                </Text>
+              )}
             </View>
 
             <View style={styles.taxCard}>
               <View style={styles.taxCardIcon}>
                 <DollarSign size={24} color="#3B82F6" />
               </View>
-              <Text style={styles.taxCardLabel}>Total Deductible</Text>
+              <Text style={styles.taxCardLabel}>Net Revenue</Text>
               <Text style={[styles.taxCardValue, { color: '#3B82F6' }]}>
-                ${totalDeductible.toFixed(2)}
+                ${totalIncome.toFixed(2)}
               </Text>
+              {totalGstCollected > 0 && (
+                <Text style={styles.taxCardSubtext}>after GST/HST</Text>
+              )}
             </View>
           </View>
 
@@ -334,11 +344,17 @@ export default function DashboardScreen() {
               <Text style={styles.sectionTitle}>REVENUE</Text>
             </View>
             <View style={styles.lineItem}>
-              <Text style={styles.lineItemLabel}>Gross Income</Text>
-              <Text style={styles.lineItemAmount}>${totalIncome.toFixed(2)}</Text>
+              <Text style={styles.lineItemLabel}>Gross Sales</Text>
+              <Text style={styles.lineItemAmount}>${totalGrossSales.toFixed(2)}</Text>
             </View>
+            {totalGstCollected > 0 && (
+              <View style={styles.lineItem}>
+                <Text style={[styles.lineItemLabel, { color: '#DC2626' }]}>Less: GST/HST Collected</Text>
+                <Text style={[styles.lineItemAmount, { color: '#DC2626' }]}>-${totalGstCollected.toFixed(2)}</Text>
+              </View>
+            )}
             <View style={[styles.lineItem, styles.totalLine]}>
-              <Text style={styles.totalLabel}>Total Revenue</Text>
+              <Text style={styles.totalLabel}>Total Revenue (Net of GST/HST)</Text>
               <Text style={styles.totalAmount}>${totalIncome.toFixed(2)}</Text>
             </View>
           </View>
