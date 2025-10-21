@@ -10,6 +10,12 @@ import { generateT2125CSV, downloadCSV } from '@/lib/t2125/csvExport';
 import { generateT2125HTML, downloadHTML } from '@/lib/t2125/htmlExport';
 import { showToast } from '@/lib/toast';
 import ExportModal from '@/components/ExportModal';
+import { IncomePart3CCard } from '@/components/IncomePart3CCard';
+import {
+  getIncomeTotalsPart3C,
+  calculateIncomeTotalsDisplay,
+  IncomeTotalsDisplay,
+} from '@/lib/calcs/income';
 
 const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000001';
 const DEFAULT_PROFILE: any = { business_name: 'Your Business', id: DEFAULT_USER_ID };
@@ -34,6 +40,15 @@ export default function DashboardScreen() {
   const [loading, setLoading] = useState(true);
   const [showExportModal, setShowExportModal] = useState(false);
   const [mileageSettings, setMileageSettings] = useState<any>(null);
+  const [incomeTotals, setIncomeTotals] = useState<IncomeTotalsDisplay>({
+    line3A: 0,
+    line3B: 0,
+    line3C: 0,
+    line8230: 0,
+    line8299: 0,
+    hasWarning: false,
+    warningMessage: null,
+  });
 
   const loadData = useCallback(async () => {
     const currentYear = new Date().getFullYear();
@@ -52,6 +67,11 @@ export default function DashboardScreen() {
     if (assetsRes.data) setAssets(assetsRes.data);
     if (categoriesRes.data) setCraCategories(categoriesRes.data);
     if (settingsRes.data) setMileageSettings(settingsRes.data);
+
+    const totals = await getIncomeTotalsPart3C();
+    const display = calculateIncomeTotalsDisplay(totals);
+    setIncomeTotals(display);
+
     setLoading(false);
   }, []);
 
@@ -94,9 +114,7 @@ export default function DashboardScreen() {
     }, [loadData])
   );
 
-  const totalGrossSales = income.reduce((sum, entry) => sum + Number(entry.gross_income), 0);
-  const totalGstCollected = income.reduce((sum, entry) => sum + Number(entry.gst_collected || 0), 0);
-  const totalIncome = totalGrossSales - totalGstCollected;
+  const totalIncome = incomeTotals.line8299;
 
   const getCategoryLabel = (categoryCode: string): string => {
     const craCategory = craCategories.find(c => c.code === categoryCode);
@@ -213,34 +231,17 @@ export default function DashboardScreen() {
         <View style={styles.analyticsSection}>
           <Text style={styles.sectionMainTitle}>Overview</Text>
 
-          <View style={styles.taxSummaryCards}>
-            <View style={styles.taxCard}>
-              <View style={styles.taxCardIcon}>
-                <TrendingUp size={24} color="#10B981" />
-              </View>
-              <Text style={styles.taxCardLabel}>Gross Sales</Text>
-              <Text style={[styles.taxCardValue, { color: '#10B981' }]}>
-                ${totalGrossSales.toFixed(2)}
-              </Text>
-              {totalGstCollected > 0 && (
-                <Text style={styles.taxCardSubtext}>
-                  includes ${totalGstCollected.toFixed(2)} GST/HST
-                </Text>
-              )}
-            </View>
-
-            <View style={styles.taxCard}>
-              <View style={styles.taxCardIcon}>
-                <DollarSign size={24} color="#3B82F6" />
-              </View>
-              <Text style={styles.taxCardLabel}>Net Revenue</Text>
-              <Text style={[styles.taxCardValue, { color: '#3B82F6' }]}>
-                ${totalIncome.toFixed(2)}
-              </Text>
-              {totalGstCollected > 0 && (
-                <Text style={styles.taxCardSubtext}>after GST/HST</Text>
-              )}
-            </View>
+          <View style={styles.incomeSection}>
+            <IncomePart3CCard
+              line3A={incomeTotals.line3A}
+              line3B={incomeTotals.line3B}
+              line3C={incomeTotals.line3C}
+              line8230={incomeTotals.line8230}
+              line8299={incomeTotals.line8299}
+              hasWarning={incomeTotals.hasWarning}
+              warningMessage={incomeTotals.warningMessage}
+              readOnly={true}
+            />
           </View>
 
           <View style={styles.taxSummaryCards}>
@@ -532,6 +533,9 @@ const styles = StyleSheet.create({
   },
   analyticsSection: {
     marginBottom: 20,
+  },
+  incomeSection: {
+    marginBottom: 16,
   },
   sectionMainTitle: {
     fontSize: 20,
