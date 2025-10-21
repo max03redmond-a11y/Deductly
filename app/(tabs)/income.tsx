@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
   totalAmount: {
     fontSize: 17,
     fontWeight: '700',
-    color: theme.colors.success,
+    color: theme.colors.text,
   },
   addButton: {
     width: '100%',
