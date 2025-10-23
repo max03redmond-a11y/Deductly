@@ -40,6 +40,10 @@ export default function ExpensesScreen() {
   const [salePrice, setSalePrice] = useState('');
   const [yearPurchased, setYearPurchased] = useState(new Date().getFullYear().toString());
   const [showTooltip, setShowTooltip] = useState<string | null>(null);
+  const [ccaResults, setCcaResults] = useState<{
+    ccaDeduction: number;
+    remainingUCC: number;
+  } | null>(null);
 
   const loadExpenses = useCallback(async () => {
     const currentYear = new Date().getFullYear();
@@ -122,6 +126,32 @@ export default function ExpensesScreen() {
     acc[category] += expense.amount * (expense.business_percentage / 100);
     return acc;
   }, {} as Record<string, number>);
+
+  const calculateCCA = () => {
+    const purchasePriceNum = parseFloat(purchasePrice) || 0;
+    const businessUseNum = parseFloat(ccaBusinessUse) || 0;
+    const openingUCCNum = parseFloat(openingUCC) || 0;
+    const salePriceNum = parseFloat(salePrice) || 0;
+    const ccaRate = getCCARate(vehicleClass) / 100;
+
+    if (purchasePriceNum <= 0 || businessUseNum <= 0) {
+      if (Platform.OS === 'web') {
+        alert('Please enter valid Purchase Price and Business Use %');
+      } else {
+        Alert.alert('Invalid Input', 'Please enter valid Purchase Price and Business Use %');
+      }
+      return;
+    }
+
+    const baseAmount = (purchasePriceNum * (businessUseNum / 100)) / 2;
+    const ccaDeduction = baseAmount * ccaRate;
+    const remainingUCC = openingUCCNum + baseAmount - ccaDeduction - salePriceNum;
+
+    setCcaResults({
+      ccaDeduction,
+      remainingUCC: Math.max(0, remainingUCC),
+    });
+  };
 
   return (
     <View style={styles.container}>
@@ -382,6 +412,32 @@ export default function ExpensesScreen() {
                 placeholderTextColor="#9CA3AF"
               />
             </View>
+
+            <TouchableOpacity style={styles.calculateButton} onPress={calculateCCA}>
+              <Text style={styles.calculateButtonText}>Calculate CCA</Text>
+            </TouchableOpacity>
+
+            {ccaResults && (
+              <View style={styles.resultsContainer}>
+                <Text style={styles.resultsTitle}>CCA Calculation Results</Text>
+
+                <View style={styles.resultRow}>
+                  <Text style={styles.resultLabel}>CCA Deduction for this Year:</Text>
+                  <Text style={styles.resultValue}>${ccaResults.ccaDeduction.toFixed(2)}</Text>
+                </View>
+
+                <View style={[styles.resultRow, styles.resultRowLast]}>
+                  <Text style={styles.resultLabel}>Remaining UCC Balance:</Text>
+                  <Text style={styles.resultValueSecondary}>
+                    ${ccaResults.remainingUCC.toFixed(2)}
+                  </Text>
+                </View>
+
+                <Text style={styles.resultsNote}>
+                  (carry forward to next year)
+                </Text>
+              </View>
+            )}
           </View>
         </ScrollView>
       )}
@@ -870,5 +926,72 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: 'Montserrat-Bold',
     color: '#FFFFFF',
+  },
+  calculateButton: {
+    backgroundColor: '#059669',
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 8,
+    marginBottom: 24,
+    shadowColor: '#059669',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  calculateButtonText: {
+    fontSize: 16,
+    fontFamily: 'Montserrat-Bold',
+    color: '#FFFFFF',
+  },
+  resultsContainer: {
+    backgroundColor: '#F0FDF4',
+    borderRadius: 12,
+    padding: 20,
+    borderWidth: 2,
+    borderColor: '#BBF7D0',
+  },
+  resultsTitle: {
+    fontSize: 16,
+    fontFamily: 'Montserrat-Bold',
+    color: '#059669',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  resultRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#BBF7D0',
+  },
+  resultRowLast: {
+    borderBottomWidth: 0,
+  },
+  resultLabel: {
+    fontSize: 14,
+    fontFamily: 'Montserrat-SemiBold',
+    color: '#374151',
+    flex: 1,
+  },
+  resultValue: {
+    fontSize: 18,
+    fontFamily: 'Montserrat-Bold',
+    color: '#059669',
+  },
+  resultValueSecondary: {
+    fontSize: 16,
+    fontFamily: 'Montserrat-Bold',
+    color: '#6B7280',
+  },
+  resultsNote: {
+    fontSize: 12,
+    fontFamily: 'Montserrat-Medium',
+    color: '#6B7280',
+    textAlign: 'center',
+    marginTop: 8,
+    fontStyle: 'italic',
   },
 });
