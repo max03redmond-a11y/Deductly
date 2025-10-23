@@ -89,10 +89,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
     });
+
+    if (error) {
+      return { error };
+    }
+
+    if (data.user) {
+      try {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: data.user.id,
+            email: data.user.email!,
+            province: 'ON',
+            business_type: 'Rideshare Driver',
+            profile_completed: false,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          });
+
+        if (profileError && profileError.code !== '23505') {
+          console.error('Profile creation error:', profileError);
+        }
+      } catch (err) {
+        console.error('Profile creation failed:', err);
+      }
+    }
+
     return { error };
   };
 
