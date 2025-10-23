@@ -26,6 +26,7 @@ export default function MileageScreen() {
 
   const [logs, setLogs] = useState<MileageLog[]>([]);
   const [loading, setLoading] = useState(true);
+  const [adding, setAdding] = useState(false);
 
   const [yearStartOdo, setYearStartOdo] = useState('');
   const [yearEndOdo, setYearEndOdo] = useState('');
@@ -71,16 +72,20 @@ export default function MileageScreen() {
     }
 
     setLoading(false);
-  }, [currentYear]);
+  }, [currentYear, user]);
 
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    if (user) {
+      loadData();
+    }
+  }, [loadData, user]);
 
   useFocusEffect(
     useCallback(() => {
-      loadData();
-    }, [loadData])
+      if (user) {
+        loadData();
+      }
+    }, [loadData, user])
   );
 
   const businessKmYTD = logs
@@ -129,6 +134,7 @@ export default function MileageScreen() {
   };
 
   const handleAddTrip = async () => {
+    if (adding) return;
 
     let distanceNum: number;
     let startOdoNum = 0;
@@ -168,7 +174,10 @@ export default function MileageScreen() {
       return;
     }
 
-    const { error } = await supabase
+    setAdding(true);
+    console.log('Adding trip with user ID:', user.id);
+
+    const { data, error } = await supabase
       .from('mileage_logs')
       .insert([{
         user_id: user.id,
@@ -179,19 +188,24 @@ export default function MileageScreen() {
         business_km: isBusiness ? distanceNum : 0,
         purpose: purpose || null,
         is_business: isBusiness,
-      }]);
+      }])
+      .select();
 
     if (error) {
-      Alert.alert('Error', 'Failed to add trip');
-      console.error(error);
+      console.error('Failed to add trip:', error);
+      Alert.alert('Error', error.message || 'Failed to add trip');
+      setAdding(false);
       return;
     }
+
+    console.log('Trip added successfully:', data);
 
     setStartOdo('');
     setEndOdo('');
     setDistance('');
     setPurpose('');
     setIsBusiness(true);
+    setAdding(false);
     showToast('Trip added');
     loadData();
   };

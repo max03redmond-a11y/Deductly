@@ -95,22 +95,24 @@ export default function ExpensesScreen() {
     }
 
     setLoading(false);
-  }, []);
+  }, [user]);
 
   useEffect(() => {
-    loadExpenses();
+    if (user) {
+      loadExpenses();
 
-    const channel = supabase
-      .channel('expenses-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'expenses' }, () => {
-        loadExpenses();
-      })
-      .subscribe();
+      const channel = supabase
+        .channel('expenses-changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'expenses' }, () => {
+          loadExpenses();
+        })
+        .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [loadExpenses]);
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [loadExpenses, user]);
 
   useFocusEffect(
     useCallback(() => {
