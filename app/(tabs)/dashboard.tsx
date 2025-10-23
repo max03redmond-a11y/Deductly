@@ -424,9 +424,9 @@ export default function DashboardScreen() {
               </View>
             )}
 
-            <View style={[styles.lineItem, styles.subtotalLine]}>
-              <Text style={styles.subtotalLabel}>Operating Expenses Subtotal</Text>
-              <Text style={styles.subtotalAmount}>
+            <View style={[styles.lineItem, styles.deductibleLine]}>
+              <Text style={styles.deductibleLineLabel}>Operating Expenses Subtotal</Text>
+              <Text style={styles.deductibleLineAmount}>
                 ${totalOperatingExpenses.toFixed(2)}
               </Text>
             </View>
