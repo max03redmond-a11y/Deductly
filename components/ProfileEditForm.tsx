@@ -10,7 +10,7 @@ import {
   Platform,
   Alert,
 } from 'react-native';
-import { Eye, EyeOff, Check, AlertCircle, Info } from 'lucide-react-native';
+import { Check, AlertCircle, Info } from 'lucide-react-native';
 import { Profile, CANADIAN_PROVINCES } from '@/types/database';
 import { supabase } from '@/lib/supabase';
 import { theme } from '@/constants/theme';
@@ -22,10 +22,8 @@ interface ProfileEditFormProps {
 
 export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
   const [loading, setLoading] = useState(false);
-  const [showSIN, setShowSIN] = useState(false);
 
   const [legalName, setLegalName] = useState(profile.legal_name || '');
-  const [sin, setSin] = useState('');
   const [addressLine1, setAddressLine1] = useState(profile.mailing_address_line1 || '');
   const [addressLine2, setAddressLine2] = useState(profile.mailing_address_line2 || '');
   const [city, setCity] = useState(profile.mailing_city || '');
@@ -50,7 +48,6 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
   const calculateCompleteness = (): number => {
     const fields = [
       legalName,
-      sin,
       businessAddressLine1,
       businessCity,
       businessProvince,
@@ -62,22 +59,16 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
       fiscalYearEnd,
     ];
 
-    const filledFields = fields.filter((f) => f && f.trim().length > 0).length;
+    const filledFields = fields.filter((f) => f && f.toString().trim().length > 0).length;
     return Math.round((filledFields / fields.length) * 100);
   };
 
   const completeness = calculateCompleteness();
 
   const handleSave = async () => {
-    if (!legalName || !sin) {
-      const msg = 'Please fill in your legal name and SIN';
+    if (!legalName) {
+      const msg = 'Please fill in your legal name';
       Platform.OS === 'web' ? alert(msg) : Alert.alert('Required Fields', msg);
-      return;
-    }
-
-    if (sin.replace(/\D/g, '').length !== 9) {
-      const msg = 'SIN must be 9 digits';
-      Platform.OS === 'web' ? alert(msg) : Alert.alert('Invalid SIN', msg);
       return;
     }
 
@@ -97,7 +88,6 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
 
     const updates: Partial<Profile> = {
       legal_name: legalName,
-      sin_encrypted: sin,
       business_name: businessName || null,
       business_address_line1: businessAddressLine1,
       business_address_line2: businessAddressLine2 || null,
@@ -110,6 +100,10 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
       accounting_method: accountingMethod,
       fiscal_year_start: fiscalYearStart,
       fiscal_year_end_date: fiscalYearEnd,
+      mailing_address_line1: addressLine1 || null,
+      mailing_address_line2: addressLine2 || null,
+      mailing_city: city || null,
+      mailing_postal_code: postalCode || null,
       profile_completed: completeness === 100,
       profile_completed_at: completeness === 100 ? new Date().toISOString() : null,
       updated_at: new Date().toISOString(),
@@ -127,13 +121,6 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
       Platform.OS === 'web' ? alert(msg) : Alert.alert('Success', msg);
       onSuccess();
     }
-  };
-
-  const formatSIN = (value: string) => {
-    const digits = value.replace(/\D/g, '').slice(0, 9);
-    if (digits.length <= 3) return digits;
-    if (digits.length <= 6) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
-    return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
   };
 
   const formatPostalCode = (value: string) => {
@@ -175,34 +162,6 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
             placeholderTextColor="#9CA3AF"
             editable={!loading}
           />
-        </View>
-
-        <View style={styles.field}>
-          <Text style={styles.label}>Social Insurance Number (SIN)</Text>
-          <View style={styles.sinInputContainer}>
-            <TextInput
-              style={[styles.input, styles.sinInput]}
-              value={showSIN ? formatSIN(sin) : sin ? '•••-•••-•••' : ''}
-              onChangeText={(text) => setSin(text.replace(/\D/g, ''))}
-              placeholder="123-456-789"
-              placeholderTextColor="#9CA3AF"
-              keyboardType="number-pad"
-              maxLength={11}
-              editable={!loading && showSIN}
-              secureTextEntry={!showSIN}
-            />
-            <TouchableOpacity
-              style={styles.sinToggle}
-              onPress={() => setShowSIN(!showSIN)}
-            >
-              {showSIN ? (
-                <EyeOff size={20} color="#6B7280" />
-              ) : (
-                <Eye size={20} color="#6B7280" />
-              )}
-            </TouchableOpacity>
-          </View>
-          <Text style={styles.hint}>Encrypted and stored securely</Text>
         </View>
       </View>
 
@@ -525,20 +484,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#9CA3AF',
     marginTop: 6,
-  },
-  sinInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    position: 'relative',
-  },
-  sinInput: {
-    flex: 1,
-    paddingRight: 50,
-  },
-  sinToggle: {
-    position: 'absolute',
-    right: 14,
-    padding: 4,
   },
   radioGroup: {
     flexDirection: 'row',
