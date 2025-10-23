@@ -98,26 +98,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { error };
     }
 
+    // The database trigger should create the profile automatically
+    // We just wait a moment for it to complete
     if (data.user) {
-      try {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            id: data.user.id,
-            email: data.user.email!,
-            province: 'ON',
-            business_type: 'Rideshare Driver',
-            profile_completed: false,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          });
-
-        if (profileError && profileError.code !== '23505') {
-          console.error('Profile creation error:', profileError);
-        }
-      } catch (err) {
-        console.error('Profile creation failed:', err);
-      }
+      await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
     return { error };
