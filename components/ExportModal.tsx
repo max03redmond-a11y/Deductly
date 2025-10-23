@@ -91,6 +91,8 @@ export default function ExportModal({ visible, onClose }: ExportModalProps) {
         name: t2125Data.identification.yourName,
         totalIncome: t2125Data.part3c_income.line8299_grossBusinessIncome,
         totalExpenses: t2125Data.part4_expenses.line9368_totalExpenses,
+        ccaDeduction: t2125Data.part4_expenses.line9936_cca,
+        assetsCount: assets.length,
       });
 
       const filename = `T2125_${currentYear}_${lastName}`;
