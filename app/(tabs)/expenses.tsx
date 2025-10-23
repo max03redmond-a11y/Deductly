@@ -16,6 +16,7 @@ export default function ExpensesScreen() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [mileageLogs, setMileageLogs] = useState<MileageLog[]>([]);
   const [businessUsePercent, setBusinessUsePercent] = useState(0);
+  const [activeTab, setActiveTab] = useState<'expenses' | 'depreciation'>('expenses');
 
   const loadExpenses = useCallback(async () => {
     const currentYear = new Date().getFullYear();
@@ -105,22 +106,45 @@ export default function ExpensesScreen() {
         title="Expenses"
         subtitle={`$${totalDeductible.toFixed(2)} deductible • ${expenses.length} tracked`}
         rightAction={
-          <TouchableOpacity onPress={() => setShowAddModal(true)} style={styles.addButton}>
-            <Plus size={22} color="#059669" strokeWidth={2.5} />
-          </TouchableOpacity>
+          activeTab === 'expenses' ? (
+            <TouchableOpacity onPress={() => setShowAddModal(true)} style={styles.addButton}>
+              <Plus size={22} color="#059669" strokeWidth={2.5} />
+            </TouchableOpacity>
+          ) : null
         }
       />
 
-      {businessUsePercent > 0 && (
-        <View style={styles.businessUseBanner}>
-          <Car size={18} color="#1E40AF" />
-          <Text style={styles.businessUseBannerText}>
-            Business-use % applied: <Text style={styles.businessUseBannerValue}>{businessUsePercent.toFixed(1)}%</Text>
+      <View style={styles.tabContainer}>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'expenses' && styles.tabActive]}
+          onPress={() => setActiveTab('expenses')}
+        >
+          <Text style={[styles.tabText, activeTab === 'expenses' && styles.tabTextActive]}>
+            Vehicle & Operating Expenses
           </Text>
-        </View>
-      )}
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'depreciation' && styles.tabActive]}
+          onPress={() => setActiveTab('depreciation')}
+        >
+          <Text style={[styles.tabText, activeTab === 'depreciation' && styles.tabTextActive]}>
+            Vehicle Depreciation (CCA)
+          </Text>
+        </TouchableOpacity>
+      </View>
 
-      <ScrollView style={styles.content} contentContainerStyle={styles.scrollContent}>
+      {activeTab === 'expenses' ? (
+        <>
+          {businessUsePercent > 0 && (
+            <View style={styles.businessUseBanner}>
+              <Car size={18} color="#1E40AF" />
+              <Text style={styles.businessUseBannerText}>
+                Business-use % applied: <Text style={styles.businessUseBannerValue}>{businessUsePercent.toFixed(1)}%</Text>
+              </Text>
+            </View>
+          )}
+
+          <ScrollView style={styles.content} contentContainerStyle={styles.scrollContent}>
         {expenses.length === 0 ? (
           <EmptyState
             icon={Receipt}
@@ -170,16 +194,26 @@ export default function ExpensesScreen() {
             </View>
           </>
         )}
-      </ScrollView>
+          </ScrollView>
 
-      <EnhancedExpenseModal
-        visible={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        onSuccess={() => {
-          setShowAddModal(false);
-          loadExpenses();
-        }}
-      />
+          <EnhancedExpenseModal
+            visible={showAddModal}
+            onClose={() => setShowAddModal(false)}
+            onSuccess={() => {
+              setShowAddModal(false);
+              loadExpenses();
+            }}
+          />
+        </>
+      ) : (
+        <ScrollView style={styles.content} contentContainerStyle={styles.scrollContent}>
+          <EmptyState
+            icon={Car}
+            title="Vehicle Depreciation (CCA)"
+            message="This section will be available soon for tracking vehicle depreciation and Capital Cost Allowance."
+          />
+        </ScrollView>
+      )}
     </View>
   );
 }
@@ -293,6 +327,41 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F9FAFB',
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 20,
+    marginTop: 12,
+    marginBottom: 8,
+    borderRadius: 12,
+    padding: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 1,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tabActive: {
+    backgroundColor: '#D1FAE5',
+  },
+  tabText: {
+    fontSize: 13,
+    fontFamily: 'Montserrat-SemiBold',
+    color: '#6B7280',
+    textAlign: 'center',
+  },
+  tabTextActive: {
+    color: '#059669',
+    fontFamily: 'Montserrat-Bold',
   },
   businessUseBanner: {
     backgroundColor: '#EFF6FF',
