@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import { X, Check } from 'lucide-react-native';
 import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/contexts/AuthContext';
 import { CRACategory } from '@/types/database';
 import { CategorySelector } from './CategorySelector';
 import { useCRACategories } from '@/hooks/useCRACategories';
@@ -24,8 +25,6 @@ interface EnhancedExpenseModalProps {
   onClose: () => void;
   onSuccess: () => void;
 }
-
-const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000001';
 
 const VEHICLE_EXPENSE_CODES = [
   'GAS_FUEL',
@@ -42,6 +41,7 @@ export function EnhancedExpenseModal({
   onClose,
   onSuccess,
 }: EnhancedExpenseModalProps) {
+  const { user } = useAuth();
   const { categories, loading: categoriesLoading, getVehicleCategories } = useCRACategories();
 
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -128,11 +128,22 @@ export function EnhancedExpenseModal({
 
     setLoading(true);
 
+    if (!user) {
+      const message = 'You must be logged in';
+      if (Platform.OS === 'web') {
+        alert(message);
+      } else {
+        Alert.alert('Error', message);
+      }
+      setLoading(false);
+      return;
+    }
+
     const totalAmount = calculateTotalAmount();
     const deductibleAmount = calculateDeductibleAmount();
 
     const { error } = await supabase.from('expenses').insert({
-      user_id: DEFAULT_USER_ID,
+      user_id: user.id,
       date,
       vendor,
       merchant_name: vendor,

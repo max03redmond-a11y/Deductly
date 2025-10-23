@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, Platform, TextInput, Modal, Switch } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/contexts/AuthContext';
 import { Plus, Receipt, Trash2, Car, Info } from 'lucide-react-native';
 import { Expense, EXPENSE_CATEGORIES, MileageLog } from '@/types/database';
 import { EnhancedExpenseModal } from '@/components/EnhancedExpenseModal';
@@ -9,8 +10,6 @@ import { PageHeader } from '@/components/PageHeader';
 import { EmptyState } from '@/components/EmptyState';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { formatCategoryLabel } from '@/lib/formatters';
-
-const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000001';
 
 const TOOLTIPS = {
   vehicleClass: 'The CRA uses vehicle classes to determine how much of your car\'s value you can depreciate each year for tax purposes.\n\n• Class 10: Vehicles costing $30,000 or less (before tax)\n• Class 10.1: Vehicles costing over $30,000 (before tax, capped at $30,000 for CCA)\n• Class 54: Zero-emission or electric vehicles, which may qualify for a 100% first-year write-off under special CRA rules\n\nMost Uber drivers fall under Class 10 or 10.1, while EV drivers may use Class 54. All standard vehicles depreciate at 30% per year using the declining balance method.',
@@ -28,6 +27,7 @@ const getCCARate = (vehicleClass: '10' | '10.1' | '54'): number => {
 };
 
 export default function ExpensesScreen() {
+  const { user } = useAuth();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -48,24 +48,26 @@ export default function ExpensesScreen() {
   } | null>(null);
 
   const loadExpenses = useCallback(async () => {
+    if (!user) return;
+
     const currentYear = new Date().getFullYear();
 
     const [expensesRes, mileageRes, mileageSettingsRes] = await Promise.all([
       supabase
         .from('expenses')
         .select('*')
-        .eq('user_id', DEFAULT_USER_ID)
+        .eq('user_id', user.id)
         .order('date', { ascending: false }),
       supabase
         .from('mileage_logs')
         .select('*')
-        .eq('user_id', DEFAULT_USER_ID)
+        .eq('user_id', user.id)
         .gte('date', `${currentYear}-01-01`)
         .lte('date', `${currentYear}-12-31`),
       supabase
         .from('mileage_settings')
         .select('jan1_odometer_km, current_odometer_km')
-        .eq('user_id', DEFAULT_USER_ID)
+        .eq('user_id', user.id)
         .eq('year', currentYear)
         .maybeSingle(),
     ]);

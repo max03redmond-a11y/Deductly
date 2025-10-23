@@ -16,6 +16,7 @@ import { generateT2125PDF, exportT2125AsPDF } from '@/lib/t2125/pdfExport';
 import { generateT2125CSV, downloadCSV } from '@/lib/t2125/csvExport';
 import { downloadHTML } from '@/lib/t2125/htmlExport';
 import { useAppStore } from '@/store/useAppStore';
+import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { showToast } from '@/lib/toast';
 import { Expense, IncomeRecord, IncomeEntry, MileageLog, Asset } from '@/types/database';
@@ -29,29 +30,34 @@ interface ExportModalProps {
 type ExportFormat = 'pdf' | 'csv' | 'html';
 
 export default function ExportModal({ visible, onClose }: ExportModalProps) {
+  const { user } = useAuth();
   const [exporting, setExporting] = useState(false);
   const [selectedFormat, setSelectedFormat] = useState<ExportFormat>('pdf');
 
   const profile = useAppStore((state) => state.profile);
 
-  const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000001';
   const currentYear = new Date().getFullYear();
   const lastName = profile?.full_name?.split(' ').pop()?.toLowerCase() || 'export';
 
   const handleExport = async () => {
     if (exporting) return;
 
+    if (!user) {
+      showToast('You must be logged in', 'error');
+      return;
+    }
+
     setExporting(true);
 
     try {
       // Fetch all data from Supabase
       const [expensesRes, incomeEntriesRes, mileageRes, assetsRes, profileRes, settingsRes] = await Promise.all([
-        supabase.from('expenses').select('*').eq('user_id', DEFAULT_USER_ID),
-        supabase.from('income_entries').select('*').eq('user_id', DEFAULT_USER_ID),
-        supabase.from('mileage_logs').select('*').eq('user_id', DEFAULT_USER_ID),
-        supabase.from('assets').select('*').eq('user_id', DEFAULT_USER_ID),
-        supabase.from('profiles').select('*').eq('id', DEFAULT_USER_ID).maybeSingle(),
-        supabase.from('mileage_settings').select('*').eq('user_id', DEFAULT_USER_ID).eq('year', currentYear).maybeSingle(),
+        supabase.from('expenses').select('*').eq('user_id', user.id),
+        supabase.from('income_entries').select('*').eq('user_id', user.id),
+        supabase.from('mileage_logs').select('*').eq('user_id', user.id),
+        supabase.from('assets').select('*').eq('user_id', user.id),
+        supabase.from('profiles').select('*').eq('id', user.id).maybeSingle(),
+        supabase.from('mileage_settings').select('*').eq('user_id', user.id).eq('year', currentYear).maybeSingle(),
       ]);
 
       if (expensesRes.error) {

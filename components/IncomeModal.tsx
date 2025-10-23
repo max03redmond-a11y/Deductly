@@ -12,6 +12,7 @@ import {
 import { X } from 'lucide-react-native';
 import { supabase } from '@/lib/supabase';
 import { useAppStore } from '@/store/useAppStore';
+import { useAuth } from '@/contexts/AuthContext';
 import { IncomeEntry } from '@/types/database';
 import { Button } from './Button';
 import { theme } from '@/constants/theme';
@@ -22,9 +23,8 @@ interface IncomeModalProps {
   onClose: () => void;
 }
 
-const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000001';
-
 export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
+  const { user } = useAuth();
   const { addIncomeEntry, loadIncomeEntries, showToast } = useAppStore();
   const [loading, setLoading] = useState(false);
 
@@ -65,6 +65,11 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
   };
 
   const handleSave = async () => {
+    if (!user) {
+      showToast('You must be logged in', 'error');
+      return;
+    }
+
     if (!date || !payoutAmount) {
       showToast('Please fill in date and gross sales amount', 'error');
       return;
@@ -86,7 +91,7 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
 
     try {
       const incomeData = {
-        user_id: DEFAULT_USER_ID,
+        user_id: user.id,
         date,
         platform: 'Income',
         gross_income: grossSales,
@@ -104,7 +109,7 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
           .from('income_entries')
           .update(incomeData)
           .eq('id', entry.id)
-          .eq('user_id', DEFAULT_USER_ID);
+          .eq('user_id', user.id);
 
         if (error) throw error;
         showToast('Income entry updated', 'success');
