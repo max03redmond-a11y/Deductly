@@ -1,18 +1,34 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, Platform } from 'react-native';
 import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { CANADIAN_PROVINCES, BUSINESS_TYPES } from '@/types/database';
-
-const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000001';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function ProfileSetupScreen() {
+  const { user } = useAuth();
   const [province, setProvince] = useState('');
   const [businessType, setBusinessType] = useState('');
   const [gstHstRegistered, setGstHstRegistered] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (!user) {
+      router.replace('/auth/sign-in');
+    }
+  }, [user]);
+
   const handleComplete = async () => {
+    if (!user) {
+      if (Platform.OS === 'web') {
+        alert('You must be logged in to complete setup');
+      } else {
+        Alert.alert('Error', 'You must be logged in to complete setup');
+      }
+      router.replace('/auth/sign-in');
+      return;
+    }
+
     if (!province || !businessType) {
       if (Platform.OS === 'web') {
         alert('Please select both province and business type');
@@ -24,13 +40,15 @@ export default function ProfileSetupScreen() {
 
     setLoading(true);
 
-    const { error } = await supabase.from('profiles').insert({
-      id: DEFAULT_USER_ID,
-      email: 'driver@example.com',
-      province,
-      business_type: businessType,
-      gst_hst_registered: gstHstRegistered,
-    });
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        province,
+        business_type: businessType,
+        gst_hst_registered: gstHstRegistered,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', user.id);
 
     if (error) {
       if (Platform.OS === 'web') {
