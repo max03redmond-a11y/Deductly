@@ -1,34 +1,111 @@
 import { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
-import { User, Shield, Building2, ChevronRight, Edit3, FileText } from 'lucide-react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, Platform } from 'react-native';
+import { User, Shield, Building2, ChevronRight, Edit3, FileText, LogOut, Trash2 } from 'lucide-react-native';
+import { useAuth } from '@/contexts/AuthContext';
 import { CANADIAN_PROVINCES, BUSINESS_TYPES } from '@/types/database';
 import { theme } from '@/constants/theme';
 import { Card } from '@/components/Card';
 import { ProfileEditForm } from '@/components/ProfileEditForm';
-
-const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000001';
-const DEFAULT_PROFILE: any = {
-  id: DEFAULT_USER_ID,
-  email: 'driver@example.com',
-  full_name: 'Driver',
-  province: 'ON',
-  business_type: 'rideshare',
-  gst_hst_registered: false,
-  profile_completed: true,
-};
+import { supabase } from '@/lib/supabase';
+import { showToast } from '@/lib/toast';
+import { router } from 'expo-router';
 
 export default function ProfileScreen() {
-  const profile = DEFAULT_PROFILE;
+  const { user, profile, signOut, refreshProfile } = useAuth();
   const [editMode, setEditMode] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const provinceName = CANADIAN_PROVINCES.find(p => p.value === profile?.province)?.label;
   const businessTypeName = BUSINESS_TYPES.find(b => b.value === profile?.business_type)?.label;
 
   const handleEditSuccess = async () => {
+    await refreshProfile();
     setEditMode(false);
   };
 
-  if (editMode && profile) {
+  const handleLogout = async () => {
+    if (Platform.OS === 'web') {
+      if (confirm('Are you sure you want to logout?')) {
+        await signOut();
+      }
+    } else {
+      Alert.alert(
+        'Logout',
+        'Are you sure you want to logout?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Logout',
+            style: 'destructive',
+            onPress: () => signOut(),
+          },
+        ]
+      );
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    const confirmMessage = 'This will permanently delete your account and all your data. This action cannot be undone.';
+
+    if (Platform.OS === 'web') {
+      if (confirm(confirmMessage)) {
+        await performAccountDeletion();
+      }
+    } else {
+      Alert.alert(
+        'Delete Account',
+        confirmMessage,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Delete',
+            style: 'destructive',
+            onPress: () => performAccountDeletion(),
+          },
+        ]
+      );
+    }
+  };
+
+  const performAccountDeletion = async () => {
+    if (!user) return;
+
+    setDeleting(true);
+    try {
+      await supabase.from('expenses').delete().eq('user_id', user.id);
+      await supabase.from('income_entries').delete().eq('user_id', user.id);
+      await supabase.from('mileage_logs').delete().eq('user_id', user.id);
+      await supabase.from('mileage_settings').delete().eq('user_id', user.id);
+      await supabase.from('mileage_year').delete().eq('user_id', user.id);
+      await supabase.from('profiles').delete().eq('id', user.id);
+
+      const { error } = await supabase.auth.admin.deleteUser(user.id);
+
+      if (error) {
+        console.log('Note: Could not delete auth user (admin access required)');
+      }
+
+      await signOut();
+      showToast('Account deleted successfully', 'success');
+    } catch (error: any) {
+      console.error('Delete account error:', error);
+      showToast('Failed to delete account: ' + error.message, 'error');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  if (!profile) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Loading profile...</Text>
+        </View>
+      </View>
+    );
+  }
+
+  if (editMode) {
     return (
       <View style={styles.container}>
         <View style={styles.editHeader}>
@@ -46,16 +123,14 @@ export default function ProfileScreen() {
   return (
     <View style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Profile Header */}
         <View style={styles.profileHeader}>
           <View style={styles.avatarContainer}>
             <User size={48} color={theme.colors.primary} />
           </View>
-          <Text style={styles.userName}>{profile.full_name}</Text>
+          <Text style={styles.userName}>{profile.full_name || 'User'}</Text>
           <Text style={styles.userEmail}>{profile.email}</Text>
         </View>
 
-        {/* Profile Completeness Banner */}
         {profile && !profile.profile_completed && (
           <View style={styles.section}>
             <Card style={styles.completenessCard}>
@@ -76,7 +151,6 @@ export default function ProfileScreen() {
           </View>
         )}
 
-        {/* Account Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Account</Text>
 
@@ -91,11 +165,11 @@ export default function ProfileScreen() {
 
             <View style={styles.menuDivider} />
 
-            <TouchableOpacity style={styles.menuItem}>
+            <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
               <View style={styles.menuIconContainer}>
-                <Shield size={20} color={theme.colors.icon} />
+                <LogOut size={20} color={theme.colors.icon} />
               </View>
-              <Text style={styles.menuLabel}>Account Security</Text>
+              <Text style={styles.menuLabel}>Logout</Text>
               <ChevronRight size={20} color={theme.colors.iconInactive} />
             </TouchableOpacity>
 
@@ -114,7 +188,6 @@ export default function ProfileScreen() {
           </Card>
         </View>
 
-        {/* Business Details */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Business Details</Text>
 
@@ -142,6 +215,26 @@ export default function ProfileScreen() {
           </Card>
         </View>
 
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Danger Zone</Text>
+
+          <Card style={styles.menuCard}>
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={handleDeleteAccount}
+              disabled={deleting}
+            >
+              <View style={[styles.menuIconContainer, styles.dangerIconContainer]}>
+                <Trash2 size={20} color="#DC2626" />
+              </View>
+              <Text style={[styles.menuLabel, styles.dangerText]}>
+                {deleting ? 'Deleting Account...' : 'Delete Account'}
+              </Text>
+              <ChevronRight size={20} color={theme.colors.iconInactive} />
+            </TouchableOpacity>
+          </Card>
+        </View>
+
         <View style={styles.footer}>
           <Text style={styles.footerText}>Deductly • Version 1.0.0</Text>
         </View>
@@ -157,6 +250,15 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: theme.typography.fontSize.base,
+    color: theme.colors.textSecondary,
   },
   profileHeader: {
     alignItems: 'center',
@@ -212,6 +314,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: theme.spacing.md,
   },
+  dangerIconContainer: {
+    backgroundColor: '#FEE2E2',
+  },
   menuContent: {
     flex: 1,
   },
@@ -220,6 +325,9 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.base,
     fontWeight: theme.typography.fontWeight.medium,
     color: theme.colors.text,
+  },
+  dangerText: {
+    color: '#DC2626',
   },
   menuValue: {
     fontSize: theme.typography.fontSize.sm,

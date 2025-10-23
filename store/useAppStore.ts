@@ -5,21 +5,26 @@ import { showToast } from '@/lib/toast';
 import { AppStore } from '@/types/store';
 import { Expense, IncomeEntry } from '@/types/database';
 
-const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000001';
-
 export const useAppStore = create<AppStore>((set, get) => ({
-  // Auth State (deprecated but kept for compatibility)
+  // Auth State
   user: null,
   profile: null,
-  isLoggedIn: true,
-  loading: false,
+  isLoggedIn: false,
+  loading: true,
 
-  setUser: (user) => set({ user, isLoggedIn: true }),
+  setUser: (user) => set({ user, isLoggedIn: !!user }),
   setProfile: (profile) => set({ profile }),
   setLoading: (loading) => set({ loading }),
 
   logout: async (clearData = false) => {
-    console.log('Logout not available without authentication');
+    try {
+      await supabase.auth.signOut();
+      set({ user: null, profile: null, isLoggedIn: false, items: [], incomeEntries: [] });
+      router.replace('/auth/sign-in');
+    } catch (error: any) {
+      console.error('Logout error:', error);
+      showToast('Failed to logout: ' + error.message, 'error');
+    }
   },
 
   // Expenses State
@@ -34,7 +39,12 @@ export const useAppStore = create<AppStore>((set, get) => ({
   },
 
   removeExpense: async (id: string) => {
-    const { items } = get();
+    const { items, user } = get();
+    if (!user) {
+      showToast('Please login to delete expenses', 'error');
+      return false;
+    }
+
     const expenseToDelete = items.find((e) => e.id === id);
 
     if (!expenseToDelete) {
@@ -50,8 +60,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
       const { error } = await supabase
         .from('expenses')
         .delete()
-        .eq('id', id)
-        .eq('user_id', DEFAULT_USER_ID);
+        .eq('id', id);
 
       if (error) throw error;
 
@@ -67,8 +76,14 @@ export const useAppStore = create<AppStore>((set, get) => ({
   },
 
   clearExpenses: async () => {
+    const { user } = get();
+    if (!user) {
+      showToast('Please login to clear expenses', 'error');
+      return;
+    }
+
     try {
-      await supabase.from('expenses').delete().eq('user_id', DEFAULT_USER_ID);
+      await supabase.from('expenses').delete().eq('user_id', user.id);
       set({ items: [] });
       showToast('All expenses cleared', 'success');
     } catch (error: any) {
@@ -78,11 +93,17 @@ export const useAppStore = create<AppStore>((set, get) => ({
   },
 
   loadExpenses: async () => {
+    const { user } = get();
+    if (!user) {
+      set({ items: [] });
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from('expenses')
         .select('*')
-        .eq('user_id', DEFAULT_USER_ID)
+        .eq('user_id', user.id)
         .order('date', { ascending: false });
 
       if (error) throw error;
@@ -106,7 +127,12 @@ export const useAppStore = create<AppStore>((set, get) => ({
   },
 
   removeIncomeEntry: async (id: string) => {
-    const { incomeEntries } = get();
+    const { incomeEntries, user } = get();
+    if (!user) {
+      showToast('Please login to delete income entries', 'error');
+      return false;
+    }
+
     const entryToDelete = incomeEntries.find((e) => e.id === id);
 
     if (!entryToDelete) {
@@ -122,8 +148,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
       const { error } = await supabase
         .from('income_entries')
         .delete()
-        .eq('id', id)
-        .eq('user_id', DEFAULT_USER_ID);
+        .eq('id', id);
 
       if (error) throw error;
 
@@ -139,11 +164,17 @@ export const useAppStore = create<AppStore>((set, get) => ({
   },
 
   loadIncomeEntries: async () => {
+    const { user } = get();
+    if (!user) {
+      set({ incomeEntries: [] });
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from('income_entries')
         .select('*')
-        .eq('user_id', DEFAULT_USER_ID)
+        .eq('user_id', user.id)
         .order('date', { ascending: false });
 
       if (error) throw error;

@@ -1,15 +1,28 @@
 import { useEffect } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function IndexScreen() {
+  const { user, loading, profile } = useAuth();
+
   useEffect(() => {
-    router.replace('/(tabs)');
-  }, []);
+    if (!loading) {
+      if (user) {
+        if (profile?.profile_completed) {
+          router.replace('/(tabs)');
+        } else {
+          router.replace('/onboarding/profile-setup');
+        }
+      } else {
+        router.replace('/auth/sign-in');
+      }
+    }
+  }, [user, loading, profile]);
 
   return (
     <View style={styles.container}>
-      <ActivityIndicator size="large" color="#007AFF" />
+      <ActivityIndicator size="large" color="#1E5128" />
     </View>
   );
 }
