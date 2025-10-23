@@ -46,6 +46,7 @@ export default function ProfileSetupScreen() {
         province,
         business_type: businessType,
         gst_hst_registered: gstHstRegistered,
+        profile_completed: true,
         updated_at: new Date().toISOString(),
       })
       .eq('id', user.id);
