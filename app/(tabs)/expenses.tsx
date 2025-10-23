@@ -8,6 +8,7 @@ import { EnhancedExpenseModal } from '@/components/EnhancedExpenseModal';
 import { PageHeader } from '@/components/PageHeader';
 import { EmptyState } from '@/components/EmptyState';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
+import { formatCategoryLabel } from '@/lib/formatters';
 
 const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -222,12 +223,13 @@ export default function ExpensesScreen() {
                   .sort(([, a], [, b]) => b - a)
                   .map(([category, amount]) => {
                     const categoryInfo = EXPENSE_CATEGORIES.find(c => c.value === category);
+                    const categoryLabel = categoryInfo?.label || formatCategoryLabel(category);
                     const percentage = (amount / totalDeductible) * 100;
                     return (
                       <View key={category} style={styles.categoryCard}>
                         <View style={styles.categoryHeader}>
                           <View style={styles.categoryInfo}>
-                            <Text style={styles.categoryName}>{categoryInfo?.label || category}</Text>
+                            <Text style={styles.categoryName}>{categoryLabel}</Text>
                             <Text style={styles.categoryPercentage}>{percentage.toFixed(0)}%</Text>
                           </View>
                           <Text style={styles.categoryAmount}>${amount.toFixed(2)}</Text>
@@ -481,6 +483,7 @@ export default function ExpensesScreen() {
 
 function ExpenseItem({ expense, onDelete }: { expense: Expense; onDelete: () => void }) {
   const categoryInfo = EXPENSE_CATEGORIES.find(c => c.value === expense.category);
+  const categoryLabel = expense.category_label || categoryInfo?.label || formatCategoryLabel(expense.category_code || expense.category);
   const deductibleAmount = expense.amount * (expense.business_percentage / 100);
   const [deleting, setDeleting] = useState(false);
 
@@ -560,7 +563,7 @@ function ExpenseItem({ expense, onDelete }: { expense: Expense; onDelete: () => 
       </Text>
 
       <Text style={styles.expenseCategory} numberOfLines={1}>
-        {categoryInfo?.label}
+        {categoryLabel}
       </Text>
 
       <View style={styles.expenseFooter}>

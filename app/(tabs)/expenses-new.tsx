@@ -5,6 +5,7 @@ import { useAppStore } from '@/store/useAppStore';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { Expense, EXPENSE_CATEGORIES } from '@/types/database';
 import { supabase } from '@/lib/supabase';
+import { formatCategoryLabel } from '@/lib/formatters';
 
 export default function ExpensesScreen() {
   const { items: expenses, loading, loadExpenses, removeExpense, user } = useAppStore();
@@ -87,12 +88,13 @@ export default function ExpensesScreen() {
                   .sort(([, a], [, b]) => b - a)
                   .map(([category, amount]) => {
                     const categoryInfo = EXPENSE_CATEGORIES.find(c => c.value === category);
+                    const categoryLabel = categoryInfo?.label || formatCategoryLabel(category);
                     const percentage = (amount / totalDeductible) * 100;
                     return (
                       <View key={category} style={styles.categoryCard}>
                         <View style={styles.categoryHeader}>
                           <View style={styles.categoryInfo}>
-                            <Text style={styles.categoryName}>{categoryInfo?.label || category}</Text>
+                            <Text style={styles.categoryName}>{categoryLabel}</Text>
                             <Text style={styles.categoryDescription}>{categoryInfo?.description}</Text>
                           </View>
                           <View style={styles.categoryAmountContainer}>
@@ -160,6 +162,7 @@ export default function ExpensesScreen() {
 
 function ExpenseItem({ expense, onDelete }: { expense: Expense; onDelete: () => void }) {
   const categoryInfo = EXPENSE_CATEGORIES.find(c => c.value === expense.category);
+  const categoryLabel = expense.category_label || categoryInfo?.label || formatCategoryLabel(expense.category_code || expense.category);
   const deductibleAmount = expense.amount * (expense.business_percentage / 100);
 
   return (
@@ -171,7 +174,7 @@ function ExpenseItem({ expense, onDelete }: { expense: Expense; onDelete: () => 
         <View style={styles.expenseInfo}>
           <Text style={styles.expenseMerchant}>{expense.merchant_name}</Text>
           <View style={styles.expenseMeta}>
-            <Text style={styles.expenseCategory}>{categoryInfo?.label}</Text>
+            <Text style={styles.expenseCategory}>{categoryLabel}</Text>
             <Text style={styles.expenseDate}>
               {new Date(expense.date).toLocaleDateString('en-CA', {
                 month: 'short',

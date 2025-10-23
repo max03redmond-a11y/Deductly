@@ -8,6 +8,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { EmptyState } from '@/components/EmptyState';
 import { useAppState } from '@/lib/state/appStore';
 import { calculateSummaryTotals, getYTDFilter } from '@/lib/calcs/summary';
+import { formatCategoryLabel } from '@/lib/formatters';
 
 const DEFAULT_USER_NAME = 'Driver';
 
@@ -115,6 +116,7 @@ export default function HomeScreen() {
             <View style={styles.expenseGrid}>
               {expenses.map((expense) => {
                 const categoryInfo = EXPENSE_CATEGORIES.find((c) => c.value === expense.category);
+                const categoryLabel = expense.category_label || categoryInfo?.label || formatCategoryLabel(expense.category_code || expense.category);
                 const deductibleAmount = expense.amount * (expense.business_percentage / 100);
 
                 return (
@@ -130,7 +132,7 @@ export default function HomeScreen() {
                     </Text>
 
                     <Text style={styles.expenseCategory} numberOfLines={1}>
-                      {categoryInfo?.label}
+                      {categoryLabel}
                     </Text>
 
                     <View style={styles.expenseFooter}>

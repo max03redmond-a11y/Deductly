@@ -11,6 +11,7 @@ import { generateT2125HTML, downloadHTML } from '@/lib/t2125/htmlExport';
 import { showToast } from '@/lib/toast';
 import ExportModal from '@/components/ExportModal';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
+import { formatCategoryLabel } from '@/lib/formatters';
 
 const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000001';
 const DEFAULT_PROFILE: any = { business_name: 'Your Business', id: DEFAULT_USER_ID };
@@ -112,7 +113,10 @@ export default function DashboardScreen() {
     if (craCategory) return craCategory.label;
 
     const legacyCategory = EXPENSE_CATEGORIES.find(c => c.value === categoryCode);
-    return legacyCategory?.label || categoryCode;
+    if (legacyCategory) return legacyCategory.label;
+
+    // Fall back to automatic formatting
+    return formatCategoryLabel(categoryCode);
   };
 
   const isVehicleExpense = (categoryCode: string): boolean => {
@@ -174,9 +178,9 @@ export default function DashboardScreen() {
     .sort(([, a], [, b]) => b - a)
     .slice(0, 8)
     .map(([category, amount], index) => {
-      const categoryInfo = EXPENSE_CATEGORIES.find(c => c.value === category);
+      const categoryLabel = getCategoryLabel(category);
       return {
-        name: categoryInfo?.label || category,
+        name: categoryLabel,
         amount: amount,
         color: chartColors[index % chartColors.length],
         legendFontColor: '#6B7280',

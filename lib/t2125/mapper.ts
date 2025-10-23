@@ -302,13 +302,6 @@ export function generateT2125Data(
     ? ccaData.ccaDeduction * (businessUsePercent / 100)
     : calculateCCADeduction(assets, filter);
 
-  console.log('CCA Calculation:', {
-    assetsCount: assets.length,
-    businessUsePercent,
-    ccaDataProvided: !!ccaData,
-    rawCcaDeduction: ccaData?.ccaDeduction,
-    finalCcaDeduction: ccaDeduction,
-  });
   expensesByLine.line9936_cca = ccaDeduction;
 
   // Calculate Chart A motor vehicle totals
@@ -323,13 +316,6 @@ export function generateT2125Data(
   // Calculate total expenses INCLUDING motor vehicle expenses
   const nonVehicleExpenses = Object.values(expensesByLine).reduce((sum, val) => sum + (val || 0), 0);
   const totalExpenses = nonVehicleExpenses + chartA_line16;
-
-  console.log('Total Expenses Breakdown:', {
-    nonVehicleExpenses,
-    chartA_line16_motorVehicle: chartA_line16,
-    line9936_cca: expensesByLine.line9936_cca,
-    totalExpenses,
-  });
 
   const netIncomeBeforeAdjustments = totalGrossBusinessIncome - totalExpenses;
 
