@@ -29,6 +29,9 @@ export default function SignInScreen() {
       } else {
         Alert.alert('Sign In Failed', error.message);
       }
+    } else {
+      // Navigate to index which will route to appropriate screen
+      router.replace('/');
     }
   };
 
