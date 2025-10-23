@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, Platform, TextInput, Modal } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, Platform, TextInput, Modal, Switch } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { supabase } from '@/lib/supabase';
 import { Plus, Receipt, Trash2, Car, Info } from 'lucide-react-native';
@@ -17,6 +17,7 @@ const TOOLTIPS = {
   ccaRate: 'Automatically filled based on vehicle class.',
   salePrice: 'If you sold your car this year, enter the amount received.',
   yearPurchased: 'The year you started using the vehicle for Uber.',
+  halfYearRule: 'In the first year you use your vehicle for Uber, the CRA only allows you to claim half of your normal depreciation. Leave this on for your first year, and off for later years.',
 };
 
 const getCCARate = (vehicleClass: '10' | '10.1' | '54'): number => {
@@ -38,6 +39,7 @@ export default function ExpensesScreen() {
   const [salePrice, setSalePrice] = useState('');
   const [yearPurchased, setYearPurchased] = useState(new Date().getFullYear().toString());
   const [showTooltip, setShowTooltip] = useState<string | null>(null);
+  const [halfYearRule, setHalfYearRule] = useState(true);
   const [ccaResults, setCcaResults] = useState<{
     ccaDeduction: number;
     remainingUCC: number;
@@ -140,7 +142,7 @@ export default function ExpensesScreen() {
       return;
     }
 
-    const baseAmount = purchasePriceNum / 2;
+    const baseAmount = halfYearRule ? purchasePriceNum / 2 : purchasePriceNum;
     const ccaDeduction = baseAmount * ccaRate;
     const remainingUCC = openingUCCNum + baseAmount - ccaDeduction - salePriceNum;
 
@@ -149,6 +151,12 @@ export default function ExpensesScreen() {
       remainingUCC: Math.max(0, remainingUCC),
     });
   };
+
+  useEffect(() => {
+    if (ccaResults) {
+      calculateCCA();
+    }
+  }, [halfYearRule]);
 
   return (
     <View style={styles.container}>
@@ -293,6 +301,24 @@ export default function ExpensesScreen() {
                     Class 54
                   </Text>
                 </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={styles.formField}>
+              <View style={styles.toggleRow}>
+                <View style={styles.toggleLabelContainer}>
+                  <Text style={styles.fieldLabel}>Half-Year Rule (first year only)</Text>
+                  <TouchableOpacity onPress={() => setShowTooltip('halfYearRule')}>
+                    <Info size={16} color="#6B7280" />
+                  </TouchableOpacity>
+                </View>
+                <Switch
+                  value={halfYearRule}
+                  onValueChange={setHalfYearRule}
+                  trackColor={{ false: '#D1D5DB', true: '#86EFAC' }}
+                  thumbColor={halfYearRule ? '#059669' : '#F3F4F6'}
+                  ios_backgroundColor="#D1D5DB"
+                />
               </View>
             </View>
 
@@ -802,6 +828,22 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Montserrat-SemiBold',
     color: '#374151',
+  },
+  toggleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#F9FAFB',
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  toggleLabelContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flex: 1,
   },
   segmentedControl: {
     flexDirection: 'row',
