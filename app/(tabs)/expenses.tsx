@@ -1,14 +1,29 @@
 import { useState, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, Platform } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, Platform, TextInput, Modal } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { supabase } from '@/lib/supabase';
-import { Plus, Receipt, Trash2, Car } from 'lucide-react-native';
+import { Plus, Receipt, Trash2, Car, Info } from 'lucide-react-native';
 import { Expense, EXPENSE_CATEGORIES, MileageLog } from '@/types/database';
 import { EnhancedExpenseModal } from '@/components/EnhancedExpenseModal';
 import { PageHeader } from '@/components/PageHeader';
 import { EmptyState } from '@/components/EmptyState';
 
 const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000001';
+
+const TOOLTIPS = {
+  vehicleClass: 'The CRA category that determines your CCA rate. Most Uber drivers use Class 10 (under $30k) or 10.1 (over $30k).',
+  purchasePrice: 'The cost of your vehicle including taxes and fees.',
+  businessUse: 'Your business driving % based on total km driven for Uber.',
+  openingUCC: 'The remaining undepreciated cost from last year. Enter 0 if this is your first year.',
+  ccaRate: 'Automatically filled based on vehicle class.',
+  salePrice: 'If you sold your car this year, enter the amount received.',
+  yearPurchased: 'The year you started using the vehicle for Uber.',
+};
+
+const getCCARate = (vehicleClass: '10' | '10.1' | '54'): number => {
+  if (vehicleClass === '54') return 100;
+  return 30;
+};
 
 export default function ExpensesScreen() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -17,6 +32,14 @@ export default function ExpensesScreen() {
   const [mileageLogs, setMileageLogs] = useState<MileageLog[]>([]);
   const [businessUsePercent, setBusinessUsePercent] = useState(0);
   const [activeTab, setActiveTab] = useState<'expenses' | 'depreciation'>('expenses');
+
+  const [vehicleClass, setVehicleClass] = useState<'10' | '10.1' | '54'>('10');
+  const [purchasePrice, setPurchasePrice] = useState('');
+  const [ccaBusinessUse, setCcaBusinessUse] = useState('');
+  const [openingUCC, setOpeningUCC] = useState('');
+  const [salePrice, setSalePrice] = useState('');
+  const [yearPurchased, setYearPurchased] = useState(new Date().getFullYear().toString());
+  const [showTooltip, setShowTooltip] = useState<string | null>(null);
 
   const loadExpenses = useCallback(async () => {
     const currentYear = new Date().getFullYear();
@@ -207,13 +230,188 @@ export default function ExpensesScreen() {
         </>
       ) : (
         <ScrollView style={styles.content} contentContainerStyle={styles.scrollContent}>
-          <EmptyState
-            icon={Car}
-            title="Vehicle Depreciation (CCA)"
-            message="This section will be available soon for tracking vehicle depreciation and Capital Cost Allowance."
-          />
+          <View style={styles.ccaFormContainer}>
+            <Text style={styles.ccaFormTitle}>Capital Cost Allowance (CCA)</Text>
+            <Text style={styles.ccaFormSubtitle}>Track vehicle depreciation for tax purposes</Text>
+
+            <View style={styles.formField}>
+              <View style={styles.labelRow}>
+                <Text style={styles.fieldLabel}>Vehicle Class</Text>
+                <TouchableOpacity onPress={() => setShowTooltip('vehicleClass')}>
+                  <Info size={16} color="#6B7280" />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.segmentedControl}>
+                <TouchableOpacity
+                  style={[styles.segment, vehicleClass === '10' && styles.segmentActive]}
+                  onPress={() => setVehicleClass('10')}
+                >
+                  <Text style={[styles.segmentText, vehicleClass === '10' && styles.segmentTextActive]}>
+                    Class 10
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.segment, vehicleClass === '10.1' && styles.segmentActive]}
+                  onPress={() => setVehicleClass('10.1')}
+                >
+                  <Text style={[styles.segmentText, vehicleClass === '10.1' && styles.segmentTextActive]}>
+                    Class 10.1
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.segment, vehicleClass === '54' && styles.segmentActive]}
+                  onPress={() => setVehicleClass('54')}
+                >
+                  <Text style={[styles.segmentText, vehicleClass === '54' && styles.segmentTextActive]}>
+                    Class 54
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={styles.formField}>
+              <View style={styles.labelRow}>
+                <Text style={styles.fieldLabel}>Vehicle Purchase Price</Text>
+                <TouchableOpacity onPress={() => setShowTooltip('purchasePrice')}>
+                  <Info size={16} color="#6B7280" />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.inputContainer}>
+                <Text style={styles.inputPrefix}>$</Text>
+                <TextInput
+                  style={styles.input}
+                  value={purchasePrice}
+                  onChangeText={setPurchasePrice}
+                  placeholder="0.00"
+                  keyboardType="decimal-pad"
+                  placeholderTextColor="#9CA3AF"
+                />
+              </View>
+            </View>
+
+            <View style={styles.formField}>
+              <View style={styles.labelRow}>
+                <Text style={styles.fieldLabel}>Business Use %</Text>
+                <TouchableOpacity onPress={() => setShowTooltip('businessUse')}>
+                  <Info size={16} color="#6B7280" />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  value={ccaBusinessUse}
+                  onChangeText={setCcaBusinessUse}
+                  placeholder="0"
+                  keyboardType="decimal-pad"
+                  placeholderTextColor="#9CA3AF"
+                />
+                <Text style={styles.inputSuffix}>%</Text>
+              </View>
+            </View>
+
+            <View style={styles.formField}>
+              <View style={styles.labelRow}>
+                <Text style={styles.fieldLabel}>Opening UCC Balance</Text>
+                <TouchableOpacity onPress={() => setShowTooltip('openingUCC')}>
+                  <Info size={16} color="#6B7280" />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.inputContainer}>
+                <Text style={styles.inputPrefix}>$</Text>
+                <TextInput
+                  style={styles.input}
+                  value={openingUCC}
+                  onChangeText={setOpeningUCC}
+                  placeholder="0.00"
+                  keyboardType="decimal-pad"
+                  placeholderTextColor="#9CA3AF"
+                />
+              </View>
+            </View>
+
+            <View style={styles.formField}>
+              <View style={styles.labelRow}>
+                <Text style={styles.fieldLabel}>CCA Rate</Text>
+                <TouchableOpacity onPress={() => setShowTooltip('ccaRate')}>
+                  <Info size={16} color="#6B7280" />
+                </TouchableOpacity>
+              </View>
+              <View style={[styles.inputContainer, styles.inputDisabled]}>
+                <TextInput
+                  style={styles.input}
+                  value={`${getCCARate(vehicleClass)}%`}
+                  editable={false}
+                  placeholderTextColor="#9CA3AF"
+                />
+              </View>
+            </View>
+
+            <View style={styles.formField}>
+              <View style={styles.labelRow}>
+                <Text style={styles.fieldLabel}>Vehicle Sale Price (Optional)</Text>
+                <TouchableOpacity onPress={() => setShowTooltip('salePrice')}>
+                  <Info size={16} color="#6B7280" />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.inputContainer}>
+                <Text style={styles.inputPrefix}>$</Text>
+                <TextInput
+                  style={styles.input}
+                  value={salePrice}
+                  onChangeText={setSalePrice}
+                  placeholder="0.00"
+                  keyboardType="decimal-pad"
+                  placeholderTextColor="#9CA3AF"
+                />
+              </View>
+            </View>
+
+            <View style={styles.formField}>
+              <View style={styles.labelRow}>
+                <Text style={styles.fieldLabel}>Year Purchased</Text>
+                <TouchableOpacity onPress={() => setShowTooltip('yearPurchased')}>
+                  <Info size={16} color="#6B7280" />
+                </TouchableOpacity>
+              </View>
+              <TextInput
+                style={styles.inputContainer}
+                value={yearPurchased}
+                onChangeText={setYearPurchased}
+                placeholder={new Date().getFullYear().toString()}
+                keyboardType="number-pad"
+                placeholderTextColor="#9CA3AF"
+              />
+            </View>
+          </View>
         </ScrollView>
       )}
+
+      <Modal
+        visible={showTooltip !== null}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowTooltip(null)}
+      >
+        <TouchableOpacity
+          style={styles.tooltipOverlay}
+          activeOpacity={1}
+          onPress={() => setShowTooltip(null)}
+        >
+          <View style={styles.tooltipContainer}>
+            <View style={styles.tooltipContent}>
+              <Text style={styles.tooltipText}>
+                {showTooltip && TOOLTIPS[showTooltip as keyof typeof TOOLTIPS]}
+              </Text>
+              <TouchableOpacity
+                style={styles.tooltipButton}
+                onPress={() => setShowTooltip(null)}
+              >
+                <Text style={styles.tooltipButtonText}>Got it</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 }
@@ -536,5 +734,141 @@ const styles = StyleSheet.create({
   },
   deleteButtonDisabled: {
     opacity: 0.5,
+  },
+  ccaFormContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 1,
+  },
+  ccaFormTitle: {
+    fontSize: 20,
+    fontFamily: 'Montserrat-Bold',
+    color: '#111827',
+    marginBottom: 4,
+  },
+  ccaFormSubtitle: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginBottom: 24,
+  },
+  formField: {
+    marginBottom: 20,
+  },
+  labelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  fieldLabel: {
+    fontSize: 14,
+    fontFamily: 'Montserrat-SemiBold',
+    color: '#374151',
+  },
+  segmentedControl: {
+    flexDirection: 'row',
+    backgroundColor: '#F3F4F6',
+    borderRadius: 8,
+    padding: 4,
+  },
+  segment: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    alignItems: 'center',
+  },
+  segmentActive: {
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  segmentText: {
+    fontSize: 13,
+    fontFamily: 'Montserrat-Medium',
+    color: '#6B7280',
+  },
+  segmentTextActive: {
+    color: '#059669',
+    fontFamily: 'Montserrat-Bold',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F9FAFB',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    paddingHorizontal: 12,
+    height: 48,
+  },
+  inputDisabled: {
+    backgroundColor: '#F3F4F6',
+  },
+  inputPrefix: {
+    fontSize: 16,
+    fontFamily: 'Montserrat-SemiBold',
+    color: '#6B7280',
+    marginRight: 4,
+  },
+  inputSuffix: {
+    fontSize: 16,
+    fontFamily: 'Montserrat-SemiBold',
+    color: '#6B7280',
+    marginLeft: 4,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    fontFamily: 'Montserrat-Medium',
+    color: '#111827',
+    padding: 0,
+  },
+  tooltipOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  tooltipContainer: {
+    width: '100%',
+    maxWidth: 400,
+  },
+  tooltipContent: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 5,
+  },
+  tooltipText: {
+    fontSize: 15,
+    lineHeight: 22,
+    color: '#374151',
+    marginBottom: 20,
+  },
+  tooltipButton: {
+    backgroundColor: '#059669',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  tooltipButtonText: {
+    fontSize: 15,
+    fontFamily: 'Montserrat-Bold',
+    color: '#FFFFFF',
   },
 });
