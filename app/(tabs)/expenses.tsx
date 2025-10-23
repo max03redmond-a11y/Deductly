@@ -129,21 +129,20 @@ export default function ExpensesScreen() {
 
   const calculateCCA = () => {
     const purchasePriceNum = parseFloat(purchasePrice) || 0;
-    const businessUseNum = parseFloat(ccaBusinessUse) || 0;
     const openingUCCNum = parseFloat(openingUCC) || 0;
     const salePriceNum = parseFloat(salePrice) || 0;
     const ccaRate = getCCARate(vehicleClass) / 100;
 
-    if (purchasePriceNum <= 0 || businessUseNum <= 0) {
+    if (purchasePriceNum <= 0) {
       if (Platform.OS === 'web') {
-        alert('Please enter valid Purchase Price and Business Use %');
+        alert('Please enter valid Purchase Price');
       } else {
-        Alert.alert('Invalid Input', 'Please enter valid Purchase Price and Business Use %');
+        Alert.alert('Invalid Input', 'Please enter valid Purchase Price');
       }
       return;
     }
 
-    const baseAmount = (purchasePriceNum * (businessUseNum / 100)) / 2;
+    const baseAmount = purchasePriceNum / 2;
     const ccaDeduction = baseAmount * ccaRate;
     const remainingUCC = openingUCCNum + baseAmount - ccaDeduction - salePriceNum;
 
