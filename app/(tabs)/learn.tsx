@@ -282,115 +282,117 @@ export default function LearnScreen() {
             <Text style={styles.contentTitle}>CRA Rules for Rideshare & Delivery Drivers</Text>
 
             <Text style={styles.paragraph}>
-              When you drive for Uber, Lyft, or do deliveries, the Canada Revenue Agency (CRA) considers you self-employed — not an employee.
+              If you drive for Uber, Lyft, DoorDash, or any other gig platform, the Canada Revenue Agency (CRA) considers you self-employed — meaning you operate your own small business. You're responsible for tracking your income, recording expenses, and paying your own taxes. Deductly is built to make that process simple and CRA-compliant.
             </Text>
 
-            <Text style={styles.paragraph}>
-              This means you run your own small business, and you're responsible for tracking your income, claiming deductions, and paying taxes yourself.
-            </Text>
+            <View style={styles.divider} />
 
             <Text style={styles.sectionHeader}>💵 1. How Taxes Work</Text>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                You report all your business income on Form T2125 – Statement of Business or Professional Activities.
+                Rideshare and delivery income is reported on Form T2125 – Statement of Business or Professional Activities, which you file along with your personal return (T1).
               </Text>
             </View>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                You'll include this form with your personal tax return (T1).
+                Platforms don't withhold taxes, so you'll likely owe income tax and CPP contributions at year-end (roughly 11% of your net income for both portions of CPP).
               </Text>
             </View>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                Taxes aren't withheld from your pay, so you'll likely owe tax at year-end unless you make installment payments.
-              </Text>
-            </View>
-
-            <View style={styles.bulletPoint}>
-              <Text style={styles.bullet}>•</Text>
-              <Text style={styles.bulletText}>
-                You also pay CPP contributions (Canada Pension Plan) as both the employer and employee portions — roughly 11% total on your net income.
+                Making quarterly installment payments can help avoid a large balance owing.
               </Text>
             </View>
 
             <View style={styles.infoBox}>
-              <Text style={styles.infoBoxTitle}>💡 Think of yourself as your own boss</Text>
+              <Text style={styles.infoBoxTitle}>💡 Tip: Think of yourself as running a small business</Text>
               <Text style={styles.infoBoxText}>
-                You keep what's left after business costs and taxes.
+                You keep what's left after expenses and taxes.
               </Text>
             </View>
+
+            <View style={styles.divider} />
 
             <Text style={styles.sectionHeader}>🧾 2. What You Can Deduct</Text>
 
             <Text style={styles.paragraph}>
-              You can deduct any reasonable expense used to earn income from your rideshare or delivery work.
+              The CRA allows you to deduct any reasonable expense used to earn business income. Deductly automatically assigns these to the correct T2125 lines.
             </Text>
 
-            <Text style={styles.subheading}>Common Deductions:</Text>
+            <Text style={styles.subheading}>Common deductible expenses include:</Text>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                <Text style={styles.bold}>Fuel & Oil:</Text> Gas for business driving.
+                <Text style={styles.bold}>Fuel & Oil</Text> – gas used for business driving
               </Text>
             </View>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                <Text style={styles.bold}>Maintenance & Repairs:</Text> Tire changes, brakes, oil changes, car washes.
+                <Text style={styles.bold}>Maintenance & Repairs</Text> – tire changes, brakes, oil, detailing, car washes
               </Text>
             </View>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                <Text style={styles.bold}>Insurance:</Text> Vehicle and commercial coverage.
+                <Text style={styles.bold}>Insurance</Text> – business or rideshare coverage
               </Text>
             </View>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                <Text style={styles.bold}>License & Registration Fees:</Text> Uber fees, vehicle licensing costs.
+                <Text style={styles.bold}>License & Registration</Text> – vehicle licensing and Uber or Lyft fees
               </Text>
             </View>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                <Text style={styles.bold}>Phone & Data:</Text> Portion used for rideshare apps and navigation.
+                <Text style={styles.bold}>Phone & Data</Text> – portion used for navigation or apps
               </Text>
             </View>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                <Text style={styles.bold}>Parking & Tolls:</Text> Business-related only.
+                <Text style={styles.bold}>Parking & Tolls</Text> – business-related only
               </Text>
             </View>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                <Text style={styles.bold}>Interest on Car Loan:</Text> The business-use percentage only.
+                <Text style={styles.bold}>Interest on Car Loan</Text> – business-use portion
               </Text>
             </View>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                <Text style={styles.bold}>Home Office (optional):</Text> If you manage bookings or records from home.
+                <Text style={styles.bold}>Capital Cost Allowance (CCA)</Text> – yearly vehicle depreciation (Deductly calculates this automatically)
               </Text>
             </View>
 
-            <Text style={styles.sectionHeader}>🚗 3. Business Use Percentage</Text>
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                <Text style={styles.bold}>Home Office (optional)</Text> – if you manage trips, records, or admin work from home
+              </Text>
+            </View>
+
+            <View style={styles.divider} />
+
+            <Text style={styles.sectionHeader}>🚗 3. Business-Use Percentage</Text>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
@@ -409,45 +411,56 @@ export default function LearnScreen() {
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                <Text style={styles.bold}>Example:</Text> If 70% of your total kilometres are for Uber, you can claim 70% of your gas, insurance, and maintenance costs.
+                <Text style={styles.bold}>Example:</Text> If 60% of your kilometres are for Uber, Deductly applies 60% to your fuel, insurance, repairs, and CCA.
               </Text>
             </View>
+
+            <View style={styles.divider} />
 
             <Text style={styles.sectionHeader}>💰 4. GST/HST Rules</Text>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                If your total earnings from ridesharing exceed $30,000 in a 12-month period, you must register for GST/HST.
+                Once you earn $30,000 or more in a 12-month period, you must register for GST/HST.
               </Text>
             </View>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                Uber and Lyft usually collect GST/HST on fares for you, but you may need to file and remit it.
+                Uber and Lyft usually collect GST/HST on fares, but you may still need to file and remit it to the CRA.
               </Text>
             </View>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                Once registered, you can claim input tax credits (ITCs) on eligible expenses (e.g., gas, repairs).
+                If registered, you can claim Input Tax Credits (ITCs) on eligible business expenses such as fuel, repairs, and car washes.
               </Text>
             </View>
 
-            <Text style={styles.sectionHeader}>🧮 5. Why Deductly Helps</Text>
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                Deductly records GST/HST on income and expenses so your totals are ready for your return.
+              </Text>
+            </View>
+
+            <View style={styles.divider} />
+
+            <Text style={styles.sectionHeader}>⚙️ 5. How Deductly Keeps You CRA-Ready</Text>
 
             <Text style={styles.paragraph}>
-              Deductly keeps everything in one place — your income, mileage, and expenses — and automatically assigns them to the right CRA categories on the T2125 form.
+              Deductly automatically organizes your income, mileage, vehicle depreciation, and expenses, and maps them to the correct lines on Form T2125.
             </Text>
 
             <Text style={styles.paragraph}>
-              This means when tax season arrives, your data is organized, CRA-compliant, and ready to export.
+              You'll know exactly what to report, what to deduct, and what your true taxable income is — without messy spreadsheets or missed write-offs.
             </Text>
 
             <Text style={[styles.paragraph, styles.highlight]}>
-              No messy spreadsheets. No missed deductions. Just clean, accurate records.
+              🧮 Stay organized. Stay compliant. Save at tax time.
             </Text>
           </View>
         );
@@ -815,5 +828,11 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.sm,
     color: theme.colors.textSecondary,
     lineHeight: 20,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: theme.colors.border,
+    marginVertical: theme.spacing.lg,
+    opacity: 0.3,
   },
 });
