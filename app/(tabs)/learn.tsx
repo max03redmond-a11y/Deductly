@@ -35,14 +35,10 @@ export default function LearnScreen() {
         return (
           <View style={styles.content}>
             <Text style={styles.emoji}>📱</Text>
-            <Text style={styles.contentTitle}>How Deductly Works (Beta)</Text>
+            <Text style={styles.contentTitle}>How Deductly Works</Text>
 
             <Text style={styles.paragraph}>
-              Deductly helps gig workers like Uber, Lyft, and DoorDash drivers organize income, mileage, and expenses so that tax time is easy — even if you're doing it all manually right now.
-            </Text>
-
-            <Text style={styles.paragraph}>
-              Because Deductly is in beta, you'll need to manually record everything you spend and earn. Here's how to do it properly:
+              Deductly helps gig workers like Uber, Lyft, and DoorDash drivers stay organized and tax-ready — automatically tracking income, mileage, expenses, and vehicle depreciation so tax time is stress-free.
             </Text>
 
             <Text style={styles.sectionHeader}>💵 1. Record Your Income</Text>
@@ -50,44 +46,44 @@ export default function LearnScreen() {
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                Open the Revenue or Income tab each time you receive a payout from Uber, Lyft, or another platform.
+                Use the Income tab whenever you receive a payout from Uber, Lyft, or another platform.
               </Text>
             </View>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                Enter the amount received, date, and source (e.g., "Uber – Weekly Payout").
+                Enter your gross sales and any additional income like tips, bonuses, or referral rewards.
               </Text>
             </View>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                Keep notes for bonuses or tips so they're included in your tax totals later.
+                Deductly automatically calculates your gross business income and adjusts for GST/HST if applicable.
               </Text>
             </View>
 
-            <Text style={styles.sectionHeader}>🧾 2. Log Every Expense</Text>
+            <Text style={styles.sectionHeader}>🧾 2. Log Your Expenses</Text>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                Record any cost directly related to your gig work — gas, maintenance, repairs, insurance, phone bill, parking, or car washes.
-              </Text>
-            </View>
-
-            <View style={styles.bulletPoint}>
-              <Text style={styles.bullet}>•</Text>
-              <Text style={styles.bulletText}>
-                Always enter the amount, date, and short description (e.g., "Gas – Shell Station").
+                Add every business-related cost — from gas and maintenance to insurance, licenses, and car washes.
               </Text>
             </View>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                Keep receipts! Snap photos and store them securely for CRA records.
+                Expenses are grouped into Vehicle and Operating categories for CRA accuracy.
+              </Text>
+            </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                Deductly tracks your totals, applies your business-use percentage, and ensures every deduction is counted.
               </Text>
             </View>
 
@@ -96,49 +92,73 @@ export default function LearnScreen() {
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                Log your start and end odometer readings each day or trip.
+                Record your business and personal kilometres directly in the Mileage tab.
               </Text>
             </View>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                Deductly will calculate your business-use percentage automatically (e.g., 75% business use = 75% of vehicle costs deductible).
+                Deductly calculates your business-use % automatically and applies it to your vehicle deductions.
               </Text>
             </View>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                <Text style={styles.bold}>Tip:</Text> Reset your odometer log every January 1st for accurate yearly totals.
+                Use this to stay compliant with CRA record-keeping rules and maximize your deductions.
               </Text>
             </View>
 
-            <Text style={styles.sectionHeader}>🧮 4. Export When You're Ready to File</Text>
+            <Text style={styles.sectionHeader}>⚙️ 4. Calculate Vehicle Depreciation (CCA)</Text>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                When tax season comes, use the Export feature to automatically fill out your CRA Form T2125 – Statement of Business or Professional Activities.
-              </Text>
-            </View>
-
-            <View style={styles.bulletPoint}>
-              <Text style={styles.bullet}>•</Text>
-              <Text style={styles.bulletText}>
-                This form summarizes your total income, total expenses, and vehicle deductions for self-employed drivers.
+                Deductly helps you calculate your Capital Cost Allowance (CCA) — the CRA's method of depreciating your vehicle.
               </Text>
             </View>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                You can download the T2125 PDF and send it to your tax preparer or upload it with your return.
+                Select your vehicle class (10, 10.1, or 54 for electric), enter your purchase details, and Deductly does the rest.
+              </Text>
+            </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                The app applies the half-year rule, tracks your remaining UCC, and automatically connects your deduction to the T2125 form.
+              </Text>
+            </View>
+
+            <Text style={styles.sectionHeader}>📤 5. Export When You're Ready to File</Text>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                When tax season arrives, simply export your data.
+              </Text>
+            </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                Deductly automatically fills out your CRA Form T2125 – Statement of Business or Professional Activities, complete with all income, expenses, and CCA values.
+              </Text>
+            </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                Download your T2125 PDF and share it with your accountant or upload it directly when you file your taxes.
               </Text>
             </View>
 
             <Text style={[styles.paragraph, styles.highlight]}>
-              Even though Deductly is still in beta, these steps help you stay organized and compliant — so you're always ready for tax season and never miss a deduction.
+              🧠 Stay Organized. Maximize Deductions. File with Confidence.{'\n\n'}
+              Deductly keeps your records CRA-compliant and your deductions accurate — so you can focus on driving while we handle the math.
             </Text>
           </View>
         );
