@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Dimensions, Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { supabase } from '@/lib/supabase';
-import { TrendingUp, TrendingDown, Download, FileText, PieChart, DollarSign, Percent } from 'lucide-react-native';
+import { TrendingUp, TrendingDown, Download, FileText, PieChart, DollarSign, Percent, Info } from 'lucide-react-native';
 import { Expense, IncomeEntry, IncomeRecord, MileageLog, Asset, EXPENSE_CATEGORIES, CRACategory } from '@/types/database';
 import { PieChart as RNPieChart } from 'react-native-chart-kit';
 import { generateT2125Data } from '@/lib/t2125/mapper';
@@ -10,6 +10,7 @@ import { generateT2125CSV, downloadCSV } from '@/lib/t2125/csvExport';
 import { generateT2125HTML, downloadHTML } from '@/lib/t2125/htmlExport';
 import { showToast } from '@/lib/toast';
 import ExportModal from '@/components/ExportModal';
+import { storage, STORAGE_KEYS } from '@/lib/storage';
 
 const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000001';
 const DEFAULT_PROFILE: any = { business_name: 'Your Business', id: DEFAULT_USER_ID };
@@ -34,6 +35,8 @@ export default function DashboardScreen() {
   const [loading, setLoading] = useState(true);
   const [showExportModal, setShowExportModal] = useState(false);
   const [mileageSettings, setMileageSettings] = useState<any>(null);
+  const [ccaData, setCcaData] = useState<{ ccaDeduction: number; remainingUCC: number } | null>(null);
+  const [showCcaTooltip, setShowCcaTooltip] = useState(false);
 
   const loadData = useCallback(async () => {
     const currentYear = new Date().getFullYear();
@@ -52,6 +55,10 @@ export default function DashboardScreen() {
     if (assetsRes.data) setAssets(assetsRes.data);
     if (categoriesRes.data) setCraCategories(categoriesRes.data);
     if (settingsRes.data) setMileageSettings(settingsRes.data);
+
+    const storedCcaData = await storage.getJSON<{ ccaDeduction: number; remainingUCC: number }>(STORAGE_KEYS.CCA_DATA);
+    if (storedCcaData) setCcaData(storedCcaData);
+
     setLoading(false);
   }, []);
 
@@ -150,7 +157,8 @@ export default function DashboardScreen() {
   const totalVehicleExpensesBeforeBusinessUse = Object.values(vehicleExpensesByCategory).reduce((sum, val) => sum + val, 0);
   const totalVehicleExpenses = totalVehicleExpensesBeforeBusinessUse * (mileageBusinessUsePercentage / 100);
   const totalOperatingExpenses = Object.values(operatingExpensesByCategory).reduce((sum, val) => sum + val, 0);
-  const totalExpenses = totalVehicleExpenses + totalOperatingExpenses;
+  const deductibleCca = ccaData ? ccaData.ccaDeduction * (mileageBusinessUsePercentage / 100) : 0;
+  const totalExpenses = totalVehicleExpenses + totalOperatingExpenses + deductibleCca;
   const netProfit = totalIncome - totalExpenses;
   const profitMargin = totalIncome > 0 ? (netProfit / totalIncome) * 100 : 0;
 
@@ -422,6 +430,56 @@ export default function DashboardScreen() {
                 ${totalOperatingExpenses.toFixed(2)}
               </Text>
             </View>
+          </View>
+
+          <View style={styles.statementSection}>
+            <View style={styles.sectionHeader}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <Text style={styles.sectionTitle}>VEHICLE DEPRECIATION (CCA)</Text>
+                <TouchableOpacity onPress={() => setShowCcaTooltip(!showCcaTooltip)}>
+                  <Info size={14} color="#9CA3AF" />
+                </TouchableOpacity>
+              </View>
+              {showCcaTooltip && (
+                <View style={styles.tooltipBox}>
+                  <Text style={styles.tooltipText}>
+                    CRA allows you to deduct part of your vehicle's cost each year as depreciation (Capital Cost Allowance). Only the business-use portion is deductible.
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            {ccaData ? (
+              <>
+                <View style={styles.lineItem}>
+                  <Text style={styles.lineItemLabel}>Annual CCA Deduction</Text>
+                  <Text style={styles.lineItemAmount}>${ccaData.ccaDeduction.toFixed(2)}</Text>
+                </View>
+
+                <View style={styles.lineItem}>
+                  <Text style={[styles.lineItemLabel, { color: '#6B7280', fontSize: 13 }]}>
+                    Business Use % (from mileage)
+                  </Text>
+                  <Text style={[styles.lineItemAmount, { color: '#6B7280', fontSize: 13 }]}>
+                    {mileageBusinessUsePercentage.toFixed(1)}%
+                  </Text>
+                </View>
+
+                <View style={[styles.lineItem, styles.deductibleLine]}>
+                  <Text style={styles.deductibleLineLabel}>Deductible CCA</Text>
+                  <Text style={styles.deductibleLineAmount}>
+                    ${deductibleCca.toFixed(2)}
+                  </Text>
+                </View>
+              </>
+            ) : (
+              <View style={styles.lineItem}>
+                <Text style={[styles.lineItemLabel, { fontStyle: 'italic', color: '#9CA3AF' }]}>
+                  No CCA calculated yet
+                </Text>
+                <Text style={styles.lineItemAmount}>$0.00</Text>
+              </View>
+            )}
           </View>
 
           <View style={styles.statementSection}>
@@ -887,5 +945,17 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontFamily: 'Montserrat-SemiBold',
+  },
+  tooltipBox: {
+    backgroundColor: '#F3F4F6',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 8,
+  },
+  tooltipText: {
+    fontSize: 12,
+    fontFamily: 'Montserrat-Regular',
+    color: '#4B5563',
+    lineHeight: 18,
   },
 });

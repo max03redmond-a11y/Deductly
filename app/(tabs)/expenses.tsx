@@ -7,6 +7,7 @@ import { Expense, EXPENSE_CATEGORIES, MileageLog } from '@/types/database';
 import { EnhancedExpenseModal } from '@/components/EnhancedExpenseModal';
 import { PageHeader } from '@/components/PageHeader';
 import { EmptyState } from '@/components/EmptyState';
+import { storage, STORAGE_KEYS } from '@/lib/storage';
 
 const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -146,10 +147,13 @@ export default function ExpensesScreen() {
     const ccaDeduction = baseAmount * ccaRate;
     const remainingUCC = openingUCCNum - ccaDeduction;
 
-    setCcaResults({
+    const results = {
       ccaDeduction,
       remainingUCC: Math.max(0, remainingUCC),
-    });
+    };
+
+    setCcaResults(results);
+    storage.setJSON(STORAGE_KEYS.CCA_DATA, results);
   };
 
   useEffect(() => {

@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const STORAGE_KEYS = {
   UI_STATE: '@deductly/ui',
+  CCA_DATA: '@deductly/cca',
 } as const;
 
 export const storage = {
