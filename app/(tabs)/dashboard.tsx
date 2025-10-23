@@ -281,21 +281,41 @@ export default function DashboardScreen() {
                 <PieChart size={20} color="#111827" />
                 <Text style={styles.chartTitle}>Expenses by Category</Text>
               </View>
+              <Text style={styles.chartSubtitle}>
+                Top {chartData.length} categories • ${totalExpenses.toFixed(2)} total
+              </Text>
               <View style={styles.chartWrapper}>
                 <RNPieChart
                   data={chartData}
                   width={Dimensions.get('window').width - 80}
-                  height={220}
+                  height={200}
                   chartConfig={{
                     color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
                   }}
                   accessor="amount"
                   backgroundColor="transparent"
-                  paddingLeft="15"
-                  center={[10, 0]}
+                  paddingLeft="0"
+                  center={[0, 0]}
                   absolute
-                  hasLegend={true}
+                  hasLegend={false}
                 />
+              </View>
+              <View style={styles.legendContainer}>
+                {chartData.map((item, index) => {
+                  const percentage = (item.amount / totalExpenses) * 100;
+                  return (
+                    <View key={index} style={styles.legendItem}>
+                      <View style={styles.legendRow}>
+                        <View style={styles.legendLeft}>
+                          <View style={[styles.legendDot, { backgroundColor: item.color }]} />
+                          <Text style={styles.legendLabel} numberOfLines={1}>{item.name}</Text>
+                        </View>
+                        <Text style={styles.legendPercentage}>{percentage.toFixed(1)}%</Text>
+                      </View>
+                      <Text style={styles.legendAmount}>${item.amount.toFixed(2)}</Text>
+                    </View>
+                  );
+                })}
               </View>
             </View>
           )}
@@ -676,6 +696,57 @@ const styles = StyleSheet.create({
   },
   chartWrapper: {
     alignItems: 'center',
+    marginBottom: 24,
+  },
+  chartSubtitle: {
+    fontSize: 13,
+    fontFamily: 'Montserrat-Regular',
+    color: '#6B7280',
+    marginBottom: 20,
+  },
+  legendContainer: {
+    gap: 12,
+  },
+  legendItem: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+  },
+  legendRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  legendLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    flex: 1,
+  },
+  legendDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+  },
+  legendLabel: {
+    fontSize: 14,
+    fontFamily: 'Montserrat-Medium',
+    color: '#111827',
+    flex: 1,
+  },
+  legendPercentage: {
+    fontSize: 14,
+    fontFamily: 'Montserrat-SemiBold',
+    color: '#111827',
+    marginLeft: 8,
+  },
+  legendAmount: {
+    fontSize: 12,
+    fontFamily: 'Montserrat-Regular',
+    color: '#6B7280',
+    marginLeft: 22,
   },
   statementContainer: {
     backgroundColor: '#FFFFFF',
