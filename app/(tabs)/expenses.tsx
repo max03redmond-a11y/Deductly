@@ -13,7 +13,6 @@ const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000001';
 const TOOLTIPS = {
   vehicleClass: 'The CRA category that determines your CCA rate. Most Uber drivers use Class 10 (under $30k) or 10.1 (over $30k).',
   purchasePrice: 'The cost of your vehicle including taxes and fees.',
-  businessUse: 'Your business driving % based on total km driven for Uber.',
   openingUCC: 'The remaining undepreciated cost from last year. Enter 0 if this is your first year.',
   ccaRate: 'Automatically filled based on vehicle class.',
   salePrice: 'If you sold your car this year, enter the amount received.',
@@ -35,7 +34,6 @@ export default function ExpensesScreen() {
 
   const [vehicleClass, setVehicleClass] = useState<'10' | '10.1' | '54'>('10');
   const [purchasePrice, setPurchasePrice] = useState('');
-  const [ccaBusinessUse, setCcaBusinessUse] = useState('');
   const [openingUCC, setOpeningUCC] = useState('');
   const [salePrice, setSalePrice] = useState('');
   const [yearPurchased, setYearPurchased] = useState(new Date().getFullYear().toString());
@@ -315,26 +313,6 @@ export default function ExpensesScreen() {
                   keyboardType="decimal-pad"
                   placeholderTextColor="#9CA3AF"
                 />
-              </View>
-            </View>
-
-            <View style={styles.formField}>
-              <View style={styles.labelRow}>
-                <Text style={styles.fieldLabel}>Business Use %</Text>
-                <TouchableOpacity onPress={() => setShowTooltip('businessUse')}>
-                  <Info size={16} color="#6B7280" />
-                </TouchableOpacity>
-              </View>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.input}
-                  value={ccaBusinessUse}
-                  onChangeText={setCcaBusinessUse}
-                  placeholder="0"
-                  keyboardType="decimal-pad"
-                  placeholderTextColor="#9CA3AF"
-                />
-                <Text style={styles.inputSuffix}>%</Text>
               </View>
             </View>
 
