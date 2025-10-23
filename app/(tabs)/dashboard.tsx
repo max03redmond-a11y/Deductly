@@ -344,9 +344,9 @@ export default function DashboardScreen() {
                 <Text style={styles.lineItemAmount}>${totalOtherIncome.toFixed(2)}</Text>
               </View>
             )}
-            <View style={[styles.lineItem, styles.totalLine]}>
-              <Text style={styles.totalLabel}>8299 - Gross Business Income</Text>
-              <Text style={styles.totalAmount}>${totalIncome.toFixed(2)}</Text>
+            <View style={[styles.lineItem, styles.incomeLine]}>
+              <Text style={styles.incomeLineLabel}>8299 - Gross Business Income</Text>
+              <Text style={styles.incomeLineAmount}>${totalIncome.toFixed(2)}</Text>
             </View>
           </View>
 
@@ -957,5 +957,25 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat-Regular',
     color: '#4B5563',
     lineHeight: 18,
+  },
+  incomeLine: {
+    borderTopWidth: 2,
+    borderTopColor: '#10B981',
+    marginTop: 12,
+    paddingTop: 12,
+    backgroundColor: '#ECFDF5',
+    marginHorizontal: -12,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  incomeLineLabel: {
+    fontSize: 14,
+    fontFamily: 'Montserrat-SemiBold',
+    color: '#059669',
+  },
+  incomeLineAmount: {
+    fontSize: 16,
+    fontFamily: 'Montserrat-SemiBold',
+    color: '#059669',
   },
 });
