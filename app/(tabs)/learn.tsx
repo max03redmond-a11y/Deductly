@@ -7,10 +7,10 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Info, FileText, Scale, TrendingUp } from 'lucide-react-native';
+import { Info, FileText, Scale, TrendingUp, Rocket } from 'lucide-react-native';
 import { theme } from '@/constants/theme';
 
-type TabId = 'how-it-works' | 'tracking' | 'cra-rules' | 'maximize';
+type TabId = 'how-it-works' | 'tracking' | 'cra-rules' | 'maximize' | 'whats-next';
 
 interface Tab {
   id: TabId;
@@ -24,6 +24,7 @@ const TABS: Tab[] = [
   { id: 'tracking', title: 'Tracking', icon: FileText, emoji: '🧾' },
   { id: 'cra-rules', title: 'CRA Rules', icon: Scale, emoji: '🇨🇦' },
   { id: 'maximize', title: 'Maximize', icon: TrendingUp, emoji: '💰' },
+  { id: 'whats-next', title: "What's Next", icon: Rocket, emoji: '🚀' },
 ];
 
 export default function LearnScreen() {
@@ -624,6 +625,78 @@ export default function LearnScreen() {
 
             <Text style={[styles.paragraph, styles.highlight]}>
               By keeping consistent logs, mileage, and receipts, you'll have everything ready for your CRA T2125 export, knowing you've claimed every deduction you're entitled to.
+            </Text>
+          </View>
+        );
+
+      case 'whats-next':
+        return (
+          <View style={styles.content}>
+            <Text style={styles.emoji}>🚀</Text>
+            <Text style={styles.contentTitle}>What's Next for Deductly</Text>
+
+            <Text style={styles.paragraph}>
+              We built Deductly to make taxes simple for rideshare and delivery drivers — but this is just the beginning. Our goal is to become the best tax app for every self-employed Canadian, no spreadsheets or stress required.
+            </Text>
+
+            <Text style={styles.paragraph}>Here's what's coming next:</Text>
+
+            <View style={styles.divider} />
+
+            <Text style={styles.sectionHeader}>🧠 Smarter, Simpler Automation</Text>
+
+            <Text style={styles.paragraph}>
+              Deductly will soon include an AI Tax Assistant that helps you understand deductions, CRA rules, and personalized savings opportunities — all in plain language. Just ask a question, and get clear answers instantly.
+            </Text>
+
+            <View style={styles.divider} />
+
+            <Text style={styles.sectionHeader}>🔗 Direct Integrations</Text>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                <Text style={styles.bold}>Uber & Lyft API Connections</Text> — automatically sync your trip earnings, mileage, and fees right into Deductly.
+              </Text>
+            </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                <Text style={styles.bold}>Bank Account Linking</Text> — securely connect your bank to automatically import business transactions and categorize them for CRA reporting.
+              </Text>
+            </View>
+
+            <View style={styles.divider} />
+
+            <Text style={styles.sectionHeader}>📑 Built-In Tax Filing</Text>
+
+            <Text style={styles.paragraph}>
+              We're working toward in-app tax filing, so you can go from tracking to submitting your return without ever leaving Deductly. Your data will flow directly into your T2125 and T1 return, ready for instant submission.
+            </Text>
+
+            <View style={styles.divider} />
+
+            <Text style={styles.sectionHeader}>🇨🇦 Full CRA Compliance</Text>
+
+            <Text style={styles.paragraph}>
+              Every update moves Deductly closer to being fully CRA-certified, ensuring every line, category, and export meets official tax standards. Our mission is to make Deductly the easiest and most trusted way for Canadian gig workers and small business owners to stay compliant year-round.
+            </Text>
+
+            <View style={styles.divider} />
+
+            <Text style={styles.sectionHeader}>🌟 Our Vision</Text>
+
+            <Text style={styles.paragraph}>
+              To be the #1 tax and finance app for the self-employed — empowering drivers, freelancers, creators, and contractors to take control of their money, automate their taxes, and keep more of what they earn.
+            </Text>
+
+            <View style={styles.divider} />
+
+            <Text style={styles.sectionHeader}>💡 Stay Tuned</Text>
+
+            <Text style={styles.paragraph}>
+              We're constantly improving Deductly based on your feedback. Keep your app updated to access new features as they roll out — and help shape the future of self-employed tax tools in Canada.
             </Text>
           </View>
         );
