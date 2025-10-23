@@ -144,7 +144,7 @@ export default function ExpensesScreen() {
 
     const baseAmount = halfYearRule ? purchasePriceNum / 2 : purchasePriceNum;
     const ccaDeduction = baseAmount * ccaRate;
-    const remainingUCC = openingUCCNum + purchasePriceNum - salePriceNum - ccaDeduction;
+    const remainingUCC = openingUCCNum - ccaDeduction;
 
     setCcaResults({
       ccaDeduction,
