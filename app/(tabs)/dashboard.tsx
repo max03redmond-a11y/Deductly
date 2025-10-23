@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Dimensions, Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/contexts/AuthContext';
 import { TrendingUp, TrendingDown, Download, FileText, PieChart, DollarSign, Percent, Info } from 'lucide-react-native';
 import { Expense, IncomeEntry, IncomeRecord, MileageLog, Asset, EXPENSE_CATEGORIES, CRACategory } from '@/types/database';
 import { PieChart as RNPieChart } from 'react-native-chart-kit';
@@ -12,9 +13,6 @@ import { showToast } from '@/lib/toast';
 import ExportModal from '@/components/ExportModal';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { formatCategoryLabel } from '@/lib/formatters';
-
-const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000001';
-const DEFAULT_PROFILE: any = { business_name: 'Your Business', id: DEFAULT_USER_ID };
 
 const VEHICLE_EXPENSE_CODES = [
   'GAS_FUEL',
@@ -27,7 +25,7 @@ const VEHICLE_EXPENSE_CODES = [
 ];
 
 export default function DashboardScreen() {
-  const profile = DEFAULT_PROFILE;
+  const { user, profile } = useAuth();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [income, setIncome] = useState<IncomeEntry[]>([]);
   const [mileage, setMileage] = useState<MileageLog[]>([]);
@@ -40,14 +38,16 @@ export default function DashboardScreen() {
   const [showCcaTooltip, setShowCcaTooltip] = useState(false);
 
   const loadData = useCallback(async () => {
+    if (!user) return;
+
     const currentYear = new Date().getFullYear();
     const [expensesRes, incomeRes, mileageRes, assetsRes, categoriesRes, settingsRes] = await Promise.all([
-      supabase.from('expenses').select('*').eq('user_id', profile.id),
-      supabase.from('income_entries').select('*').eq('user_id', profile.id),
-      supabase.from('mileage_logs').select('*').eq('user_id', profile.id),
-      supabase.from('assets').select('*').eq('user_id', profile.id),
+      supabase.from('expenses').select('*').eq('user_id', user.id),
+      supabase.from('income_entries').select('*').eq('user_id', user.id),
+      supabase.from('mileage_logs').select('*').eq('user_id', user.id),
+      supabase.from('assets').select('*').eq('user_id', user.id),
       supabase.from('cra_categories').select('*'),
-      supabase.from('mileage_settings').select('*').eq('user_id', profile.id).eq('year', currentYear).maybeSingle(),
+      supabase.from('mileage_settings').select('*').eq('user_id', user.id).eq('year', currentYear).maybeSingle(),
     ]);
 
     if (expensesRes.data) setExpenses(expensesRes.data);
@@ -61,13 +61,14 @@ export default function DashboardScreen() {
     if (storedCcaData) setCcaData(storedCcaData);
 
     setLoading(false);
-  }, []);
+  }, [user]);
 
   useEffect(() => {
-    loadData();
+    if (user) {
+      loadData();
 
-    // Subscribe to real-time changes
-    const expensesChannel = supabase
+      // Subscribe to real-time changes
+      const expensesChannel = supabase
       .channel('dashboard-expenses-changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'expenses' }, () => {
         loadData();
@@ -88,12 +89,13 @@ export default function DashboardScreen() {
       })
       .subscribe();
 
-    return () => {
-      supabase.removeChannel(expensesChannel);
-      supabase.removeChannel(incomeChannel);
-      supabase.removeChannel(mileageChannel);
-    };
-  }, [loadData]);
+      return () => {
+        supabase.removeChannel(expensesChannel);
+        supabase.removeChannel(incomeChannel);
+        supabase.removeChannel(mileageChannel);
+      };
+    }
+  }, [loadData, user]);
 
   // Reload when screen comes into focus
   useFocusEffect(
