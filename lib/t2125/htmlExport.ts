@@ -363,12 +363,11 @@ export function generateT2125HTML(data: T2125Data): string {
       <div class="amount">$${formatCurrency(data.part4_expenses.line9281_motorVehicleExpenses)}</div>
     </div>` : ''}
 
-    ${data.part4_expenses.line9936_cca > 0 ? `
     <div class="row">
       <div class="line-number">9936</div>
-      <div class="description">Capital cost allowance (CCA)</div>
+      <div class="description">Capital cost allowance (CCA). Enter amount ii of Area A minus any personal part and any CCA for business-use-of-home expenses</div>
       <div class="amount">$${formatCurrency(data.part4_expenses.line9936_cca)}</div>
-    </div>` : ''}
+    </div>
 
     <div class="row total">
       <div class="line-number">9368</div>
@@ -512,8 +511,8 @@ export function generateT2125HTML(data: T2125Data): string {
       '9270': { label: 'Other Expenses', value: data.part4_expenses.line9270_otherExpenses },
       '9275': { label: 'Delivery, Freight & Express', value: data.part4_expenses.line9275_deliveryFreight },
       '9281': { label: 'Motor Vehicle Expenses', value: data.part4_expenses.line9281_motorVehicleExpenses },
-      '9936': { label: 'Capital Cost Allowance', value: data.part4_expenses.line9936_cca },
-    }).filter(([_, data]) => data.value > 0).map(([line, data]) => `
+      '9936': { label: 'Capital Cost Allowance (CCA)', value: data.part4_expenses.line9936_cca },
+    }).filter(([_, data]) => data.value > 0 || _ === '9936').map(([line, data]) => `
     <div class="row">
       <div class="line-number">${line}</div>
       <div class="description">${data.label}</div>
