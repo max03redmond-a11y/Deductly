@@ -166,11 +166,11 @@ export default function LearnScreen() {
       case 'tracking':
         return (
           <View style={styles.content}>
-            <Text style={styles.emoji}>🧾</Text>
-            <Text style={styles.contentTitle}>Tracking Expenses & Mileage</Text>
+            <Text style={styles.emoji}>📊</Text>
+            <Text style={styles.contentTitle}>Tracking Expenses, Mileage & Depreciation</Text>
 
             <Text style={styles.paragraph}>
-              In Deductly Beta, everything needs to be logged manually — but doing it right now saves you hours later at tax time. The CRA requires you to keep detailed records for all your self-employment expenses and mileage.
+              Accurate tracking is the foundation of maximizing your deductions. Deductly keeps all your expenses, mileage, and vehicle depreciation (CCA) in one place so your CRA export is always complete and compliant.
             </Text>
 
             <Text style={styles.sectionHeader}>🧾 1. Logging Expenses</Text>
@@ -178,28 +178,28 @@ export default function LearnScreen() {
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                Each time you pay for something work-related (gas, oil changes, repairs, insurance, phone bill, parking, etc.), add a new expense entry in the app.
+                Add every business-related cost — like gas, oil changes, repairs, insurance, phone bills, parking, or car washes — right in the app.
               </Text>
             </View>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                Record the date, amount, and a short description like "Gas – Shell Station."
+                Enter the date, amount, vendor, and category to keep everything organized.
               </Text>
             </View>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                Select the correct category so it exports properly to your CRA T2125 later.
+                Deductly automatically assigns each cost to the correct CRA expense line so it's ready for your T2125 export later.
               </Text>
             </View>
 
             <View style={styles.infoBox}>
-              <Text style={styles.infoBoxTitle}>💡 Keep every receipt.</Text>
+              <Text style={styles.infoBoxTitle}>💡 Tip: Keep every receipt!</Text>
               <Text style={styles.infoBoxText}>
-                The CRA can request proof for up to 6 years. Snap photos of all paper receipts or upload screenshots for digital ones. Deductly stores them securely so you never lose evidence of your claims.
+                The CRA can request proof for up to six years. Snap photos or upload screenshots — Deductly stores them securely so you're always audit-ready.
               </Text>
             </View>
 
@@ -208,39 +208,69 @@ export default function LearnScreen() {
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                Log each trip's start and end odometer readings in the Mileage tab.
+                Log your start and end odometer readings for each business trip or driving day.
               </Text>
             </View>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                Include a brief note for each trip (e.g., "Airport rides – 4 trips").
+                Add short notes (e.g., "Airport rides – 4 trips") for clear recordkeeping.
               </Text>
             </View>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                At year-end, Deductly calculates your business-use percentage, which determines how much of your car expenses are deductible.
+                Deductly automatically calculates your business-use percentage, which determines how much of your vehicle expenses and depreciation are deductible.
               </Text>
             </View>
 
             <View style={styles.bulletPoint}>
               <Text style={styles.bullet}>•</Text>
               <Text style={styles.bulletText}>
-                Try to record your mileage daily or weekly for accuracy — it's much easier than catching up months later.
+                Update mileage regularly — daily or weekly — for the most accurate results.
               </Text>
             </View>
 
-            <Text style={styles.sectionHeader}>🧮 3. Why Accurate Tracking Matters</Text>
+            <Text style={styles.sectionHeader}>⚙️ 3. Vehicle Depreciation (CCA)</Text>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                The Capital Cost Allowance (CCA) lets you deduct the decline in value of your vehicle over time.
+              </Text>
+            </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                Deductly makes this simple — enter your vehicle class (10, 10.1, or 54 for electric vehicles), purchase details, and whether the half-year rule applies.
+              </Text>
+            </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                The app automatically calculates your annual CCA deduction and tracks your remaining Undepreciated Capital Cost (UCC) each year.
+              </Text>
+            </View>
+
+            <View style={styles.bulletPoint}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.bulletText}>
+                On your T2125 export, Deductly applies your business-use percentage to your CCA so your deduction is accurate and CRA-ready.
+              </Text>
+            </View>
+
+            <Text style={styles.sectionHeader}>🧮 4. Why It Matters</Text>
 
             <Text style={styles.paragraph}>
-              The more precise your records, the larger your legal deductions and the smaller your audit risk. Every kilometer and every receipt adds up to real tax savings.
+              Precise tracking means bigger deductions and less audit risk. Every kilometre, receipt, and CCA entry adds up to real savings.
             </Text>
 
             <Text style={[styles.paragraph, styles.highlight]}>
-              Deductly helps you stay organized — all your income, expenses, and mileage are stored together so your export to the T2125 is accurate and CRA-ready.
+              Deductly keeps everything organized — so your income, expenses, mileage, and vehicle depreciation flow seamlessly into your CRA T2125 export, saving you time and stress at tax season.
             </Text>
           </View>
         );
