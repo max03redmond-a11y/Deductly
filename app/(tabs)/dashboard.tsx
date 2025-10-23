@@ -186,7 +186,7 @@ export default function DashboardScreen() {
 
   const handleExportT2125CSV = async () => {
     try {
-      const t2125Data = generateT2125Data(profile, expenses, income, mileage, assets, mileageSettings);
+      const t2125Data = generateT2125Data(profile, expenses, income, mileage, assets, mileageSettings, ccaData);
       const csvContent = generateT2125CSV(t2125Data);
       await downloadCSV(csvContent, `t2125_export_${new Date().getFullYear()}.csv`);
       showToast('T2125 CSV exported successfully');
@@ -198,7 +198,7 @@ export default function DashboardScreen() {
 
   const handleExportT2125HTML = async () => {
     try {
-      const t2125Data = generateT2125Data(profile, expenses, income, mileage, assets, mileageSettings);
+      const t2125Data = generateT2125Data(profile, expenses, income, mileage, assets, mileageSettings, ccaData);
       const htmlContent = generateT2125HTML(t2125Data);
       await downloadHTML(htmlContent, `t2125_report_${new Date().getFullYear()}.html`);
       showToast('T2125 report exported successfully');

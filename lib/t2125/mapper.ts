@@ -206,7 +206,8 @@ export function generateT2125Data(
   income: IncomeRecord[] | IncomeEntry[],
   mileage: MileageLog[],
   assets: Asset[],
-  mileageSettings?: any
+  mileageSettings?: any,
+  ccaData?: { ccaDeduction: number; remainingUCC: number } | null
 ): T2125Data {
   const filter = getYTDFilter();
   const currentYear = new Date().getFullYear();
@@ -295,11 +296,18 @@ export function generateT2125Data(
 
   const totalVehicleExpenses = vehicleFuel + vehicleInsurance + vehicleMaintenance + vehicleLicence + vehicleParking + vehicleLease;
 
-  const ccaDeduction = calculateCCADeduction(assets, filter);
+  // Calculate CCA using the provided ccaData (from storage) if available
+  // This ensures consistency with the dashboard display
+  const ccaDeduction = ccaData
+    ? ccaData.ccaDeduction * (businessUsePercent / 100)
+    : calculateCCADeduction(assets, filter);
+
   console.log('CCA Calculation:', {
     assetsCount: assets.length,
-    assets: assets.map(a => ({ name: a.asset_name, cca_current: a.cca_current })),
-    ccaDeduction,
+    businessUsePercent,
+    ccaDataProvided: !!ccaData,
+    rawCcaDeduction: ccaData?.ccaDeduction,
+    finalCcaDeduction: ccaDeduction,
   });
   expensesByLine.line9936_cca = ccaDeduction;
 

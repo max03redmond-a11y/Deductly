@@ -19,6 +19,7 @@ import { useAppStore } from '@/store/useAppStore';
 import { supabase } from '@/lib/supabase';
 import { showToast } from '@/lib/toast';
 import { Expense, IncomeRecord, IncomeEntry, MileageLog, Asset } from '@/types/database';
+import { storage, STORAGE_KEYS } from '@/lib/storage';
 
 interface ExportModalProps {
   visible: boolean;
@@ -78,14 +79,18 @@ export default function ExportModal({ visible, onClose }: ExportModalProps) {
       const userProfile = profileRes.data || profile;
       const mileageSettings = settingsRes.data || null;
 
+      // Load CCA data from storage
+      const ccaData = await storage.getJSON<{ ccaDeduction: number; remainingUCC: number }>(STORAGE_KEYS.CCA_DATA);
+
       console.log('Export data counts:', {
         expenses: expenses.length,
         income: incomeEntries.length,
         mileage: mileage.length,
         assets: assets.length,
+        ccaData: ccaData,
       });
 
-      const t2125Data = generateT2125Data(userProfile, expenses, incomeEntries, mileage, assets, mileageSettings);
+      const t2125Data = generateT2125Data(userProfile, expenses, incomeEntries, mileage, assets, mileageSettings, ccaData);
 
       console.log('T2125 generated:', {
         name: t2125Data.identification.yourName,
