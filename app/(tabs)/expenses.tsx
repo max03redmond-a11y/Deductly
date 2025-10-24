@@ -12,7 +12,7 @@ import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { formatCategoryLabel } from '@/lib/formatters';
 
 const TOOLTIPS = {
-  vehicleClass: 'The CRA uses vehicle classes to determine how much of your car\'s value you can depreciate each year for tax purposes.\n\n• Class 10: Vehicles costing $30,000 or less (before tax)\n• Class 10.1: Vehicles costing over $30,000 (before tax, capped at $30,000 for CCA)\n• Class 54: Zero-emission or electric vehicles, which may qualify for a 100% first-year write-off under special CRA rules\n\nMost Uber drivers fall under Class 10 or 10.1, while EV drivers may use Class 54. All standard vehicles depreciate at 30% per year using the declining balance method.',
+  vehicleClass: 'The CRA uses vehicle classes to determine how much of your car\'s value you can depreciate each year for tax purposes.\n\n• Class 10: Vehicles costing $30,000 or less (before tax)\n• Class 10.1: Vehicles costing over $30,000 (before tax, capped at $30,000 for CCA)\n• Class 54: Zero-emission or electric vehicles\n\nAll vehicle classes depreciate at 30% per year using the declining balance method.',
   purchasePrice: 'The cost of your vehicle including taxes and fees.',
   openingUCC: 'The remaining undepreciated cost from last year. Enter 0 if this is your first year.',
   ccaRate: 'Automatically filled based on vehicle class.',
@@ -22,7 +22,6 @@ const TOOLTIPS = {
 };
 
 const getCCARate = (vehicleClass: '10' | '10.1' | '54'): number => {
-  if (vehicleClass === '54') return 100;
   return 30;
 };
 

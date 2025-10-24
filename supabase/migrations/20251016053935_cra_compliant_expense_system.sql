@@ -67,7 +67,7 @@ VALUES
   ('PARKING_TOLLS', 'Parking and Tolls', '9281', true, 'On-trip parking and tolls.', 'Parking while picking up/dropping off passengers and highway tolls during trips are deductible. Personal parking is not.', 100, false),
   ('LEASE_PAYMENTS', 'Vehicle Lease Payments', '9281', true, 'Vehicle lease payments (CRA monthly cap).', 'Lease payments are capped at approx. $900 + tax per month (2025 limit). We apply the cap automatically. Deduct business-use % of capped amount.', 100, true),
   ('LOAN_INTEREST', 'Interest on Car Loan', '8710', false, 'Interest on car loan (CRA monthly cap).', 'Only the interest portion of loan payments is deductible, not principal. Monthly cap of ~$300 applies. Deduct business-use % only.', 100, true),
-  ('VEHICLE_DEPRECIATION_CCA', 'Capital Cost Allowance (CCA)', '9936', false, 'Depreciation using CCA (Class 10/10.1/54).', 'Vehicle depreciation at 30% declining balance (Class 10/10.1) or 100% first-year for zero-emission (Class 54). 50% rule applies in year 1 for Class 10/10.1. Luxury vehicle cap enforced automatically.', 100, true),
+  ('VEHICLE_DEPRECIATION_CCA', 'Capital Cost Allowance (CCA)', '9936', false, 'Depreciation using CCA (Class 10/10.1/54).', 'Vehicle depreciation at 30% declining balance for all vehicle classes (Class 10/10.1/54). 50% rule applies in year 1. Luxury vehicle cap enforced automatically.', 100, true),
 
   -- Operating/Admin expenses
   ('UBER_FEES', 'Platform Service Fees', '8871', false, 'Platform/service fees deducted by Uber/Lyft.', 'Fees charged by Uber, Lyft, DoorDash, etc. are fully deductible. These reduce your net income and are reported separately from gross earnings.', 100, false),
