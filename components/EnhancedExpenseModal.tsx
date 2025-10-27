@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
+  InputAccessoryView,
 } from 'react-native';
 import { X, Check } from 'lucide-react-native';
 import { supabase } from '@/lib/supabase';
@@ -52,6 +53,15 @@ export function EnhancedExpenseModal({
   const [businessPercentage, setBusinessPercentage] = useState('100');
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const dateInputRef = useRef<TextInput>(null);
+  const vendorInputRef = useRef<TextInput>(null);
+  const amountInputRef = useRef<TextInput>(null);
+  const taxInputRef = useRef<TextInput>(null);
+  const percentageInputRef = useRef<TextInput>(null);
+  const notesInputRef = useRef<TextInput>(null);
+
+  const inputAccessoryViewID = 'expenseInputAccessory';
 
   useEffect(() => {
     if (visible) {
@@ -180,6 +190,14 @@ export function EnhancedExpenseModal({
   const totalAmount = calculateTotalAmount();
   const deductibleAmount = calculateDeductibleAmount();
 
+  const handleNext = (nextRef: React.RefObject<TextInput | null>) => {
+    nextRef.current?.focus();
+  };
+
+  const handleDone = () => {
+    Keyboard.dismiss();
+  };
+
   return (
     <Modal visible={visible} animationType="slide" transparent>
       <KeyboardAvoidingView
@@ -205,7 +223,7 @@ export function EnhancedExpenseModal({
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.scrollContent}
             keyboardShouldPersistTaps="handled"
-            keyboardDismissMode="on-drag"
+            keyboardDismissMode="interactive"
             nestedScrollEnabled={true}
             bounces={true}
           >
@@ -217,12 +235,16 @@ export function EnhancedExpenseModal({
                 <View style={styles.inputWrapper}>
                   <Text style={styles.label}>Date</Text>
                   <TextInput
+                    ref={dateInputRef}
                     style={styles.input}
                     value={date}
                     onChangeText={setDate}
                     placeholder="YYYY-MM-DD"
                     placeholderTextColor="#9CA3AF"
                     editable={!loading}
+                    returnKeyType="next"
+                    onSubmitEditing={() => handleNext(vendorInputRef)}
+                    inputAccessoryViewID={Platform.OS === 'ios' ? inputAccessoryViewID : undefined}
                   />
                 </View>
               </View>
@@ -231,6 +253,7 @@ export function EnhancedExpenseModal({
                 <View style={styles.inputWrapper}>
                   <Text style={styles.label}>Vendor</Text>
                   <TextInput
+                    ref={vendorInputRef}
                     style={styles.input}
                     value={vendor}
                     onChangeText={setVendor}
@@ -238,6 +261,9 @@ export function EnhancedExpenseModal({
                     placeholderTextColor="#9CA3AF"
                     editable={!loading}
                     autoCapitalize="words"
+                    returnKeyType="next"
+                    onSubmitEditing={() => handleNext(amountInputRef)}
+                    inputAccessoryViewID={Platform.OS === 'ios' ? inputAccessoryViewID : undefined}
                   />
                 </View>
               </View>
@@ -253,6 +279,7 @@ export function EnhancedExpenseModal({
                   <View style={styles.dollarInput}>
                     <Text style={styles.dollarSign}>$</Text>
                     <TextInput
+                      ref={amountInputRef}
                       style={styles.amountField}
                       value={amountBeforeTax}
                       onChangeText={setAmountBeforeTax}
@@ -260,6 +287,11 @@ export function EnhancedExpenseModal({
                       placeholderTextColor="#9CA3AF"
                       keyboardType="decimal-pad"
                       editable={!loading}
+                      textAlign="right"
+                      clearButtonMode="while-editing"
+                      returnKeyType="next"
+                      onSubmitEditing={() => handleNext(taxInputRef)}
+                      inputAccessoryViewID={Platform.OS === 'ios' ? inputAccessoryViewID : undefined}
                     />
                   </View>
                 </View>
@@ -269,6 +301,7 @@ export function EnhancedExpenseModal({
                   <View style={styles.dollarInput}>
                     <Text style={styles.dollarSign}>$</Text>
                     <TextInput
+                      ref={taxInputRef}
                       style={styles.amountField}
                       value={taxAmount}
                       onChangeText={setTaxAmount}
@@ -276,6 +309,11 @@ export function EnhancedExpenseModal({
                       placeholderTextColor="#9CA3AF"
                       keyboardType="decimal-pad"
                       editable={!loading}
+                      textAlign="right"
+                      clearButtonMode="while-editing"
+                      returnKeyType="done"
+                      onSubmitEditing={handleDone}
+                      inputAccessoryViewID={Platform.OS === 'ios' ? inputAccessoryViewID : undefined}
                     />
                   </View>
                 </View>
@@ -345,6 +383,7 @@ export function EnhancedExpenseModal({
                   <Text style={styles.customLabel}>Or enter custom %:</Text>
                   <View style={styles.percentageInput}>
                     <TextInput
+                      ref={percentageInputRef}
                       style={styles.percentageField}
                       value={businessPercentage}
                       onChangeText={setBusinessPercentage}
@@ -352,6 +391,9 @@ export function EnhancedExpenseModal({
                       placeholderTextColor="#9CA3AF"
                       keyboardType="decimal-pad"
                       editable={!loading}
+                      returnKeyType="next"
+                      onSubmitEditing={() => handleNext(notesInputRef)}
+                      inputAccessoryViewID={Platform.OS === 'ios' ? inputAccessoryViewID : undefined}
                     />
                     <Text style={styles.percentSign}>%</Text>
                   </View>
@@ -389,6 +431,7 @@ export function EnhancedExpenseModal({
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>NOTES (OPTIONAL)</Text>
               <TextInput
+                ref={notesInputRef}
                 style={[styles.input, styles.notesInput]}
                 value={notes}
                 onChangeText={setNotes}
@@ -397,6 +440,9 @@ export function EnhancedExpenseModal({
                 multiline
                 numberOfLines={3}
                 editable={!loading}
+                returnKeyType="done"
+                onSubmitEditing={handleDone}
+                inputAccessoryViewID={Platform.OS === 'ios' ? inputAccessoryViewID : undefined}
               />
             </View>
           </ScrollView>
@@ -414,6 +460,16 @@ export function EnhancedExpenseModal({
             </TouchableOpacity>
           </View>
         </View>
+
+        {Platform.OS === 'ios' && (
+          <InputAccessoryView nativeID={inputAccessoryViewID}>
+            <View style={styles.inputAccessory}>
+              <TouchableOpacity onPress={handleDone}>
+                <Text style={styles.accessoryButtonText}>Done</Text>
+              </TouchableOpacity>
+            </View>
+          </InputAccessoryView>
+        )}
       </KeyboardAvoidingView>
     </Modal>
   );
@@ -749,5 +805,22 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#1E40AF',
     lineHeight: 20,
+  },
+  inputAccessory: {
+    backgroundColor: '#FFFFFF',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+  },
+  accessoryButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1E5128',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
 });

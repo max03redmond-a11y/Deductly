@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,10 @@ import {
   ScrollView,
   TextInput,
   Platform,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
+  InputAccessoryView,
 } from 'react-native';
 import { X } from 'lucide-react-native';
 import { supabase } from '@/lib/supabase';
@@ -27,6 +31,15 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
   const { user } = useAuth();
   const { addIncomeEntry, loadIncomeEntries, showToast } = useAppStore();
   const [loading, setLoading] = useState(false);
+
+  const dateInputRef = useRef<TextInput>(null);
+  const payoutInputRef = useRef<TextInput>(null);
+  const gstInputRef = useRef<TextInput>(null);
+  const tipsInputRef = useRef<TextInput>(null);
+  const bonusesInputRef = useRef<TextInput>(null);
+  const otherIncomeInputRef = useRef<TextInput>(null);
+
+  const inputAccessoryViewID = 'incomeInputAccessory';
 
   const [date, setDate] = useState('');
   const [payoutAmount, setPayoutAmount] = useState('');
@@ -144,6 +157,14 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
   const otherIncomeAmount = parseFloat(otherIncome) || 0;
   const totalIncome = grossSales + tipsAmount + bonusesAmount + otherIncomeAmount;
 
+  const handleNext = (nextRef: React.RefObject<TextInput | null>) => {
+    nextRef.current?.focus();
+  };
+
+  const handleDone = () => {
+    Keyboard.dismiss();
+  };
+
   return (
     <Modal
       visible={visible}
@@ -151,7 +172,13 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
       presentationStyle="pageSheet"
       onRequestClose={onClose}
     >
-      <View style={styles.container}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.flex1}
+        keyboardVerticalOffset={0}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.title}>{entry ? 'Edit Income' : 'Add Income'}</Text>
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
@@ -159,17 +186,25 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
           </TouchableOpacity>
         </View>
 
-        <ScrollView style={styles.content}>
+        <ScrollView
+          style={styles.content}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="interactive"
+        >
           <View style={styles.section}>
             <Text style={styles.label}>
               Date <Text style={styles.required}>*</Text>
             </Text>
             <TextInput
+              ref={dateInputRef}
               style={styles.input}
               value={date}
               onChangeText={setDate}
               placeholder="YYYY-MM-DD"
               placeholderTextColor={theme.colors.textSecondary}
+              returnKeyType="next"
+              onSubmitEditing={() => handleNext(payoutInputRef)}
+              inputAccessoryViewID={Platform.OS === 'ios' ? inputAccessoryViewID : undefined}
             />
           </View>
 
@@ -181,12 +216,18 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
               {includesTax ? 'Total amount including GST/HST' : 'Total amount (no tax)'}
             </Text>
             <TextInput
-              style={styles.input}
+              ref={payoutInputRef}
+              style={[styles.input, styles.currencyInput]}
               value={payoutAmount}
               onChangeText={setPayoutAmount}
               placeholder="0.00"
               keyboardType="decimal-pad"
               placeholderTextColor={theme.colors.textSecondary}
+              textAlign="right"
+              clearButtonMode="while-editing"
+              returnKeyType={includesTax ? 'next' : 'done'}
+              onSubmitEditing={() => includesTax ? handleNext(gstInputRef) : handleDone()}
+              inputAccessoryViewID={Platform.OS === 'ios' ? inputAccessoryViewID : undefined}
             />
           </View>
 
@@ -221,12 +262,18 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
                 Enter the GST/HST portion included in gross sales
               </Text>
               <TextInput
-                style={styles.input}
+                ref={gstInputRef}
+                style={[styles.input, styles.currencyInput]}
                 value={gstAmount}
                 onChangeText={setGstAmount}
                 placeholder="0.00"
                 keyboardType="decimal-pad"
                 placeholderTextColor={theme.colors.textSecondary}
+                textAlign="right"
+                clearButtonMode="while-editing"
+                returnKeyType="next"
+                onSubmitEditing={() => handleNext(tipsInputRef)}
+                inputAccessoryViewID={Platform.OS === 'ios' ? inputAccessoryViewID : undefined}
               />
             </View>
           )}
@@ -241,24 +288,36 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
           <View style={styles.section}>
             <Text style={styles.label}>Tips ($)</Text>
             <TextInput
-              style={styles.input}
+              ref={tipsInputRef}
+              style={[styles.input, styles.currencyInput]}
               value={tips}
               onChangeText={setTips}
               placeholder="0.00"
               keyboardType="decimal-pad"
               placeholderTextColor={theme.colors.textSecondary}
+              textAlign="right"
+              clearButtonMode="while-editing"
+              returnKeyType="next"
+              onSubmitEditing={() => handleNext(bonusesInputRef)}
+              inputAccessoryViewID={Platform.OS === 'ios' ? inputAccessoryViewID : undefined}
             />
           </View>
 
           <View style={styles.section}>
             <Text style={styles.label}>Bonuses ($)</Text>
             <TextInput
-              style={styles.input}
+              ref={bonusesInputRef}
+              style={[styles.input, styles.currencyInput]}
               value={bonuses}
               onChangeText={setBonuses}
               placeholder="0.00"
               keyboardType="decimal-pad"
               placeholderTextColor={theme.colors.textSecondary}
+              textAlign="right"
+              clearButtonMode="while-editing"
+              returnKeyType="next"
+              onSubmitEditing={() => handleNext(otherIncomeInputRef)}
+              inputAccessoryViewID={Platform.OS === 'ios' ? inputAccessoryViewID : undefined}
             />
           </View>
 
@@ -268,12 +327,18 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
               Referrals, incentives, or other income
             </Text>
             <TextInput
-              style={styles.input}
+              ref={otherIncomeInputRef}
+              style={[styles.input, styles.currencyInput]}
               value={otherIncome}
               onChangeText={setOtherIncome}
               placeholder="0.00"
               keyboardType="decimal-pad"
               placeholderTextColor={theme.colors.textSecondary}
+              textAlign="right"
+              clearButtonMode="while-editing"
+              returnKeyType="done"
+              onSubmitEditing={handleDone}
+              inputAccessoryViewID={Platform.OS === 'ios' ? inputAccessoryViewID : undefined}
             />
           </View>
 
@@ -326,7 +391,19 @@ export function IncomeModal({ visible, entry, onClose }: IncomeModalProps) {
           <Button title="Cancel" onPress={onClose} style={styles.button} />
           <Button title={entry ? 'Update' : 'Add Income'} onPress={handleSave} loading={loading} style={styles.button} />
         </View>
-      </View>
+        </View>
+      </TouchableWithoutFeedback>
+
+      {Platform.OS === 'ios' && (
+        <InputAccessoryView nativeID={inputAccessoryViewID}>
+          <View style={styles.inputAccessory}>
+            <TouchableOpacity onPress={handleDone}>
+              <Text style={styles.accessoryButtonText}>Done</Text>
+            </TouchableOpacity>
+          </View>
+        </InputAccessoryView>
+      )}
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
@@ -484,5 +561,28 @@ const styles = StyleSheet.create({
   },
   button: {
     flex: 1,
+  },
+  flex1: {
+    flex: 1,
+  },
+  currencyInput: {
+    fontVariant: ['tabular-nums'],
+  },
+  inputAccessory: {
+    backgroundColor: theme.colors.surface,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+  },
+  accessoryButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.colors.primary,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
 });
