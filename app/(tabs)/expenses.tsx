@@ -11,6 +11,7 @@ import { EmptyState } from '@/components/EmptyState';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { formatCategoryLabel } from '@/lib/formatters';
 import { TabScreenWrapper } from '@/components/TabScreenWrapper';
+import { theme } from '@/constants/theme';
 
 const TOOLTIPS = {
   vehicleClass: 'The CRA uses vehicle classes to determine how much of your car\'s value you can depreciate each year for tax purposes.\n\n• Class 10: Vehicles costing $30,000 or less (before tax)\n• Class 10.1: Vehicles costing over $30,000 (before tax, capped at $30,000 for CCA)\n• Class 54: Zero-emission or electric vehicles\n\nAll vehicle classes depreciate at 30% per year using the declining balance method.',
@@ -693,13 +694,9 @@ const styles = StyleSheet.create({
   categoryCard: {
     backgroundColor: '#FFFFFF',
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 24,
     marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 1,
+    ...theme.shadows.sm,
   },
   categoryHeader: {
     flexDirection: 'row',
@@ -740,14 +737,10 @@ const styles = StyleSheet.create({
   },
   expenseCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    borderRadius: 24,
     padding: 12,
     width: '48%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
+    ...theme.shadows.sm,
   },
   expenseHeader: {
     flexDirection: 'row',

@@ -14,6 +14,7 @@ import ExportModal from '@/components/ExportModal';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { formatCategoryLabel } from '@/lib/formatters';
 import { TabScreenWrapper } from '@/components/TabScreenWrapper';
+import { theme } from '@/constants/theme';
 
 const VEHICLE_EXPENSE_CODES = [
   'GAS_FUEL',
@@ -641,15 +642,11 @@ const styles = StyleSheet.create({
   taxCard: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-    borderRadius: 20,
+    borderRadius: 24,
     padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 12,
-    elevation: 1,
     borderWidth: 1,
     borderColor: '#F3F4F6',
+    ...theme.shadows.sm,
   },
   taxCardIcon: {
     width: 48,
@@ -915,16 +912,12 @@ const styles = StyleSheet.create({
   },
   metricCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 20,
+    borderRadius: 24,
     padding: 20,
     width: '48%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 12,
-    elevation: 1,
     borderWidth: 1,
     borderColor: '#F3F4F6',
+    ...theme.shadows.sm,
   },
   metricLabel: {
     fontSize: 12,

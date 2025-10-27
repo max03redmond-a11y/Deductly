@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Car, Plus, Calendar } from 'lucide-react-native';
 import { showToast } from '@/lib/toast';
 import { TabScreenWrapper } from '@/components/TabScreenWrapper';
+import { theme } from '@/constants/theme';
 
 interface MileageLog {
   id: string;
@@ -632,13 +633,14 @@ const styles = StyleSheet.create({
   },
   businessUseCard: {
     backgroundColor: '#EFF6FF',
-    borderRadius: 12,
+    borderRadius: 24,
     padding: 20,
     alignItems: 'center',
     marginTop: 8,
     marginBottom: 16,
     borderWidth: 1,
     borderColor: '#DBEAFE',
+    ...theme.shadows.sm,
   },
   businessUseLabel: {
     fontSize: 12,
@@ -674,10 +676,11 @@ const styles = StyleSheet.create({
   },
   yearCalcCard: {
     backgroundColor: '#F9FAFB',
-    borderRadius: 12,
+    borderRadius: 24,
     padding: 16,
     borderWidth: 1,
     borderColor: '#E5E7EB',
+    ...theme.shadows.sm,
   },
   yearCalcRow: {
     flexDirection: 'row',

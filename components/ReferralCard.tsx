@@ -58,17 +58,13 @@ export function ReferralCard({ referral }: ReferralCardProps) {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
+    borderRadius: 24,
     padding: 16,
     marginRight: 12,
     width: 280,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
     borderWidth: 1,
     borderColor: '#F3F4F6',
+    ...theme.shadows.sm,
   },
   header: {
     flexDirection: 'row',

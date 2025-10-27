@@ -110,6 +110,7 @@ export const borderRadius = {
   base: 12,
   lg: 16,
   xl: 20,
+  '2xl': 24,
   full: 9999,
 };
 
@@ -123,31 +124,31 @@ export const shadows = {
   },
   sm: {
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  base: {
-    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 2,
   },
-  md: {
+  base: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 3,
   },
+  md: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 4,
+  },
   lg: {
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
+    shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.15,
-    shadowRadius: 16,
-    elevation: 5,
+    shadowRadius: 20,
+    elevation: 6,
   },
 };
 
@@ -203,9 +204,9 @@ export const components = {
 
   card: {
     backgroundColor: colors.surface,
-    borderRadius: borderRadius.base,
+    borderRadius: borderRadius['2xl'],
     padding: spacing.lg,
-    ...shadows.base,
+    ...shadows.sm,
   },
 
   input: {

@@ -286,11 +286,12 @@ const styles = StyleSheet.create({
   },
   incomeCard: {
     backgroundColor: '#fff',
-    borderRadius: 12,
+    borderRadius: 24,
     padding: 14,
     marginBottom: 10,
     borderWidth: 1,
     borderColor: theme.colors.border,
+    ...theme.shadows.sm,
   },
   incomeHeader: {
     flexDirection: 'row',

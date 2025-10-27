@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { Clock, Bookmark } from 'lucide-react-native';
 import { ArticleCategory, CATEGORY_COLORS } from '@/lib/imageCatalog';
+import { theme } from '@/constants/theme';
 
 export type LearnArticle = {
   id: string;
@@ -89,14 +90,10 @@ export function LearnCard({ article, onPress }: LearnCardProps) {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 20,
+    borderRadius: 24,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 12,
-    elevation: 3,
     marginBottom: 16,
+    ...theme.shadows.sm,
   },
   imageContainer: {
     position: 'relative',
