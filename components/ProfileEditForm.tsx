@@ -18,10 +18,21 @@ import { theme } from '@/constants/theme';
 interface ProfileEditFormProps {
   profile: Profile;
   onSuccess: () => void;
+  onChangeDetected?: () => void;
 }
 
-export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
+export function ProfileEditForm({ profile, onSuccess, onChangeDetected }: ProfileEditFormProps) {
   const [loading, setLoading] = useState(false);
+
+  const [changeDetected, setChangeDetected] = useState(false);
+
+  const handleFieldChange = (setter: (value: any) => void, value: any) => {
+    setter(value);
+    if (!changeDetected && onChangeDetected) {
+      setChangeDetected(true);
+      onChangeDetected();
+    }
+  };
 
   const [legalName, setLegalName] = useState(profile.legal_name || '');
   const [addressLine1, setAddressLine1] = useState(profile.mailing_address_line1 || '');
@@ -157,7 +168,7 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
           <TextInput
             style={styles.input}
             value={legalName}
-            onChangeText={setLegalName}
+            onChangeText={(text) => handleFieldChange(setLegalName, text)}
             placeholder="Your full legal name"
             placeholderTextColor="#9CA3AF"
             editable={!loading}
@@ -173,7 +184,7 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
           <TextInput
             style={styles.input}
             value={businessName}
-            onChangeText={setBusinessName}
+            onChangeText={(text) => handleFieldChange(setBusinessName, text)}
             placeholder="e.g., Self-employed – Uber Driver"
             placeholderTextColor="#9CA3AF"
             editable={!loading}
@@ -186,7 +197,7 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
           <TextInput
             style={styles.input}
             value={mainProductService}
-            onChangeText={setMainProductService}
+            onChangeText={(text) => handleFieldChange(setMainProductService, text)}
             placeholder="Rideshare transportation"
             placeholderTextColor="#9CA3AF"
             editable={!loading}
@@ -199,7 +210,7 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
           <TextInput
             style={styles.input}
             value={industryCode}
-            onChangeText={setIndustryCode}
+            onChangeText={(text) => handleFieldChange(setIndustryCode, text)}
             placeholder="485310"
             placeholderTextColor="#9CA3AF"
             keyboardType="number-pad"
@@ -312,7 +323,7 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
           <TextInput
             style={styles.input}
             value={businessAddressLine1}
-            onChangeText={setBusinessAddressLine1}
+            onChangeText={(text) => handleFieldChange(setBusinessAddressLine1, text)}
             placeholder="123 Main Street"
             placeholderTextColor="#9CA3AF"
             editable={!loading}

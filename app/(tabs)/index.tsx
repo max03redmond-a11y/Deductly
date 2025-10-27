@@ -15,13 +15,44 @@ export default function ProfileScreen() {
   const { user, profile, signOut, refreshProfile } = useAuth();
   const [editMode, setEditMode] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const provinceName = CANADIAN_PROVINCES.find(p => p.value === profile?.province)?.label;
   const businessTypeName = BUSINESS_TYPES.find(b => b.value === profile?.business_type)?.label;
 
   const handleEditSuccess = async () => {
     await refreshProfile();
+    setHasUnsavedChanges(false);
     setEditMode(false);
+  };
+
+  const handleCancelEdit = () => {
+    if (hasUnsavedChanges) {
+      if (Platform.OS === 'web') {
+        if (confirm('You have unsaved changes. Are you sure you want to cancel?')) {
+          setHasUnsavedChanges(false);
+          setEditMode(false);
+        }
+      } else {
+        Alert.alert(
+          'Unsaved Changes',
+          'You have unsaved changes. Are you sure you want to cancel?',
+          [
+            { text: 'Keep Editing', style: 'cancel' },
+            {
+              text: 'Discard Changes',
+              style: 'destructive',
+              onPress: () => {
+                setHasUnsavedChanges(false);
+                setEditMode(false);
+              },
+            },
+          ]
+        );
+      }
+    } else {
+      setEditMode(false);
+    }
   };
 
   const handleLogout = async () => {
@@ -110,13 +141,17 @@ export default function ProfileScreen() {
     return (
       <View style={styles.container}>
         <View style={styles.editHeader}>
-          <TouchableOpacity onPress={() => setEditMode(false)} style={styles.backButton}>
-            <Text style={styles.backButtonText}>Cancel</Text>
+          <TouchableOpacity onPress={handleCancelEdit} style={styles.cancelButton}>
+            <Text style={styles.cancelButtonText}>Cancel</Text>
           </TouchableOpacity>
           <Text style={styles.editTitle}>Edit Profile</Text>
-          <View style={styles.backButton} />
+          <View style={styles.cancelButton} />
         </View>
-        <ProfileEditForm profile={profile} onSuccess={handleEditSuccess} />
+        <ProfileEditForm
+          profile={profile}
+          onSuccess={handleEditSuccess}
+          onChangeDetected={() => setHasUnsavedChanges(true)}
+        />
       </View>
     );
   }
@@ -167,16 +202,6 @@ export default function ProfileScreen() {
 
             <View style={styles.menuDivider} />
 
-            <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
-              <View style={styles.menuIconContainer}>
-                <LogOut size={20} color={theme.colors.icon} />
-              </View>
-              <Text style={styles.menuLabel}>Logout</Text>
-              <ChevronRight size={20} color={theme.colors.iconInactive} />
-            </TouchableOpacity>
-
-            <View style={styles.menuDivider} />
-
             <TouchableOpacity style={styles.menuItem}>
               <View style={styles.menuIconContainer}>
                 <Building2 size={20} color={theme.colors.icon} />
@@ -185,6 +210,20 @@ export default function ProfileScreen() {
                 <Text style={styles.menuLabel}>Business Information</Text>
                 <Text style={styles.menuValue}>{businessTypeName}</Text>
               </View>
+              <ChevronRight size={20} color={theme.colors.iconInactive} />
+            </TouchableOpacity>
+          </Card>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Session</Text>
+
+          <Card style={styles.menuCard}>
+            <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
+              <View style={[styles.menuIconContainer, styles.logoutIconContainer]}>
+                <LogOut size={20} color="#DC2626" />
+              </View>
+              <Text style={[styles.menuLabel, styles.logoutText]}>Logout</Text>
               <ChevronRight size={20} color={theme.colors.iconInactive} />
             </TouchableOpacity>
           </Card>
@@ -320,6 +359,12 @@ const styles = StyleSheet.create({
   dangerIconContainer: {
     backgroundColor: '#FEE2E2',
   },
+  logoutIconContainer: {
+    backgroundColor: '#FEE2E2',
+  },
+  logoutText: {
+    color: '#DC2626',
+  },
   menuContent: {
     flex: 1,
   },
@@ -390,6 +435,20 @@ const styles = StyleSheet.create({
   backButtonText: {
     fontSize: theme.typography.fontSize.base,
     color: theme.colors.primary,
+    fontWeight: theme.typography.fontWeight.semibold,
+  },
+  cancelButton: {
+    minWidth: 80,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.base,
+    backgroundColor: theme.colors.background,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cancelButtonText: {
+    fontSize: theme.typography.fontSize.base,
+    color: theme.colors.text,
     fontWeight: theme.typography.fontWeight.semibold,
   },
   completenessCard: {
