@@ -10,6 +10,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { EmptyState } from '@/components/EmptyState';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { formatCategoryLabel } from '@/lib/formatters';
+import { TabScreenWrapper } from '@/components/TabScreenWrapper';
 
 const TOOLTIPS = {
   vehicleClass: 'The CRA uses vehicle classes to determine how much of your car\'s value you can depreciate each year for tax purposes.\n\n• Class 10: Vehicles costing $30,000 or less (before tax)\n• Class 10.1: Vehicles costing over $30,000 (before tax, capped at $30,000 for CCA)\n• Class 54: Zero-emission or electric vehicles\n\nAll vehicle classes depreciate at 30% per year using the declining balance method.',
@@ -167,11 +168,12 @@ export default function ExpensesScreen() {
   }, [halfYearRule]);
 
   return (
-    <View style={styles.container}>
-      <PageHeader
-        title="Expenses"
-        subtitle={`$${totalDeductible.toFixed(2)} deductible • ${expenses.length} tracked`}
-        rightAction={
+    <TabScreenWrapper>
+      <View style={styles.container}>
+        <PageHeader
+          title="Expenses"
+          subtitle={`$${totalDeductible.toFixed(2)} deductible • ${expenses.length} tracked`}
+          rightAction={
           activeTab === 'expenses' ? (
             <TouchableOpacity onPress={() => setShowAddModal(true)} style={styles.addButton}>
               <Plus size={22} color="#059669" strokeWidth={2.5} />
@@ -480,7 +482,8 @@ export default function ExpensesScreen() {
           </View>
         </TouchableOpacity>
       </Modal>
-    </View>
+      </View>
+    </TabScreenWrapper>
   );
 }
 

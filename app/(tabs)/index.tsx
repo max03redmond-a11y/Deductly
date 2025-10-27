@@ -9,6 +9,7 @@ import { ProfileEditForm } from '@/components/ProfileEditForm';
 import { supabase } from '@/lib/supabase';
 import { showToast } from '@/lib/toast';
 import { router } from 'expo-router';
+import { TabScreenWrapper } from '@/components/TabScreenWrapper';
 
 export default function ProfileScreen() {
   const { user, profile, signOut, refreshProfile } = useAuth();
@@ -121,7 +122,8 @@ export default function ProfileScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <TabScreenWrapper>
+      <View style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.profileHeader}>
           <View style={styles.avatarContainer}>
@@ -239,7 +241,8 @@ export default function ProfileScreen() {
           <Text style={styles.footerText}>Deductly • Version 1.0.0</Text>
         </View>
       </ScrollView>
-    </View>
+      </View>
+    </TabScreenWrapper>
   );
 }
 

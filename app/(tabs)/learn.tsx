@@ -9,6 +9,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Info, FileText, Scale, TrendingUp, Rocket } from 'lucide-react-native';
 import { theme } from '@/constants/theme';
+import { TabScreenWrapper } from '@/components/TabScreenWrapper';
 
 type TabId = 'how-it-works' | 'tracking' | 'cra-rules' | 'maximize' | 'whats-next';
 
@@ -704,7 +705,8 @@ export default function LearnScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <TabScreenWrapper>
+      <View style={styles.container}>
       <LinearGradient
         colors={[theme.colors.surface, theme.colors.primaryLight]}
         style={styles.hero}
@@ -742,7 +744,8 @@ export default function LearnScreen() {
       >
         {renderContent()}
       </ScrollView>
-    </View>
+      </View>
+    </TabScreenWrapper>
   );
 }
 

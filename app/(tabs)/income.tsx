@@ -16,6 +16,7 @@ import { EmptyState } from '@/components/EmptyState';
 import { Button } from '@/components/Button';
 import { theme } from '@/constants/theme';
 import { IncomeModal } from '@/components/IncomeModal';
+import { TabScreenWrapper } from '@/components/TabScreenWrapper';
 
 export default function IncomeScreen() {
   const { incomeEntries, loadIncomeEntries, removeIncomeEntry, loading } = useAppStore();
@@ -92,8 +93,9 @@ export default function IncomeScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <PageHeader title="Income" />
+    <TabScreenWrapper>
+      <View style={styles.container}>
+        <PageHeader title="Income" />
 
       <View style={styles.summaryContainer}>
         <Card style={styles.summaryCard}>
@@ -160,7 +162,8 @@ export default function IncomeScreen() {
           setSelectedEntry(undefined);
         }}
       />
-    </View>
+      </View>
+    </TabScreenWrapper>
   );
 }
 

@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { Car, Plus, Calendar } from 'lucide-react-native';
 import { showToast } from '@/lib/toast';
+import { TabScreenWrapper } from '@/components/TabScreenWrapper';
 
 interface MileageLog {
   id: string;
@@ -226,12 +227,13 @@ export default function MileageScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.flex1}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
-    >
-      <View style={styles.container}>
+    <TabScreenWrapper>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.flex1}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+      >
+        <View style={styles.container}>
         <View style={styles.header}>
         <View style={styles.headerContent}>
           <View style={styles.headerTextContainer}>
@@ -501,8 +503,9 @@ export default function MileageScreen() {
           )}
         </View>
       </ScrollView>
-      </View>
-    </KeyboardAvoidingView>
+        </View>
+      </KeyboardAvoidingView>
+    </TabScreenWrapper>
   );
 }
 

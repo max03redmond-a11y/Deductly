@@ -13,6 +13,7 @@ import { showToast } from '@/lib/toast';
 import ExportModal from '@/components/ExportModal';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { formatCategoryLabel } from '@/lib/formatters';
+import { TabScreenWrapper } from '@/components/TabScreenWrapper';
 
 const VEHICLE_EXPENSE_CODES = [
   'GAS_FUEL',
@@ -215,7 +216,8 @@ export default function DashboardScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <TabScreenWrapper>
+      <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.headerContent}>
           <View style={styles.headerTextContainer}>
@@ -579,7 +581,8 @@ export default function DashboardScreen() {
         visible={showExportModal}
         onClose={() => setShowExportModal(false)}
       />
-    </View>
+      </View>
+    </TabScreenWrapper>
   );
 }
 
