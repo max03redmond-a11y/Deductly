@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,10 @@ import {
   ActivityIndicator,
   Platform,
   Alert,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
+  InputAccessoryView,
 } from 'react-native';
 import { Check, AlertCircle, Info } from 'lucide-react-native';
 import { Profile, CANADIAN_PROVINCES } from '@/types/database';
@@ -25,6 +29,20 @@ export function ProfileEditForm({ profile, onSuccess, onChangeDetected }: Profil
   const [loading, setLoading] = useState(false);
 
   const [changeDetected, setChangeDetected] = useState(false);
+
+  const legalNameRef = useRef<TextInput>(null);
+  const businessNameRef = useRef<TextInput>(null);
+  const mainProductServiceRef = useRef<TextInput>(null);
+  const industryCodeRef = useRef<TextInput>(null);
+  const fiscalYearStartRef = useRef<TextInput>(null);
+  const fiscalYearEndRef = useRef<TextInput>(null);
+  const businessAddressLine1Ref = useRef<TextInput>(null);
+  const businessAddressLine2Ref = useRef<TextInput>(null);
+  const businessCityRef = useRef<TextInput>(null);
+  const businessProvinceRef = useRef<TextInput>(null);
+  const businessPostalCodeRef = useRef<TextInput>(null);
+
+  const inputAccessoryViewID = 'profileEditInputAccessory';
 
   const handleFieldChange = (setter: (value: any) => void, value: any) => {
     setter(value);
@@ -140,8 +158,28 @@ export function ProfileEditForm({ profile, onSuccess, onChangeDetected }: Profil
     return `${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)}`;
   };
 
+  const handleNext = (nextRef: React.RefObject<TextInput | null>) => {
+    nextRef.current?.focus();
+  };
+
+  const handleDone = () => {
+    Keyboard.dismiss();
+  };
+
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.flex1}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.flex1}>
+          <ScrollView
+            style={styles.container}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="interactive"
+          >
       <View style={styles.completenessBar}>
         <View style={styles.completenessHeader}>
           <Text style={styles.completenessTitle}>Profile Completeness</Text>
@@ -166,12 +204,16 @@ export function ProfileEditForm({ profile, onSuccess, onChangeDetected }: Profil
         <View style={styles.field}>
           <Text style={styles.label}>Legal Name *</Text>
           <TextInput
+            ref={legalNameRef}
             style={styles.input}
             value={legalName}
             onChangeText={(text) => handleFieldChange(setLegalName, text)}
             placeholder="Your full legal name"
             placeholderTextColor="#9CA3AF"
             editable={!loading}
+            returnKeyType="next"
+            onSubmitEditing={() => handleNext(businessNameRef)}
+            inputAccessoryViewID={Platform.OS === 'ios' ? inputAccessoryViewID : undefined}
           />
         </View>
       </View>
@@ -182,12 +224,16 @@ export function ProfileEditForm({ profile, onSuccess, onChangeDetected }: Profil
         <View style={styles.field}>
           <Text style={styles.label}>Business Name (Optional)</Text>
           <TextInput
+            ref={businessNameRef}
             style={styles.input}
             value={businessName}
             onChangeText={(text) => handleFieldChange(setBusinessName, text)}
             placeholder="e.g., Self-employed – Uber Driver"
             placeholderTextColor="#9CA3AF"
             editable={!loading}
+            returnKeyType="next"
+            onSubmitEditing={() => handleNext(mainProductServiceRef)}
+            inputAccessoryViewID={Platform.OS === 'ios' ? inputAccessoryViewID : undefined}
           />
           <Text style={styles.hint}>Leave blank or write "Self-employed – Uber Driver"</Text>
         </View>
@@ -195,12 +241,16 @@ export function ProfileEditForm({ profile, onSuccess, onChangeDetected }: Profil
         <View style={styles.field}>
           <Text style={styles.label}>Main Product or Service *</Text>
           <TextInput
+            ref={mainProductServiceRef}
             style={styles.input}
             value={mainProductService}
             onChangeText={(text) => handleFieldChange(setMainProductService, text)}
             placeholder="Rideshare transportation"
             placeholderTextColor="#9CA3AF"
             editable={!loading}
+            returnKeyType="next"
+            onSubmitEditing={() => handleNext(industryCodeRef)}
+            inputAccessoryViewID={Platform.OS === 'ios' ? inputAccessoryViewID : undefined}
           />
           <Text style={styles.hint}>For Uber drivers: "Rideshare transportation" or "Driving services"</Text>
         </View>
@@ -208,6 +258,7 @@ export function ProfileEditForm({ profile, onSuccess, onChangeDetected }: Profil
         <View style={styles.field}>
           <Text style={styles.label}>Industry Code (Guide T4002) *</Text>
           <TextInput
+            ref={industryCodeRef}
             style={styles.input}
             value={industryCode}
             onChangeText={(text) => handleFieldChange(setIndustryCode, text)}
@@ -216,6 +267,9 @@ export function ProfileEditForm({ profile, onSuccess, onChangeDetected }: Profil
             keyboardType="number-pad"
             maxLength={6}
             editable={!loading}
+            returnKeyType="next"
+            onSubmitEditing={() => handleNext(fiscalYearStartRef)}
+            inputAccessoryViewID={Platform.OS === 'ios' ? inputAccessoryViewID : undefined}
           />
           <Text style={styles.hint}>Use 485310 – Taxi service (CRA code for rideshare drivers)</Text>
         </View>
@@ -288,24 +342,32 @@ export function ProfileEditForm({ profile, onSuccess, onChangeDetected }: Profil
           <View style={[styles.field, styles.fieldHalf]}>
             <Text style={styles.label}>Fiscal Year Start *</Text>
             <TextInput
+              ref={fiscalYearStartRef}
               style={styles.input}
               value={fiscalYearStart}
               onChangeText={setFiscalYearStart}
               placeholder="2025-01-01"
               placeholderTextColor="#9CA3AF"
               editable={!loading}
+              returnKeyType="next"
+              onSubmitEditing={() => handleNext(fiscalYearEndRef)}
+              inputAccessoryViewID={Platform.OS === 'ios' ? inputAccessoryViewID : undefined}
             />
           </View>
 
           <View style={[styles.field, styles.fieldHalf]}>
             <Text style={styles.label}>Fiscal Year End *</Text>
             <TextInput
+              ref={fiscalYearEndRef}
               style={styles.input}
               value={fiscalYearEnd}
               onChangeText={setFiscalYearEnd}
               placeholder="2025-12-31"
               placeholderTextColor="#9CA3AF"
               editable={!loading}
+              returnKeyType="next"
+              onSubmitEditing={() => handleNext(businessAddressLine1Ref)}
+              inputAccessoryViewID={Platform.OS === 'ios' ? inputAccessoryViewID : undefined}
             />
           </View>
         </View>
@@ -321,24 +383,32 @@ export function ProfileEditForm({ profile, onSuccess, onChangeDetected }: Profil
         <View style={styles.field}>
           <Text style={styles.label}>Street Address *</Text>
           <TextInput
+            ref={businessAddressLine1Ref}
             style={styles.input}
             value={businessAddressLine1}
             onChangeText={(text) => handleFieldChange(setBusinessAddressLine1, text)}
             placeholder="123 Main Street"
             placeholderTextColor="#9CA3AF"
             editable={!loading}
+            returnKeyType="next"
+            onSubmitEditing={() => handleNext(businessAddressLine2Ref)}
+            inputAccessoryViewID={Platform.OS === 'ios' ? inputAccessoryViewID : undefined}
           />
         </View>
 
         <View style={styles.field}>
           <Text style={styles.label}>Suite/Unit (Optional)</Text>
           <TextInput
+            ref={businessAddressLine2Ref}
             style={styles.input}
             value={businessAddressLine2}
             onChangeText={setBusinessAddressLine2}
             placeholder="Suite 100"
             placeholderTextColor="#9CA3AF"
             editable={!loading}
+            returnKeyType="next"
+            onSubmitEditing={() => handleNext(businessCityRef)}
+            inputAccessoryViewID={Platform.OS === 'ios' ? inputAccessoryViewID : undefined}
           />
         </View>
 
@@ -346,18 +416,23 @@ export function ProfileEditForm({ profile, onSuccess, onChangeDetected }: Profil
           <View style={[styles.field, styles.fieldHalf]}>
             <Text style={styles.label}>City *</Text>
             <TextInput
+              ref={businessCityRef}
               style={styles.input}
               value={businessCity}
               onChangeText={setBusinessCity}
               placeholder="Toronto"
               placeholderTextColor="#9CA3AF"
               editable={!loading}
+              returnKeyType="next"
+              onSubmitEditing={() => handleNext(businessProvinceRef)}
+              inputAccessoryViewID={Platform.OS === 'ios' ? inputAccessoryViewID : undefined}
             />
           </View>
 
           <View style={[styles.field, styles.fieldHalf]}>
             <Text style={styles.label}>Province *</Text>
             <TextInput
+              ref={businessProvinceRef}
               style={styles.input}
               value={businessProvince}
               onChangeText={(text) => setBusinessProvince(text.toUpperCase())}
@@ -366,6 +441,9 @@ export function ProfileEditForm({ profile, onSuccess, onChangeDetected }: Profil
               autoCapitalize="characters"
               maxLength={2}
               editable={!loading}
+              returnKeyType="next"
+              onSubmitEditing={() => handleNext(businessPostalCodeRef)}
+              inputAccessoryViewID={Platform.OS === 'ios' ? inputAccessoryViewID : undefined}
             />
           </View>
         </View>
@@ -373,6 +451,7 @@ export function ProfileEditForm({ profile, onSuccess, onChangeDetected }: Profil
         <View style={styles.field}>
           <Text style={styles.label}>Postal Code *</Text>
           <TextInput
+            ref={businessPostalCodeRef}
             style={styles.input}
             value={businessPostalCode}
             onChangeText={(text) => setBusinessPostalCode(formatPostalCode(text))}
@@ -381,6 +460,9 @@ export function ProfileEditForm({ profile, onSuccess, onChangeDetected }: Profil
             autoCapitalize="characters"
             maxLength={7}
             editable={!loading}
+            returnKeyType="done"
+            onSubmitEditing={handleDone}
+            inputAccessoryViewID={Platform.OS === 'ios' ? inputAccessoryViewID : undefined}
           />
         </View>
       </View>
@@ -400,7 +482,20 @@ export function ProfileEditForm({ profile, onSuccess, onChangeDetected }: Profil
       </View>
 
       <View style={styles.footer} />
-    </ScrollView>
+          </ScrollView>
+        </View>
+      </TouchableWithoutFeedback>
+
+      {Platform.OS === 'ios' && (
+        <InputAccessoryView nativeID={inputAccessoryViewID}>
+          <View style={styles.inputAccessory}>
+            <TouchableOpacity onPress={handleDone}>
+              <Text style={styles.accessoryButtonText}>Done</Text>
+            </TouchableOpacity>
+          </View>
+        </InputAccessoryView>
+      )}
+    </KeyboardAvoidingView>
   );
 }
 
@@ -594,5 +689,25 @@ const styles = StyleSheet.create({
   },
   footer: {
     height: 40,
+  },
+  flex1: {
+    flex: 1,
+  },
+  inputAccessory: {
+    backgroundColor: '#FFFFFF',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+  },
+  accessoryButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1E5128',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
 });
