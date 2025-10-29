@@ -6,7 +6,7 @@ import { CANADIAN_PROVINCES, BUSINESS_TYPES } from '@/types/database';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function ProfileSetupScreen() {
-  const { user } = useAuth();
+  const { user, refreshProfile } = useAuth();
   const [province, setProvince] = useState('');
   const [businessType, setBusinessType] = useState('');
   const [gstHstRegistered, setGstHstRegistered] = useState(false);
@@ -61,6 +61,7 @@ export default function ProfileSetupScreen() {
       return;
     }
 
+    await refreshProfile();
     setLoading(false);
     router.replace('/(tabs)');
   };
