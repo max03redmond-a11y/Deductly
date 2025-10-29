@@ -397,7 +397,7 @@ export default function DashboardScreen() {
 
             {Object.keys(vehicleExpensesByCategory).length === 0 && (
               <View style={styles.lineItem}>
-                <Text style={[styles.lineItemLabel, { fontStyle: 'italic', color: '#9CA3AF' }]}>
+                <Text style={[styles.lineItemLabel, { fontStyle: 'italic', color: '#6B7280' }]}>
                   No vehicle expenses recorded
                 </Text>
                 <Text style={styles.lineItemAmount}>$0.00</Text>
@@ -446,7 +446,7 @@ export default function DashboardScreen() {
 
             {Object.keys(operatingExpensesByCategory).length === 0 && (
               <View style={styles.lineItem}>
-                <Text style={[styles.lineItemLabel, { fontStyle: 'italic', color: '#9CA3AF' }]}>
+                <Text style={[styles.lineItemLabel, { fontStyle: 'italic', color: '#6B7280' }]}>
                   No operating expenses recorded
                 </Text>
                 <Text style={styles.lineItemAmount}>$0.00</Text>
@@ -503,7 +503,7 @@ export default function DashboardScreen() {
               </>
             ) : (
               <View style={styles.lineItem}>
-                <Text style={[styles.lineItemLabel, { fontStyle: 'italic', color: '#9CA3AF' }]}>
+                <Text style={[styles.lineItemLabel, { fontStyle: 'italic', color: '#6B7280' }]}>
                   No CCA calculated yet
                 </Text>
                 <Text style={styles.lineItemAmount}>$0.00</Text>
@@ -671,7 +671,7 @@ const styles = StyleSheet.create({
   taxCardSubtext: {
     fontSize: 11,
     fontFamily: 'Montserrat-Regular',
-    color: '#9CA3AF',
+    color: '#6B7280',
   },
   chartContainer: {
     backgroundColor: '#FFFFFF',
@@ -780,7 +780,7 @@ const styles = StyleSheet.create({
   statementPeriod: {
     fontSize: 13,
     fontFamily: 'Montserrat-Regular',
-    color: '#9CA3AF',
+    color: '#6B7280',
   },
   statementSection: {
     marginBottom: 28,
@@ -791,7 +791,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 11,
     fontFamily: 'Montserrat-SemiBold',
-    color: '#9CA3AF',
+    color: '#6B7280',
     letterSpacing: 1.2,
   },
   lineItem: {
@@ -900,7 +900,7 @@ const styles = StyleSheet.create({
   metricsSectionTitle: {
     fontSize: 11,
     fontFamily: 'Montserrat-SemiBold',
-    color: '#9CA3AF',
+    color: '#6B7280',
     letterSpacing: 1.2,
     marginBottom: 16,
     paddingHorizontal: 0,
@@ -922,7 +922,7 @@ const styles = StyleSheet.create({
   metricLabel: {
     fontSize: 12,
     fontFamily: 'Montserrat-Medium',
-    color: '#9CA3AF',
+    color: '#6B7280',
     marginBottom: 8,
   },
   metricValue: {
@@ -934,7 +934,7 @@ const styles = StyleSheet.create({
   metricSubtext: {
     fontSize: 11,
     fontFamily: 'Montserrat-Regular',
-    color: '#D1D5DB',
+    color: '#6B7280',
   },
   exportSection: {
     backgroundColor: '#FFFFFF',

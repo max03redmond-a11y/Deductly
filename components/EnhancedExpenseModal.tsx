@@ -240,7 +240,7 @@ export function EnhancedExpenseModal({
                     value={date}
                     onChangeText={setDate}
                     placeholder="YYYY-MM-DD"
-                    placeholderTextColor="#9CA3AF"
+                    placeholderTextColor="#6B7280"
                     editable={!loading}
                     returnKeyType="next"
                     onSubmitEditing={() => handleNext(vendorInputRef)}
@@ -258,7 +258,7 @@ export function EnhancedExpenseModal({
                     value={vendor}
                     onChangeText={setVendor}
                     placeholder="e.g., Esso, Canadian Tire"
-                    placeholderTextColor="#9CA3AF"
+                    placeholderTextColor="#6B7280"
                     editable={!loading}
                     autoCapitalize="words"
                     returnKeyType="next"
@@ -284,7 +284,7 @@ export function EnhancedExpenseModal({
                       value={amountBeforeTax}
                       onChangeText={setAmountBeforeTax}
                       placeholder="0.00"
-                      placeholderTextColor="#9CA3AF"
+                      placeholderTextColor="#6B7280"
                       keyboardType="decimal-pad"
                       editable={!loading}
                       textAlign="right"
@@ -306,7 +306,7 @@ export function EnhancedExpenseModal({
                       value={taxAmount}
                       onChangeText={setTaxAmount}
                       placeholder="0.00"
-                      placeholderTextColor="#9CA3AF"
+                      placeholderTextColor="#6B7280"
                       keyboardType="decimal-pad"
                       editable={!loading}
                       textAlign="right"
@@ -388,7 +388,7 @@ export function EnhancedExpenseModal({
                       value={businessPercentage}
                       onChangeText={setBusinessPercentage}
                       placeholder="0"
-                      placeholderTextColor="#9CA3AF"
+                      placeholderTextColor="#6B7280"
                       keyboardType="decimal-pad"
                       editable={!loading}
                       returnKeyType="next"
@@ -436,7 +436,7 @@ export function EnhancedExpenseModal({
                 value={notes}
                 onChangeText={setNotes}
                 placeholder="Add any additional details..."
-                placeholderTextColor="#9CA3AF"
+                placeholderTextColor="#6B7280"
                 multiline
                 numberOfLines={3}
                 editable={!loading}
@@ -625,7 +625,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 14,
-    color: '#9CA3AF',
+    color: '#6B7280',
   },
   autoCalculatedCard: {
     backgroundColor: '#EFF6FF',

@@ -19,16 +19,16 @@ export const colors = {
   surface: '#FFFFFF',           // Pure white for cards
   surfaceHover: '#F5F5F5',      // Subtle hover state
 
-  // Text
-  text: '#222222',              // Charcoal for titles
-  textSecondary: '#555555',     // Grey for body text
-  textTertiary: '#888888',      // Light grey for captions
-  textDisabled: '#BBBBBB',      // Disabled text
+  // Text - WCAG AA Compliant (≥4.5:1 contrast ratio)
+  text: '#222222',              // Charcoal for titles (15.91:1)
+  textSecondary: '#555555',     // Grey for body text (7.46:1)
+  textTertiary: '#707070',      // Light grey for captions (4.95:1) - Previously #888888
+  textDisabled: '#BBBBBB',      // Disabled text (decorative only)
 
-  // Icons
-  icon: '#888888',              // Neutral grey icons
+  // Icons - WCAG AA Compliant
+  icon: '#707070',              // Neutral grey icons (4.95:1) - Previously #888888
   iconActive: '#A8E6CF',        // Active icon (green)
-  iconInactive: '#CCCCCC',      // Inactive tab icons
+  iconInactive: '#757575',      // Inactive tab icons (4.61:1) - Previously #CCCCCC
 
   // Utility Colors
   success: '#A8E6CF',           // Success (same as primary)

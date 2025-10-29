@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
   stepIndicator: {
     fontSize: 13,
     fontFamily: 'Montserrat-Medium',
-    color: '#9CA3AF',
+    color: '#6B7280',
     marginBottom: 12,
   },
   title: {
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
   helpText: {
     fontSize: 14,
     fontFamily: 'Montserrat-Regular',
-    color: '#9CA3AF',
+    color: '#6B7280',
     marginTop: 8,
   },
   optionsList: {
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     color: '#6B7280',
   },
   optionDescriptionSelected: {
-    color: '#D1D5DB',
+    color: '#6B7280',
   },
   checkmark: {
     width: 32,

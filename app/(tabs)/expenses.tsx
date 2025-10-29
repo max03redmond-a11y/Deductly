@@ -349,7 +349,7 @@ export default function ExpensesScreen() {
                   onChangeText={setPurchasePrice}
                   placeholder="0.00"
                   keyboardType="decimal-pad"
-                  placeholderTextColor="#9CA3AF"
+                  placeholderTextColor="#6B7280"
                 />
               </View>
             </View>
@@ -369,7 +369,7 @@ export default function ExpensesScreen() {
                   onChangeText={setOpeningUCC}
                   placeholder="0.00"
                   keyboardType="decimal-pad"
-                  placeholderTextColor="#9CA3AF"
+                  placeholderTextColor="#6B7280"
                 />
               </View>
             </View>
@@ -386,7 +386,7 @@ export default function ExpensesScreen() {
                   style={styles.input}
                   value={`${getCCARate(vehicleClass)}%`}
                   editable={false}
-                  placeholderTextColor="#9CA3AF"
+                  placeholderTextColor="#6B7280"
                 />
               </View>
             </View>
@@ -406,7 +406,7 @@ export default function ExpensesScreen() {
                   onChangeText={setSalePrice}
                   placeholder="0.00"
                   keyboardType="decimal-pad"
-                  placeholderTextColor="#9CA3AF"
+                  placeholderTextColor="#6B7280"
                 />
               </View>
             </View>
@@ -424,7 +424,7 @@ export default function ExpensesScreen() {
                 onChangeText={setYearPurchased}
                 placeholder={new Date().getFullYear().toString()}
                 keyboardType="number-pad"
-                placeholderTextColor="#9CA3AF"
+                placeholderTextColor="#6B7280"
               />
             </View>
 
@@ -718,7 +718,7 @@ const styles = StyleSheet.create({
   categoryPercentage: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#9CA3AF',
+    color: '#6B7280',
   },
   categoryAmount: {
     fontSize: 16,
@@ -780,7 +780,7 @@ const styles = StyleSheet.create({
   },
   expenseDate: {
     fontSize: 10,
-    color: '#9CA3AF',
+    color: '#6B7280',
   },
   deductibleBadge: {
     backgroundColor: '#D1FAE5',

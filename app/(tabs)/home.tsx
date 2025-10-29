@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
   },
   expenseDate: {
     fontSize: 10,
-    color: '#9CA3AF',
+    color: '#6B7280',
   },
   deductibleBadge: {
     backgroundColor: '#D1FAE5',

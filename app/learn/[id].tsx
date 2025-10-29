@@ -320,11 +320,11 @@ const styles = StyleSheet.create({
     color: '#6B7280',
   },
   metaTextDark: {
-    color: '#9CA3AF',
+    color: '#6B7280',
   },
   metaDot: {
     fontSize: 13,
-    color: '#D1D5DB',
+    color: '#6B7280',
   },
   metaDotDark: {
     color: '#6B7280',
@@ -351,6 +351,6 @@ const styles = StyleSheet.create({
     marginTop: 100,
   },
   errorTextDark: {
-    color: '#9CA3AF',
+    color: '#6B7280',
   },
 });

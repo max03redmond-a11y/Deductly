@@ -209,7 +209,7 @@ export function ProfileEditForm({ profile, onSuccess, onChangeDetected }: Profil
             value={legalName}
             onChangeText={(text) => handleFieldChange(setLegalName, text)}
             placeholder="Your full legal name"
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor="#6B7280"
             editable={!loading}
             returnKeyType="next"
             onSubmitEditing={() => handleNext(businessNameRef)}
@@ -229,7 +229,7 @@ export function ProfileEditForm({ profile, onSuccess, onChangeDetected }: Profil
             value={businessName}
             onChangeText={(text) => handleFieldChange(setBusinessName, text)}
             placeholder="e.g., Self-employed – Uber Driver"
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor="#6B7280"
             editable={!loading}
             returnKeyType="next"
             onSubmitEditing={() => handleNext(mainProductServiceRef)}
@@ -246,7 +246,7 @@ export function ProfileEditForm({ profile, onSuccess, onChangeDetected }: Profil
             value={mainProductService}
             onChangeText={(text) => handleFieldChange(setMainProductService, text)}
             placeholder="Rideshare transportation"
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor="#6B7280"
             editable={!loading}
             returnKeyType="next"
             onSubmitEditing={() => handleNext(industryCodeRef)}
@@ -263,7 +263,7 @@ export function ProfileEditForm({ profile, onSuccess, onChangeDetected }: Profil
             value={industryCode}
             onChangeText={(text) => handleFieldChange(setIndustryCode, text)}
             placeholder="485310"
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor="#6B7280"
             keyboardType="number-pad"
             maxLength={6}
             editable={!loading}
@@ -347,7 +347,7 @@ export function ProfileEditForm({ profile, onSuccess, onChangeDetected }: Profil
               value={fiscalYearStart}
               onChangeText={setFiscalYearStart}
               placeholder="2025-01-01"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor="#6B7280"
               editable={!loading}
               returnKeyType="next"
               onSubmitEditing={() => handleNext(fiscalYearEndRef)}
@@ -363,7 +363,7 @@ export function ProfileEditForm({ profile, onSuccess, onChangeDetected }: Profil
               value={fiscalYearEnd}
               onChangeText={setFiscalYearEnd}
               placeholder="2025-12-31"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor="#6B7280"
               editable={!loading}
               returnKeyType="next"
               onSubmitEditing={() => handleNext(businessAddressLine1Ref)}
@@ -388,7 +388,7 @@ export function ProfileEditForm({ profile, onSuccess, onChangeDetected }: Profil
             value={businessAddressLine1}
             onChangeText={(text) => handleFieldChange(setBusinessAddressLine1, text)}
             placeholder="123 Main Street"
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor="#6B7280"
             editable={!loading}
             returnKeyType="next"
             onSubmitEditing={() => handleNext(businessAddressLine2Ref)}
@@ -404,7 +404,7 @@ export function ProfileEditForm({ profile, onSuccess, onChangeDetected }: Profil
             value={businessAddressLine2}
             onChangeText={setBusinessAddressLine2}
             placeholder="Suite 100"
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor="#6B7280"
             editable={!loading}
             returnKeyType="next"
             onSubmitEditing={() => handleNext(businessCityRef)}
@@ -421,7 +421,7 @@ export function ProfileEditForm({ profile, onSuccess, onChangeDetected }: Profil
               value={businessCity}
               onChangeText={setBusinessCity}
               placeholder="Toronto"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor="#6B7280"
               editable={!loading}
               returnKeyType="next"
               onSubmitEditing={() => handleNext(businessProvinceRef)}
@@ -437,7 +437,7 @@ export function ProfileEditForm({ profile, onSuccess, onChangeDetected }: Profil
               value={businessProvince}
               onChangeText={(text) => setBusinessProvince(text.toUpperCase())}
               placeholder="ON"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor="#6B7280"
               autoCapitalize="characters"
               maxLength={2}
               editable={!loading}
@@ -456,7 +456,7 @@ export function ProfileEditForm({ profile, onSuccess, onChangeDetected }: Profil
             value={businessPostalCode}
             onChangeText={(text) => setBusinessPostalCode(formatPostalCode(text))}
             placeholder="A1A 1A1"
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor="#6B7280"
             autoCapitalize="characters"
             maxLength={7}
             editable={!loading}
@@ -588,7 +588,7 @@ const styles = StyleSheet.create({
   },
   hint: {
     fontSize: 12,
-    color: '#9CA3AF',
+    color: '#6B7280',
     marginTop: 6,
   },
   radioGroup: {

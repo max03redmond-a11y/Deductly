@@ -293,7 +293,7 @@ function AddExpenseModal({
                 value={date}
                 onChangeText={setDate}
                 placeholder="YYYY-MM-DD"
-                placeholderTextColor="#9CA3AF"
+                placeholderTextColor="#6B7280"
                 editable={!loading}
                 testID="input-expense-date"
               />
@@ -306,7 +306,7 @@ function AddExpenseModal({
                 value={merchant}
                 onChangeText={setMerchant}
                 placeholder="Where did you spend?"
-                placeholderTextColor="#9CA3AF"
+                placeholderTextColor="#6B7280"
                 editable={!loading}
                 testID="input-expense-merchant"
               />
@@ -319,7 +319,7 @@ function AddExpenseModal({
                 value={amount}
                 onChangeText={setAmount}
                 placeholder="0.00"
-                placeholderTextColor="#9CA3AF"
+                placeholderTextColor="#6B7280"
                 keyboardType="decimal-pad"
                 editable={!loading}
                 testID="input-expense-amount"
@@ -403,7 +403,7 @@ function AddExpenseModal({
                 value={businessPercentage}
                 onChangeText={setBusinessPercentage}
                 placeholder="Custom %"
-                placeholderTextColor="#9CA3AF"
+                placeholderTextColor="#6B7280"
                 keyboardType="number-pad"
                 editable={!loading}
                 testID="input-expense-percentage"
@@ -623,7 +623,7 @@ const styles = StyleSheet.create({
   },
   expenseDate: {
     fontSize: 13,
-    color: '#9CA3AF',
+    color: '#6B7280',
   },
   expenseAmounts: {
     alignItems: 'flex-end',

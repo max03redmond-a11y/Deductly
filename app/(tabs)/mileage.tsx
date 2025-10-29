@@ -302,7 +302,7 @@ export default function MileageScreen() {
                 }}
                 keyboardType="decimal-pad"
                 placeholder="0"
-                placeholderTextColor="#9CA3AF"
+                placeholderTextColor="#6B7280"
                 editable={true}
               />
             </View>
@@ -317,7 +317,7 @@ export default function MileageScreen() {
                 }}
                 keyboardType="decimal-pad"
                 placeholder="0"
-                placeholderTextColor="#9CA3AF"
+                placeholderTextColor="#6B7280"
                 editable={true}
               />
             </View>
@@ -353,7 +353,7 @@ export default function MileageScreen() {
                 value={tripDate}
                 onChangeText={setTripDate}
                 placeholder="YYYY-MM-DD"
-                placeholderTextColor="#9CA3AF"
+                placeholderTextColor="#6B7280"
               />
             </View>
 
@@ -386,7 +386,7 @@ export default function MileageScreen() {
                       onChangeText={setStartOdo}
                       keyboardType="decimal-pad"
                       placeholder="0"
-                      placeholderTextColor="#9CA3AF"
+                      placeholderTextColor="#6B7280"
                     />
                   </View>
                   <View style={[styles.inputGroup, { flex: 1, marginLeft: 8 }]}>
@@ -397,7 +397,7 @@ export default function MileageScreen() {
                       onChangeText={setEndOdo}
                       keyboardType="decimal-pad"
                       placeholder="0"
-                      placeholderTextColor="#9CA3AF"
+                      placeholderTextColor="#6B7280"
                     />
                   </View>
                 </View>
@@ -418,7 +418,7 @@ export default function MileageScreen() {
                   onChangeText={setDistance}
                   keyboardType="decimal-pad"
                   placeholder="0"
-                  placeholderTextColor="#9CA3AF"
+                  placeholderTextColor="#6B7280"
                 />
               </View>
             )}
@@ -430,7 +430,7 @@ export default function MileageScreen() {
                 value={purpose}
                 onChangeText={setPurpose}
                 placeholder="e.g., Client meeting, Delivery"
-                placeholderTextColor="#9CA3AF"
+                placeholderTextColor="#6B7280"
               />
             </View>
 
@@ -618,7 +618,7 @@ const styles = StyleSheet.create({
   summarySource: {
     fontSize: 10,
     fontFamily: 'Montserrat-Regular',
-    color: '#9CA3AF',
+    color: '#6B7280',
     marginTop: 4,
   },
   toggleRow: {
@@ -786,7 +786,7 @@ const styles = StyleSheet.create({
   emptyStateSubtext: {
     fontSize: 14,
     fontFamily: 'Montserrat-Regular',
-    color: '#9CA3AF',
+    color: '#6B7280',
     marginTop: 4,
   },
   tripItem: {
@@ -825,12 +825,12 @@ const styles = StyleSheet.create({
   tripDistance: {
     fontSize: 12,
     fontFamily: 'Montserrat-Medium',
-    color: '#9CA3AF',
+    color: '#6B7280',
   },
   tripOdometer: {
     fontSize: 11,
     fontFamily: 'Montserrat-Regular',
-    color: '#D1D5DB',
+    color: '#6B7280',
   },
   tripFooter: {
     flexDirection: 'row',

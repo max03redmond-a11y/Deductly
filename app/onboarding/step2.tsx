@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
   stepIndicator: {
     fontSize: 13,
     fontFamily: 'Montserrat-Medium',
-    color: '#9CA3AF',
+    color: '#6B7280',
     marginBottom: 12,
   },
   title: {
