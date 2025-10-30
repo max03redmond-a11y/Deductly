@@ -5,12 +5,14 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Linking,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Info, FileText, Scale, TrendingUp, Rocket } from 'lucide-react-native';
+import { Info, FileText, Scale, TrendingUp, Rocket, ExternalLink, Shield, DollarSign, Landmark, FileCheck } from 'lucide-react-native';
 import { theme } from '@/constants/theme';
 import { TabScreenWrapper } from '@/components/TabScreenWrapper';
 
+type MainTabId = 'education' | 'resources';
 type TabId = 'how-it-works' | 'tracking' | 'cra-rules' | 'maximize' | 'whats-next';
 
 interface Tab {
@@ -29,6 +31,7 @@ const TABS: Tab[] = [
 ];
 
 export default function LearnScreen() {
+  const [mainTab, setMainTab] = useState<MainTabId>('education');
   const [activeTab, setActiveTab] = useState<TabId>('how-it-works');
 
   const renderContent = () => {
@@ -704,6 +707,104 @@ export default function LearnScreen() {
     }
   };
 
+  const renderResources = () => {
+    return (
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.content}>
+          <Text style={styles.emoji}>🔗</Text>
+          <Text style={styles.contentTitle}>Helpful Resources</Text>
+          <Text style={styles.paragraph}>
+            Explore curated resources to help you succeed as a self-employed driver.
+          </Text>
+
+          <TouchableOpacity
+            style={styles.resourceCard}
+            onPress={() => Linking.openURL('https://www.insurancehotline.com/car-insurance/rideshare/')}
+          >
+            <View style={styles.resourceIcon}>
+              <Shield size={24} color={theme.colors.primary} />
+            </View>
+            <View style={styles.resourceContent}>
+              <Text style={styles.resourceTitle}>Insurance Quotes</Text>
+              <Text style={styles.resourceDescription}>
+                Compare business-use car insurance tailored for Uber & Lyft drivers.
+              </Text>
+            </View>
+            <ExternalLink size={20} color={theme.colors.textTertiary} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.resourceCard}
+            onPress={() => Linking.openURL('https://www.wealthsimple.com/en-ca/product/tax-free-savings-account')}
+          >
+            <View style={styles.resourceIcon}>
+              <TrendingUp size={24} color={theme.colors.primary} />
+            </View>
+            <View style={styles.resourceContent}>
+              <Text style={styles.resourceTitle}>TFSA Setup (Wealthsimple)</Text>
+              <Text style={styles.resourceDescription}>
+                Start investing tax-free with your refund.
+              </Text>
+            </View>
+            <ExternalLink size={20} color={theme.colors.textTertiary} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.resourceCard}
+            onPress={() => Linking.openURL('https://www.nerdwallet.com/ca/banking/best-business-bank-accounts')}
+          >
+            <View style={styles.resourceIcon}>
+              <Landmark size={24} color={theme.colors.primary} />
+            </View>
+            <View style={styles.resourceContent}>
+              <Text style={styles.resourceTitle}>Business Bank Accounts</Text>
+              <Text style={styles.resourceDescription}>
+                Explore options to separate work and personal income.
+              </Text>
+            </View>
+            <ExternalLink size={20} color={theme.colors.textTertiary} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.resourceCard}
+            onPress={() => Linking.openURL('https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/sole-proprietorships-partnerships/business-expenses.html')}
+          >
+            <View style={styles.resourceIcon}>
+              <FileCheck size={24} color={theme.colors.primary} />
+            </View>
+            <View style={styles.resourceContent}>
+              <Text style={styles.resourceTitle}>CRA Resources</Text>
+              <Text style={styles.resourceDescription}>
+                Learn about tax deductions for self-employed drivers.
+              </Text>
+            </View>
+            <ExternalLink size={20} color={theme.colors.textTertiary} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.resourceCard}
+            onPress={() => Linking.openURL('https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses.html')}
+          >
+            <View style={styles.resourceIcon}>
+              <DollarSign size={24} color={theme.colors.primary} />
+            </View>
+            <View style={styles.resourceContent}>
+              <Text style={styles.resourceTitle}>GST/HST Registration</Text>
+              <Text style={styles.resourceDescription}>
+                Register for GST/HST and understand your obligations.
+              </Text>
+            </View>
+            <ExternalLink size={20} color={theme.colors.textTertiary} />
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    );
+  };
+
   return (
     <TabScreenWrapper>
       <View style={styles.container}>
@@ -711,39 +812,64 @@ export default function LearnScreen() {
         colors={[theme.colors.surface, theme.colors.primaryLight]}
         style={styles.hero}
       >
-        <Text style={styles.greeting}>Tax Education</Text>
-        <Text style={styles.heroTitle}>Learn</Text>
+        <Text style={styles.greeting}>Learn & Grow</Text>
+        <Text style={styles.heroTitle}>Resources</Text>
       </LinearGradient>
 
-      <View style={styles.tabBar}>
-        {TABS.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <TouchableOpacity
-              key={tab.id}
-              style={[styles.tab, isActive && styles.tabActive]}
-              onPress={() => setActiveTab(tab.id)}
-            >
-              <Icon
-                size={20}
-                color={isActive ? theme.colors.primary : theme.colors.textSecondary}
-              />
-              <Text style={[styles.tabText, isActive && styles.tabTextActive]}>
-                {tab.title}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
+      <View style={styles.mainTabBar}>
+        <TouchableOpacity
+          style={[styles.mainTab, mainTab === 'education' && styles.mainTabActive]}
+          onPress={() => setMainTab('education')}
+        >
+          <Text style={[styles.mainTabText, mainTab === 'education' && styles.mainTabTextActive]}>
+            Tax Education
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.mainTab, mainTab === 'resources' && styles.mainTabActive]}
+          onPress={() => setMainTab('resources')}
+        >
+          <Text style={[styles.mainTabText, mainTab === 'resources' && styles.mainTabTextActive]}>
+            Resources
+          </Text>
+        </TouchableOpacity>
       </View>
 
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {renderContent()}
-      </ScrollView>
+      {mainTab === 'education' && (
+        <>
+          <View style={styles.tabBar}>
+            {TABS.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <TouchableOpacity
+                  key={tab.id}
+                  style={[styles.tab, isActive && styles.tabActive]}
+                  onPress={() => setActiveTab(tab.id)}
+                >
+                  <Icon
+                    size={20}
+                    color={isActive ? theme.colors.primary : theme.colors.textSecondary}
+                  />
+                  <Text style={[styles.tabText, isActive && styles.tabTextActive]}>
+                    {tab.title}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
+          <ScrollView
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+          >
+            {renderContent()}
+          </ScrollView>
+        </>
+      )}
+
+      {mainTab === 'resources' && renderResources()}
       </View>
     </TabScreenWrapper>
   );
@@ -918,5 +1044,65 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.border,
     marginVertical: theme.spacing.lg,
     opacity: 0.3,
+  },
+  mainTabBar: {
+    flexDirection: 'row',
+    backgroundColor: theme.colors.surface,
+    paddingHorizontal: theme.spacing.base,
+    paddingVertical: theme.spacing.xs,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+    gap: theme.spacing.sm,
+  },
+  mainTab: {
+    flex: 1,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.base,
+    borderRadius: theme.borderRadius.base,
+    alignItems: 'center',
+    backgroundColor: theme.colors.background,
+  },
+  mainTabActive: {
+    backgroundColor: theme.colors.primary,
+  },
+  mainTabText: {
+    fontSize: theme.typography.fontSize.base,
+    fontWeight: theme.typography.fontWeight.semibold,
+    color: theme.colors.textSecondary,
+  },
+  mainTabTextActive: {
+    color: theme.colors.surface,
+  },
+  resourceCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.surface,
+    padding: theme.spacing.base,
+    borderRadius: theme.borderRadius.lg,
+    marginBottom: theme.spacing.base,
+    ...theme.shadows.sm,
+    gap: theme.spacing.sm,
+  },
+  resourceIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: theme.borderRadius.base,
+    backgroundColor: theme.colors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  resourceContent: {
+    flex: 1,
+  },
+  resourceTitle: {
+    fontSize: theme.typography.fontSize.base,
+    fontWeight: theme.typography.fontWeight.semibold,
+    color: theme.colors.text,
+    marginBottom: 4,
+  },
+  resourceDescription: {
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.colors.textSecondary,
+    lineHeight: 18,
   },
 });
